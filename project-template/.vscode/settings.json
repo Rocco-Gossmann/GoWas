@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.nvim": true,
+        "**/.vscode": true,
+        "**/docs": true,
+        "**/server": true,
+        "**/*.zsh": true,
+        "**/go.*": true
+    },
+    "go.buildTags": "js,wasm"
+}
