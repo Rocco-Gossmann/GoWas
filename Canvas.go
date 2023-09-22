@@ -127,7 +127,6 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
 		bmpPtr += bmpOverflowX
 
 	}
-
 }
 
 // Private Helpers
@@ -141,7 +140,7 @@ func (ec *EngineCanvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
 
 func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
 
-	ec.Mouse = <-UpdateMouse()
+	ec.Mouse = *UpdateMouse()
 
 	engine := &(*(*ec).engine)
 	if (*(*engine).Tick).Tick(engine, deltaTime) {

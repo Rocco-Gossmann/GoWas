@@ -14,12 +14,6 @@ if (WebAssembly) {
             const ctx = contexts.get(canvasid);
             switch (ev.data[0]) {
 
-                case "mouseupdate" : {
-                    const io = new Uint32Array(mouseIOState);
-                    worker.postMessage(["mousestate", io], [io.buffer]);
-                    break;
-                } break;
-
                 case "createCanvas": {
                     const canv = document.createElement("canvas");
                     canv.width = ev.data[2];
@@ -40,7 +34,8 @@ if (WebAssembly) {
                     const imgDat = new ImageData(ev.data[2], canv.width, canv.height);
                     window.requestAnimationFrame( () => { 
                         ctx.putImageData(imgDat, 0, 0);
-                        worker.postMessage(["vblankdone", canvasid]) 
+                        const io = new Uint32Array(mouseIOState);
+                        worker.postMessage(["vblankdone", canvasid, io], [io.buffer]) 
                     }); 
                 } break;
 
@@ -97,13 +92,11 @@ function handleMouseInput(canv) {
 
     canv.addEventListener("contextmenu", (ev) => {
         ev.preventDefault()
-        console.log("contextmenu")
         return ev;
     }, false)
 
     canv.addEventListener("click", (ev) => {
         ev.preventDefault()
-        console.log("click")
         return ev;
     }, false)
 

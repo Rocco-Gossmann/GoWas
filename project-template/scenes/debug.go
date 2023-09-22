@@ -9,7 +9,6 @@ import (
 )
 
 type debugScene struct {
-	player    GoWas.Point
 	playerBmp canvas.Bitmap
 }
 

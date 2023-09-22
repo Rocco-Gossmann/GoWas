@@ -12,14 +12,11 @@ type MouseState struct {
 // Holding the MouseState itself
 var mouseState = MouseState{}
 
-// Channel to responde to the other parts of the engine about the current MouseState
-var mouseStateChannel chan MouseState = make(chan MouseState)
-
 func onMouseMessage(this js.Value, args []js.Value) interface{} {
 	ev := args[0].Get("data")
-	if (ev.Type() != js.Undefined().Type()) && (ev.Get("0").String() == "mousestate") {
+	if (ev.Type() != js.Undefined().Type()) && (ev.Get("0").String() == "vblankdone") {
 
-		data := ev.Get("1")
+		data := ev.Get("2")
 		if data.Get("length").Int() != 3 {
 			js.Global().Get("console").Call("warn", "mousestate has not the required length expect 3 got", data.Get("length"))
 		}
@@ -28,7 +25,6 @@ func onMouseMessage(this js.Value, args []js.Value) interface{} {
 		mouseState.Y = uint16(data.Get("1").Int())
 		mouseState.Buttons = uint32(data.Get("2").Int())
 
-		mouseStateChannel <- mouseState
 	}
 	return nil
 }
@@ -37,11 +33,6 @@ func init() {
 	js.Global().Call("addEventListener", "message", js.FuncOf(onMouseMessage), false)
 }
 
-func UpdateMouse() chan MouseState {
-	js.Global().Call(
-		"postMessage",                // command
-		[]interface{}{"mouseupdate"}, // data
-	)
-
-	return mouseStateChannel
+func UpdateMouse() *MouseState {
+	return &mouseState
 }
