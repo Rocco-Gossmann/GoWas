@@ -7,6 +7,8 @@ type Bitmap struct {
 	MemoryBuffer  Buffer
 }
 
+const BIT_TRANSPARENCEY = 0x01000000
+
 func (b *Bitmap) Width() uint16  { return b.width }
 func (b *Bitmap) Height() uint16 { return b.height }
 func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }

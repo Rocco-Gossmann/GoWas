@@ -116,7 +116,12 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
 
 		//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
 		for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
-			(*((*ec).buffer.Memory))[caPtr] = (*((*bmp).MemoryBuffer.Memory))[bmpPtr]
+			var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & canvas.BIT_TRANSPARENCEY) >> 24
+			var transparencyinvers = transparencybit ^ 1
+
+			(*((*ec).buffer.Memory))[caPtr] =
+				(*((*ec).buffer.Memory))[caPtr]*transparencyinvers +
+					(*((*bmp).MemoryBuffer.Memory))[bmpPtr]*transparencybit
 
 			bmpPtr++ //<- move both pointers formward by one
 			caPtr++
