@@ -20,9 +20,14 @@ $(BUILDDIR)/%.html: $(BOILERPLATE)/%.html
 $(BUILDDIR)/%.js: $(BOILERPLATE)/%.js
 	cp $^ $@ 
 
+setup: go.sum
+	@echo "setup done"
 
-
+go.sum: go.mod
+	GOPRIVATE="github.com/rocco-gossmann" go mod tidy
+	
 .phony: run stop dev clean remake $(BUILDDIR)/
+
 
 run:
 	./startserver.zsh
@@ -42,3 +47,4 @@ $(BUILDDIR)/:
 
 clean:
 	rm -rf $(BUILDDIR) 
+
