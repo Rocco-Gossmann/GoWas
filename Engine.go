@@ -15,6 +15,8 @@ type Engine struct {
 	Unload *Unloadable
 
 	Run func(scene any)
+
+	Canvas func() *EngineCanvas
 }
 
 var engineActive *Engine = nil
@@ -27,6 +29,8 @@ func Init(setup EngineSetup) *Engine {
 
 	engine := Engine{}
 	engine.canvas = CreateCanvas(&engine, setup.WindowWidth, setup.WindowHeight)
+	engine.Canvas = func() *EngineCanvas { return engine.canvas }
+
 	engineActive = &engine
 
 	engine.Run = func(scene any) {
@@ -41,8 +45,8 @@ func (e *Engine) switchScene(scene any) {
 	if scene != nil {
 		hasInterface := false
 
-		if l, ok := interface{}(scene).(*Loadable); ok {
-			(*l).Load(e)
+		if l, ok := interface{}(scene).(Loadable); ok {
+			l.Load(e)
 		}
 
 		if t, ok := interface{}(scene).(Tickable); ok {

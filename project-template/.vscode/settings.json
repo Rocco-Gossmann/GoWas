@@ -7,11 +7,10 @@
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
         "**/.nvim": true,
-        "**/.vscode": true,
         "**/docs": true,
         "**/server": true,
         "**/*.zsh": true,
-        "**/go.*": true
+        "**/go.sum": true,
     },
     "go.buildTags": "js,wasm"
 }
