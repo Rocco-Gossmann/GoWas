@@ -9,7 +9,7 @@ import (
 )
 
 type debugScene struct {
-	playerBmp canvas.Bitmap
+	cursorBMP canvas.Bitmap
 }
 
 //func (s debugScene) Tick(e *GoWas.Engine, dt float64) bool {
@@ -26,10 +26,10 @@ func (s debugScene) Draw(e *GoWas.Engine, ca *GoWas.EngineCanvas) {
 	ca.FillColorA(0x00333333, 0x10)
 	mouse := ca.Mouse
 	if mouse.X > 0 || mouse.Y > 0 {
-		ca.BlitBitmap(&(s.playerBmp), int32(mouse.X), int32(mouse.Y))
+		ca.BlitBitmap(&(s.cursorBMP), int32(mouse.X), int32(mouse.Y))
 	}
 }
 
 var Debug = debugScene{
-	playerBmp: bmps.PlayerBMP,
+	cursorBMP: bmps.CursorBMP,
 }
