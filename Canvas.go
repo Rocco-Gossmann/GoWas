@@ -3,7 +3,28 @@ package GoWas
 import (
 	"github.com/rocco-gossmann/GoWas/canvas"
 	"github.com/rocco-gossmann/go_wasmcanvas"
-	canvasfragments "github.com/rocco-gossmann/go_wasmcanvas/canvas_fragments"
+)
+
+type CanvasFlag byte
+type CanvasCollisionLayers byte
+
+const (
+	// 0x01 is reserved by the Bitmaps Transparency
+
+	CANV_BACK  CanvasFlag = 0x00 // <- does nothing, is just here for completion purposes
+	CANV_FRONT CanvasFlag = 0x02 // <- When set on The canvas, A pixel, this pixel can never be overdrawn
+
+	// Collisiion Layers These layers are processed when a sprite is drawn
+	// The Blit function will return a byte that contains all collision layers, that
+	// already contained pixels, during drawing
+	// [!NOTICE] regalrdless of BMP_TRANSPARENCY or BMP_FRONT this bits are always processed
+	CANV_CL_1 CanvasCollisionLayers = 0x04
+	CANV_CL_2 CanvasCollisionLayers = 0x08
+	CANV_CL_3 CanvasCollisionLayers = 0x10
+	CANV_CL_4 CanvasCollisionLayers = 0x20
+
+	CANV_CL_NONE CanvasCollisionLayers = 0
+	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
 )
 
 type EngineCanvas struct {
@@ -43,18 +64,20 @@ func (ec *EngineCanvas) Run() {
 
 // Drawing Functions
 // ==============================================================================
-func (ec *EngineCanvas) FillRGBA(r, g, b, a byte) {
-	if a > 0 {
-		fill.Color = go_wasmcanvas.CombineRGB(r, g, b)
-		fill.Alpha = a
-		ec.wasmcanvas.Draw(&fill)
+func (ec *EngineCanvas) FillRGBA(r, g, b, alpha byte, layerReset CanvasCollisionLayers) {
+	if alpha > 0 {
+		fillJob.Color = uint32(go_wasmcanvas.CombineRGB(r, g, b))
+		fillJob.Alpha = alpha
+		fillJob.layers = layerReset
+		ec.wasmcanvas.Draw(&fillJob)
 	}
 }
-func (ec *EngineCanvas) FillColorA(color uint32, a byte) {
-	if a > 0 {
-		fill.Color = go_wasmcanvas.Color(color)
-		fill.Alpha = a
-		ec.wasmcanvas.Draw(&fill)
+func (ec *EngineCanvas) FillColorA(color uint32, alpha byte, layerReset CanvasCollisionLayers) {
+	if alpha > 0 {
+		fillJob.Color = color
+		fillJob.Alpha = alpha
+		fillJob.layers = layerReset
+		ec.wasmcanvas.Draw(&fillJob)
 	}
 }
 func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
@@ -116,8 +139,8 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
 
 		//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
 		for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
-			var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & canvas.BIT_TRANSPARENCEY) >> 24
-			var transparencyinvers = transparencybit ^ 1
+			var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(canvas.BMP_TRANSPARENCEY)) >> 24
+			var transparencyinvers = (transparencybit ^ 1)
 
 			(*((*ec).buffer.Memory))[caPtr] =
 				(*((*ec).buffer.Memory))[caPtr]*transparencyinvers +
@@ -130,13 +153,11 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
 
 		caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
 		bmpPtr += bmpOverflowX
-
 	}
 }
 
 // Private Helpers
 // ==============================================================================
-var fill = canvasfragments.Fill{}
 
 func (ec *EngineCanvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
 	(*ec).buffer.Memory = px
@@ -157,4 +178,35 @@ func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) g
 	}
 
 	return (*ec).canvasTick
+}
+
+type sFillJob struct {
+	layers CanvasCollisionLayers
+	Color  uint32
+	Alpha  byte
+}
+
+var fillJob = sFillJob{}
+
+func (f *sFillJob) Draw(pc uint32, _ uint16, _ uint16, pxs *[]uint32) {
+
+	if f.Alpha == 0 {
+		return
+	}
+	var resetMask = ^(uint32(byte(f.layers)|byte(CANV_FRONT)) << 24)
+	var resetcolor = (f.Color & 0x00ffffff)
+	if f.Alpha == 0xff {
+		for i := uint32(0); i < pc; i++ {
+			(*pxs)[i] = (((*pxs)[i] & 0xff000000) | resetcolor) & resetMask
+		}
+
+	} else {
+		factor := float64(f.Alpha) / 255.0
+		for i := uint32(0); i < pc; i++ {
+			resetPixel := (*pxs)[i]
+			go_wasmcanvas.BlendPixel(&resetPixel, resetcolor, factor)
+			(*pxs)[i] = (((*pxs)[i] & 0xff000000) | resetPixel) & resetMask
+		}
+	}
+
 }

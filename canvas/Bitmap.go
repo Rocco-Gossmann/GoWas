@@ -7,7 +7,16 @@ type Bitmap struct {
 	MemoryBuffer  Buffer
 }
 
-const BIT_TRANSPARENCEY = 0x01000000
+type BitmapFlag uint32
+
+const (
+	BMP_TRANSPARENCEY = 0x01000000 // Set on the Bitmap itself. A Pixel can either be drawn or not, their is no true Alpha channel
+
+	// ColorChannels of a BMP
+	BMP_CHANNEL_RED   = 0x00ff0000
+	BMP_CHANNEL_GREEN = 0x0000ff00
+	BMP_CHANNEL_BLUE  = 0x000000ff
+)
 
 func (b *Bitmap) Width() uint16  { return b.width }
 func (b *Bitmap) Height() uint16 { return b.height }
