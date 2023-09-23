@@ -26,7 +26,7 @@ func (s debugScene) Draw(e *GoWas.Engine, ca *GoWas.EngineCanvas) {
 	ca.FillColorA(0x00333333, 0x10, GoWas.CANV_CL_ALL)
 	mouse := ca.Mouse
 	if mouse.X > 0 || mouse.Y > 0 {
-		ca.BlitBitmap(&(s.cursorBMP), int32(mouse.X), int32(mouse.Y))
+		ca.BlitBitmap(&(s.cursorBMP), int32(mouse.X), int32(mouse.Y), 0xff, GoWas.CANV_CL_NONE)
 	}
 }
 

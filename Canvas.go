@@ -5,23 +5,20 @@ import (
 	"github.com/rocco-gossmann/go_wasmcanvas"
 )
 
-type CanvasFlag byte
-type CanvasCollisionLayers byte
+type CanvasFlag uint32
+type CanvasCollisionLayers uint32
 
 const (
-	// 0x01 is reserved by the Bitmaps Transparency
-
-	CANV_BACK  CanvasFlag = 0x00 // <- does nothing, is just here for completion purposes
-	CANV_FRONT CanvasFlag = 0x02 // <- When set on The canvas, A pixel, this pixel can never be overdrawn
-
 	// Collisiion Layers These layers are processed when a sprite is drawn
 	// The Blit function will return a byte that contains all collision layers, that
 	// already contained pixels, during drawing
 	// [!NOTICE] regalrdless of BMP_TRANSPARENCY or BMP_FRONT this bits are always processed
-	CANV_CL_1 CanvasCollisionLayers = 0x04
-	CANV_CL_2 CanvasCollisionLayers = 0x08
-	CANV_CL_3 CanvasCollisionLayers = 0x10
-	CANV_CL_4 CanvasCollisionLayers = 0x20
+	CANV_CL_1 CanvasCollisionLayers = 0x01000000
+	CANV_CL_2 CanvasCollisionLayers = 0x02000000
+	CANV_CL_3 CanvasCollisionLayers = 0x04000000
+	CANV_CL_4 CanvasCollisionLayers = 0x08000000
+
+	//Bits 0x10000000 to 0x80000000 are reserved for now
 
 	CANV_CL_NONE CanvasCollisionLayers = 0
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
@@ -80,7 +77,7 @@ func (ec *EngineCanvas) FillColorA(color uint32, alpha byte, layerReset CanvasCo
 		ec.wasmcanvas.Draw(&fillJob)
 	}
 }
-func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
+func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers) CanvasCollisionLayers {
 
 	cw, ch := int32(ec.wasmcanvas.Width()), int32(ec.wasmcanvas.Height())
 	bw, bh, bppl, pl := int32(bmp.Width()), int32(bmp.Height()), int32(bmp.PPL()), int(bmp.Pixels())
@@ -108,7 +105,7 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
 	// Check if any pixel is still on the canavs
 	if (bmpOffsetX >= bw) || (bmpOffsetY >= bh) || (x >= cw) || (y >= ch) {
 		//fmt.Println("bmp not on screen: ", (bmpOffsetX >= bw), (bmpOffsetY >= bh), (x >= cw), (y <= ch))
-		return
+		return 0
 	}
 	//fmt.Println("bmp on screen")
 
@@ -134,26 +131,97 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32) {
 		caPtr  = y*cw + x
 	)
 
-	// Start to walk
-	for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
+	var outbyte CanvasCollisionLayers = CANV_CL_NONE
 
-		//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
-		for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
-			var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(canvas.BMP_TRANSPARENCEY)) >> 24
-			var transparencyinvers = (transparencybit ^ 1)
+	if alpha == 0x00 {
+		// Only process meta data
+		//================================================================================
+		for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
 
-			(*((*ec).buffer.Memory))[caPtr] =
-				(*((*ec).buffer.Memory))[caPtr]*transparencyinvers +
+			//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
+			for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
+
+				// Only modify pixels Meta data
+				var cpx = (*((*ec).buffer.Memory))[caPtr]
+				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
+				cpx |= uint32(layers) * (cpx & uint32(CANV_CL_ALL) >> 24)
+				(*((*ec).buffer.Memory))[caPtr] = cpx
+
+				bmpPtr++ //<- move both pointers formward by one
+				caPtr++
+				//fmt.Println("drawn pixel", bmpPtr, caPtr)
+			}
+
+			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
+			bmpPtr += bmpOverflowX
+		}
+	} else if alpha == 0xff {
+		// Draw Full Pixel + Meta Data
+		//================================================================================
+		for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
+
+			//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
+			for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
+
+				var cpx = (*((*ec).buffer.Memory))[caPtr]
+				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
+
+				var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(canvas.BMP_OPAQUE)) >> 24
+				cpx |= uint32(layers) * transparencybit
+				var transparencyinvers = (transparencybit ^ 1)
+
+				var px = cpx*transparencyinvers +
 					(*((*bmp).MemoryBuffer.Memory))[bmpPtr]*transparencybit
 
-			bmpPtr++ //<- move both pointers formward by one
-			caPtr++
-			//fmt.Println("drawn pixel", bmpPtr, caPtr)
+				(*((*ec).buffer.Memory))[caPtr] = px
+
+				bmpPtr++ //<- move both pointers formward by one
+				caPtr++
+				//fmt.Println("drawn pixel", bmpPtr, caPtr)
+			}
+
+			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
+			bmpPtr += bmpOverflowX
+		}
+	} else {
+		// Blend Pixel + Meta Data
+		//================================================================================
+		factor := float64(alpha) / 255.0
+
+		for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
+
+			//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
+			for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
+
+				var cpx = (*((*ec).buffer.Memory))[caPtr]
+
+				opaque := ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & canvas.BMP_OPAQUE) >> 24
+
+				// Mixel Meta
+				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
+
+				go_wasmcanvas.BlendPixel(
+					&cpx,
+					(*((*bmp).MemoryBuffer.Memory))[bmpPtr],
+					float64(opaque)*factor,
+				)
+
+				cpx |= uint32(layers) * opaque
+
+				(*((*ec).buffer.Memory))[caPtr] = cpx
+
+				bmpPtr++ //<- move both pointers formward by one
+				caPtr++
+				//fmt.Println("drawn pixel", bmpPtr, caPtr)
+			}
+
+			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
+			bmpPtr += bmpOverflowX
 		}
 
-		caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-		bmpPtr += bmpOverflowX
 	}
+
+	return outbyte
 }
 
 // Private Helpers
@@ -180,6 +248,8 @@ func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) g
 	return (*ec).canvasTick
 }
 
+// Fill-Jobs
+// ==============================================================================
 type sFillJob struct {
 	layers CanvasCollisionLayers
 	Color  uint32
@@ -193,7 +263,7 @@ func (f *sFillJob) Draw(pc uint32, _ uint16, _ uint16, pxs *[]uint32) {
 	if f.Alpha == 0 {
 		return
 	}
-	var resetMask = ^(uint32(byte(f.layers)|byte(CANV_FRONT)) << 24)
+	var resetMask = ^(uint32(f.layers) << 24)
 	var resetcolor = (f.Color & 0x00ffffff)
 	if f.Alpha == 0xff {
 		for i := uint32(0); i < pc; i++ {

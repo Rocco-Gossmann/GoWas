@@ -9,8 +9,8 @@ import (
 func main() {
 
 	e := GoWas.Init(GoWas.EngineSetup{
-		WindowWidth:  256,
-		WindowHeight: 192,
+		WindowWidth:  160,
+		WindowHeight: 144,
 	})
 
 	e.Run(&scenes.Debug)
