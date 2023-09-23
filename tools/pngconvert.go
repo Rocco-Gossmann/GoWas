@@ -37,8 +37,6 @@ func main() {
 
 	xs, xe, ys, ye := img.Bounds().Min.X, img.Bounds().Max.X, img.Bounds().Min.Y, img.Bounds().Max.Y
 
-	var memlength int = (xe - xs) * (ye - ys)
-
 	outfile, err := os.Create(outfilename)
 	if err != nil {
 		log.Fatalln(err)
@@ -49,8 +47,8 @@ func main() {
 
 import "github.com/rocco-gossmann/GoWas/canvas"
 
-var mem_%v = [%v]uint32 {
-`, os.Args[3], os.Args[4], memlength))
+var mem_%v = []uint32 {
+`, os.Args[3], os.Args[4]))
 
 	for y := ys; y < ye; y++ {
 		outfile.WriteString("\t")
@@ -75,7 +73,5 @@ var mem_%v = [%v]uint32 {
 	}
 	outfile.WriteString(fmt.Sprintf(`}
 
-var slice_%v = mem_%v[:]
-
-var %v = canvas.CreateBitmap(%v, &slice_%v)`, os.Args[4], os.Args[4], os.Args[4], xe-xs, os.Args[4]))
+var %v = canvas.CreateBitmap(%v, &mem_%v)`, os.Args[4], xe-xs, os.Args[4]))
 }
