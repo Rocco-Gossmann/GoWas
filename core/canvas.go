@@ -1,7 +1,7 @@
-package GoWas
+package core
 
 import (
-	"github.com/rocco-gossmann/GoWas/canvas"
+	"github.com/rocco-gossmann/GoWas/types"
 	"github.com/rocco-gossmann/go_wasmcanvas"
 )
 
@@ -26,25 +26,33 @@ const (
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4 | CANV_CL_5 | CANV_CL_6
 )
 
-type EngineCanvas struct {
+type BlitSettings struct {
+	Bmp       *Bitmap               // What to blit
+	X, Y      int32                 // Where to blit it on the screen
+	Alpha     byte                  // how strong transparency is
+	Alphazero bool                  // if true, an alpha value of 0 mean "draw nothing", otherwise 0 would mean ignore alpha
+	Layers    CanvasCollisionLayers // What collision layers the drawn object occupies
+	Clip      *types.Rect           // Clipping Rectangle to only draw a certain area of the bitmap
+}
+type Canvas struct {
 	wasmcanvas go_wasmcanvas.Canvas
 	engine     *Engine
-	buffer     canvas.Buffer
+	buffer     Buffer
 	Mouse      MouseState
 }
 
 // Constructors
 // ==============================================================================
-func CreateCanvas(e *Engine, width, height uint16) *EngineCanvas {
+func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 
 	if width == 0 || height == 0 {
 		panic("GoWas.Init(setup.WindowWidth and setup.WindowHeight) must be at least 1px")
 	}
 
-	ec := EngineCanvas{
+	ec := Canvas{
 		engine:     e,
 		wasmcanvas: go_wasmcanvas.Create(width, height),
-		buffer:     canvas.Buffer{PixelPerLine: width},
+		buffer:     Buffer{PixelPerLine: width},
 	}
 
 	return &ec
@@ -52,7 +60,7 @@ func CreateCanvas(e *Engine, width, height uint16) *EngineCanvas {
 
 // Methods
 // ==============================================================================
-func (ec *EngineCanvas) Run() {
+func (ec *Canvas) Run() {
 
 	if ec == nil {
 		panic("PANIC !!!!:  EngineCanvas is nil *runs in circles*")
@@ -63,7 +71,7 @@ func (ec *EngineCanvas) Run() {
 
 // Drawing Functions
 // ==============================================================================
-func (ec *EngineCanvas) FillRGBA(r, g, b, alpha byte, layerReset CanvasCollisionLayers) {
+func (ec *Canvas) FillRGBA(r, g, b, alpha byte, layerReset CanvasCollisionLayers) {
 	if alpha > 0 {
 		fillJob.Color = uint32(go_wasmcanvas.CombineRGB(r, g, b))
 		fillJob.Alpha = alpha
@@ -71,7 +79,7 @@ func (ec *EngineCanvas) FillRGBA(r, g, b, alpha byte, layerReset CanvasCollision
 		ec.wasmcanvas.Draw(&fillJob)
 	}
 }
-func (ec *EngineCanvas) FillColorA(color uint32, alpha byte, layerReset CanvasCollisionLayers) {
+func (ec *Canvas) FillColorA(color uint32, alpha byte, layerReset CanvasCollisionLayers) {
 	if alpha > 0 {
 		fillJob.Color = color
 		fillJob.Alpha = alpha
@@ -80,20 +88,7 @@ func (ec *EngineCanvas) FillColorA(color uint32, alpha byte, layerReset CanvasCo
 	}
 }
 
-type BlitSettings struct {
-	Bmp       *canvas.Bitmap        // What to blit
-	X, Y      int32                 // Where to blit it on the screen
-	Alpha     byte                  // how strong transparency is
-	Alphazero bool                  // if true, an alpha value of 0 mean "draw nothing", otherwise 0 would mean ignore alpha
-	Layers    CanvasCollisionLayers // What collision layers the drawn object occupies
-	Clip      *Rect                 // Clipping Rectangle to only draw a certain area of the bitmap
-}
-
-func (ec *EngineCanvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
-
-	if opts.Clip == nil {
-		opts.Clip = &Rect{0, 0, opts.Bmp.Width(), opts.Bmp.Height()}
-	}
+func (ec *Canvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
 
 	if opts.Bmp == nil {
 		panic("nothing to blit")
@@ -107,18 +102,24 @@ func (ec *EngineCanvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
 	// Set Clipping Bounderys
 	bw, bh := opts.Bmp.Width(), opts.Bmp.Height()
 
-	// If clip starts outside of BMP === no render
-	if (*opts.Clip).X >= opts.Bmp.Width() || (*opts.Clip).Y >= opts.Bmp.Height() {
-		return CANV_CL_NONE
-	}
+	if opts.Clip == nil {
+		opts.Clip = &types.Rect{0, 0, bw, bh}
 
-	// No W or H == take W and H from Bitmap
-	if (*opts.Clip).W == 0 {
-		(*opts.Clip).W = bw
-	}
+	} else {
+		// If clip starts outside of BMP === no render
+		if (*opts.Clip).X >= opts.Bmp.Width() || (*opts.Clip).Y >= opts.Bmp.Height() {
+			return CANV_CL_NONE
+		}
 
-	if (*opts.Clip).H == 0 {
-		(*opts.Clip).H = bh
+		// No W or H == take W and H from Bitmap
+		if (*opts.Clip).W == 0 {
+			(*opts.Clip).W = bw
+		}
+
+		if (*opts.Clip).H == 0 {
+			(*opts.Clip).H = bh
+		}
+
 	}
 
 	// Check right and bottom Clip for overflows
@@ -137,18 +138,18 @@ func (ec *EngineCanvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
 	return ec.blitBitmapClipped(opts.Bmp, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
 }
 
-func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers) CanvasCollisionLayers {
-	return ec.blitBitmapClipped(bmp, x, y, alpha, layers, &Rect{0, 0, bmp.Width(), bmp.Height()})
+func (ec *Canvas) BlitBitmap(bmp *Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers) CanvasCollisionLayers {
+	return ec.blitBitmapClipped(bmp, x, y, alpha, layers, &types.Rect{0, 0, bmp.Width(), bmp.Height()})
 }
 
 // Implement go_wasm_canvas
 // ==============================================================================
-func (ec *EngineCanvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
+func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
 	(*ec).buffer.Memory = px
 	(*(*(*ec).engine).Draw).Draw((*ec).engine, ec)
 }
 
-func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
+func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
 
 	ec.Mouse = *UpdateMouse()
 
@@ -157,7 +158,7 @@ func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) g
 		ec.wasmcanvas.Apply(ec.canvasDraw)
 
 	} else {
-		engine.switchScene((*(*engine).Unload).Unload(engine))
+		engine.SwitchScene((*(*engine).Unload).Unload(engine))
 
 	}
 
@@ -166,7 +167,7 @@ func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) g
 
 // Private Helpers
 // ==============================================================================
-func (ec *EngineCanvas) blitBitmapClipped(bmp *canvas.Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *Rect) CanvasCollisionLayers {
+func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
 
 	//what to draw
 	var bitmapByteOffset uint32 = uint32((*clip).X)
@@ -250,7 +251,7 @@ func (ec *EngineCanvas) blitBitmapClipped(bmp *canvas.Bitmap, x, y int32, alpha 
 				var cpx = (*((*ec).buffer.Memory))[caPtr]
 				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
 
-				var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(canvas.BMP_OPAQUE)) >> 24
+				var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(BMP_OPAQUE)) >> 24
 				cpx |= uint32(layers) * transparencybit
 				var transparencyinvers = (transparencybit ^ 1)
 
@@ -277,7 +278,7 @@ func (ec *EngineCanvas) blitBitmapClipped(bmp *canvas.Bitmap, x, y int32, alpha 
 
 				var cpx = (*((*ec).buffer.Memory))[caPtr]
 
-				opaque := ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & canvas.BMP_OPAQUE) >> 24
+				opaque := ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(BMP_OPAQUE)) >> 24
 
 				// Mixel Meta
 				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))

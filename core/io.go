@@ -1,4 +1,4 @@
-package GoWas
+package core
 
 import (
 	"syscall/js"

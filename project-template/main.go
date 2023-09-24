@@ -4,11 +4,12 @@ import (
 	"GoWasTest/scenes"
 
 	"github.com/rocco-gossmann/GoWas"
+	"github.com/rocco-gossmann/GoWas/core"
 )
 
 func main() {
 
-	e := GoWas.Init(GoWas.EngineSetup{
+	e := GoWas.Init(core.EngineSetup{
 		WindowWidth:  160,
 		WindowHeight: 144,
 	})

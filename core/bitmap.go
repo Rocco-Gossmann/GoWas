@@ -1,4 +1,4 @@
-package canvas
+package core
 
 import "fmt"
 
@@ -10,24 +10,18 @@ type Bitmap struct {
 type BitmapFlag uint32
 
 const (
-	BMP_OPAQUE = 0x01000000 // Set on the Bitmap itself. A Pixel can either be drawn or not, their is no true Alpha channel
+	BMP_OPAQUE BitmapFlag = 0x01000000 // Set on the Bitmap itself. A Pixel can either be drawn or not, their is no true Alpha channel
 
-	// ColorChannels of a BMP
-	BMP_CHANNEL_RED   = 0x00ff0000
-	BMP_CHANNEL_GREEN = 0x0000ff00
-	BMP_CHANNEL_BLUE  = 0x000000ff
+	// ColorChannels oBitmapFlag f a BMP
+	BMP_CHANNEL_RED   BitmapFlag = 0x00ff0000
+	BMP_CHANNEL_GREEN BitmapFlag = 0x0000ff00
+	BMP_CHANNEL_BLUE  BitmapFlag = 0x000000ff
 )
 
 func (b *Bitmap) Width() uint16  { return b.width }
 func (b *Bitmap) Height() uint16 { return b.height }
 func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }
 func (b *Bitmap) Pixels() int    { return len((*(*b).MemoryBuffer.Memory)) }
-
-func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) Bitmap {
-	bmp := Bitmap{}
-	bmp.Init(pixelsPerLine, pixelMemory)
-	return bmp
-}
 
 func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
 
@@ -50,4 +44,10 @@ func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
 	bmp.MemoryBuffer.Memory = pixelMemory
 	bmp.MemoryBuffer.PixelPerLine = pixelsPerLine
 
+}
+
+func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) Bitmap {
+	bmp := Bitmap{}
+	bmp.Init(pixelsPerLine, pixelMemory)
+	return bmp
 }

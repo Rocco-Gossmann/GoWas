@@ -2,15 +2,16 @@ package scenes
 
 import (
 	"GoWasProject/bmps"
+	"GoWasTest/tilesets"
 	"fmt"
 
-	"github.com/rocco-gossmann/GoWas"
-	"github.com/rocco-gossmann/GoWas/canvas"
+	"github.com/rocco-gossmann/GoWas/core"
+	"github.com/rocco-gossmann/GoWas/gfx"
 )
 
 type debugScene struct {
-	cursorBMP *canvas.Bitmap
-	fontBMP   *canvas.Bitmap
+	cursorBMP *core.Bitmap
+	tsFont    *gfx.TileSet
 }
 
 //func (s debugScene) Tick(e *GoWas.Engine, dt float64) bool {
@@ -18,26 +19,21 @@ type debugScene struct {
 //	return true
 //}
 
-func (s debugScene) Load(e *GoWas.Engine) {
+func (s debugScene) Load(e *core.Engine) {
 	fmt.Println("Debug-Scene loaded")
 
-	e.Canvas().FillColorA(0x00333333, 0xff, GoWas.CANV_CL_ALL)
+	e.Canvas().FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
 
 }
 
-func (s debugScene) Draw(e *GoWas.Engine, ca *GoWas.EngineCanvas) {
-	ca.FillColorA(0x00333333, 0x10, GoWas.CANV_CL_ALL)
+func (s debugScene) Draw(e *core.Engine, ca *core.Canvas) {
+	ca.FillColorA(0x00333333, 0x10, core.CANV_CL_ALL)
 
-	ca.Blit(&GoWas.BlitSettings{
-		Bmp:   s.fontBMP,
-		Alpha: 0x04,
-		Clip:  &GoWas.Rect{Y: 16, X: 8, W: 8, H: 8},
-	})
-	//	ca.BlitBitmap(s.fontBMP, 0, 0, 0xff, GoWas.CANV_CL_NONE)
+	s.tsFont.BlitTo(ca, 65-32, nil) // Print A
 
 	mouse := ca.Mouse
 	if mouse.X > 0 || mouse.Y > 0 {
-		ca.Blit(&GoWas.BlitSettings{
+		ca.Blit(&core.BlitSettings{
 			Bmp: s.cursorBMP,
 			X:   int32(mouse.X),
 			Y:   int32(mouse.Y),
@@ -47,5 +43,5 @@ func (s debugScene) Draw(e *GoWas.Engine, ca *GoWas.EngineCanvas) {
 
 var Debug = debugScene{
 	cursorBMP: &bmps.CursorBMP,
-	fontBMP:   &bmps.AsciiFontBMP,
+	tsFont:    &tilesets.TsFont,
 }

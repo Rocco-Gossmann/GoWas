@@ -1,6 +1,6 @@
 package bmps
 
-import "github.com/rocco-gossmann/GoWas/canvas"
+import "github.com/rocco-gossmann/GoWas/core"
 
 var memory [64]uint32
 
@@ -12,4 +12,4 @@ func init() {
 
 var memslice = memory[:]
 
-var PlayerBMP = canvas.CreateBitmap(8, &memslice)
+var PlayerBMP = core.CreateBitmap(8, &memslice)
