@@ -79,6 +79,27 @@ func (ec *EngineCanvas) FillColorA(color uint32, alpha byte, layerReset CanvasCo
 		ec.wasmcanvas.Draw(&fillJob)
 	}
 }
+
+type BlitSettings struct {
+	Bmp       *canvas.Bitmap        // What to blit
+	X, Y      int32                 // Where to blit it on the screen
+	Alpha     byte                  // how strong transparency is
+	Alphazero bool                  // if true, an alpha value of 0 mean "draw nothing", otherwise 0 would mean ignore alpha
+	Layers    CanvasCollisionLayers // What collision layers the drawn object occupies
+}
+
+func (ec *EngineCanvas) Blit(opts BlitSettings) CanvasCollisionLayers {
+	if opts.Bmp == nil {
+		panic("nothing to blit")
+	}
+
+	if opts.Alpha == 0 && !opts.Alphazero {
+		opts.Alpha = 0xff
+	}
+
+	return ec.BlitBitmap(opts.Bmp, opts.X, opts.Y, opts.Alpha, opts.Layers)
+}
+
 func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers) CanvasCollisionLayers {
 
 	cw, ch := int32(ec.wasmcanvas.Width()), int32(ec.wasmcanvas.Height())

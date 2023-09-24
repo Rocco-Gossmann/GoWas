@@ -24,6 +24,12 @@ func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }
 func (b *Bitmap) Pixels() int    { return len((*(*b).MemoryBuffer.Memory)) }
 
 func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) Bitmap {
+	bmp := Bitmap{}
+	bmp.Init(pixelsPerLine, pixelMemory)
+	return bmp
+}
+
+func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
 
 	if pixelsPerLine == 0 {
 		panic("bitmap must have at least 1 pixelPerLine")
@@ -39,12 +45,9 @@ func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) Bitmap {
 		))
 	}
 
-	bmp := Bitmap{
-		width:  pixelsPerLine,
-		height: uint16(memoryLen / int(pixelsPerLine)),
-	}
+	bmp.width = pixelsPerLine
+	bmp.height = uint16(memoryLen / int(pixelsPerLine))
 	bmp.MemoryBuffer.Memory = pixelMemory
 	bmp.MemoryBuffer.PixelPerLine = pixelsPerLine
 
-	return bmp
 }
