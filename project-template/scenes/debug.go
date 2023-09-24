@@ -28,12 +28,16 @@ func (s debugScene) Load(e *GoWas.Engine) {
 func (s debugScene) Draw(e *GoWas.Engine, ca *GoWas.EngineCanvas) {
 	ca.FillColorA(0x00333333, 0x10, GoWas.CANV_CL_ALL)
 
-	ca.Blit(GoWas.BlitSettings{Bmp: s.fontBMP})
+	ca.Blit(&GoWas.BlitSettings{
+		Bmp:   s.fontBMP,
+		Alpha: 0x04,
+		Clip:  &GoWas.Rect{Y: 16, X: 8, W: 8, H: 8},
+	})
 	//	ca.BlitBitmap(s.fontBMP, 0, 0, 0xff, GoWas.CANV_CL_NONE)
 
 	mouse := ca.Mouse
 	if mouse.X > 0 || mouse.Y > 0 {
-		ca.Blit(GoWas.BlitSettings{
+		ca.Blit(&GoWas.BlitSettings{
 			Bmp: s.cursorBMP,
 			X:   int32(mouse.X),
 			Y:   int32(mouse.Y),

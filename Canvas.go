@@ -86,83 +86,146 @@ type BlitSettings struct {
 	Alpha     byte                  // how strong transparency is
 	Alphazero bool                  // if true, an alpha value of 0 mean "draw nothing", otherwise 0 would mean ignore alpha
 	Layers    CanvasCollisionLayers // What collision layers the drawn object occupies
+	Clip      *Rect                 // Clipping Rectangle to only draw a certain area of the bitmap
 }
 
-func (ec *EngineCanvas) Blit(opts BlitSettings) CanvasCollisionLayers {
+func (ec *EngineCanvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
+
+	if opts.Clip == nil {
+		opts.Clip = &Rect{0, 0, opts.Bmp.Width(), opts.Bmp.Height()}
+	}
+
 	if opts.Bmp == nil {
 		panic("nothing to blit")
 	}
 
+	// Handle Alpha
 	if opts.Alpha == 0 && !opts.Alphazero {
 		opts.Alpha = 0xff
 	}
 
-	return ec.BlitBitmap(opts.Bmp, opts.X, opts.Y, opts.Alpha, opts.Layers)
+	// Set Clipping Bounderys
+	bw, bh := opts.Bmp.Width(), opts.Bmp.Height()
+
+	// If clip starts outside of BMP === no render
+	if (*opts.Clip).X >= opts.Bmp.Width() || (*opts.Clip).Y >= opts.Bmp.Height() {
+		return CANV_CL_NONE
+	}
+
+	// No W or H == take W and H from Bitmap
+	if (*opts.Clip).W == 0 {
+		(*opts.Clip).W = bw
+	}
+
+	if (*opts.Clip).H == 0 {
+		(*opts.Clip).H = bh
+	}
+
+	// Check right and bottom Clip for overflows
+	br, bb := (*opts.Clip).X+opts.Clip.W, (*opts.Clip).Y+opts.Clip.H
+
+	// If Clipping zone overflows right => cut overflow off
+	if br >= bw {
+		(*opts.Clip).W -= (br - bw)
+	}
+
+	// If Clipping zone overflows bottom => cut overflow off
+	if bb >= bh {
+		(*opts.Clip).H -= (bb - bh)
+	}
+
+	return ec.blitBitmapClipped(opts.Bmp, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
 }
 
 func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers) CanvasCollisionLayers {
+	return ec.blitBitmapClipped(bmp, x, y, alpha, layers, &Rect{0, 0, bmp.Width(), bmp.Height()})
+}
+
+// Implement go_wasm_canvas
+// ==============================================================================
+func (ec *EngineCanvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
+	(*ec).buffer.Memory = px
+	(*(*(*ec).engine).Draw).Draw((*ec).engine, ec)
+}
+
+func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
+
+	ec.Mouse = *UpdateMouse()
+
+	engine := &(*(*ec).engine)
+	if (*(*engine).Tick).Tick(engine, deltaTime) {
+		ec.wasmcanvas.Apply(ec.canvasDraw)
+
+	} else {
+		engine.switchScene((*(*engine).Unload).Unload(engine))
+
+	}
+
+	return (*ec).canvasTick
+}
+
+// Private Helpers
+// ==============================================================================
+func (ec *EngineCanvas) blitBitmapClipped(bmp *canvas.Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *Rect) CanvasCollisionLayers {
+
+	//what to draw
+	var bitmapByteOffset uint32 = uint32((*clip).X)
+	var bitmapIndexStart uint32 = uint32((*clip).Y)*uint32(bmp.PPL()) + uint32(bitmapByteOffset)
+	var bitmapRenderLinePixels uint32 = uint32((*clip).W)
+	bitmapByteOffset += uint32(uint32(bmp.Width()) - bitmapByteOffset - bitmapRenderLinePixels)
+
+	var bitmapRenderLines int32 = int32((*clip).H)
 
 	cw, ch := int32(ec.wasmcanvas.Width()), int32(ec.wasmcanvas.Height())
-	bw, bh, bppl, pl := int32(bmp.Width()), int32(bmp.Height()), int32(bmp.PPL()), int(bmp.Pixels())
+	bw, bh := int32((*clip).W), int32((*clip).H)
 
-	//fmt.Println("drawing: ", x, y, cw, ch, bw, bh, bppl, pl)
-
-	var bmpOffsetX, bmpOffsetY, bmpOverflowX, caOverflowX int32
-	renderPPL := bppl
+	// if the bmp-clip is to far off of one of the four canvas sides
+	// => Render nothing
+	if y+bh <= 0 || x+bw <= 0 || x >= cw || y >= ch {
+		return CANV_CL_NONE
+	}
 
 	// Trim BMP Lines from the Left
 	if x < 0 {
-		renderPPL += x
-		bmpOffsetX -= x
+		bitmapIndexStart = uint32(int32(bitmapIndexStart) - x)
+		bitmapByteOffset = uint32(int32(bitmapByteOffset) - x)
 		x = 0
 	}
 
 	// Trim BMP Lines from the Top
 	if y < 0 {
-		bmpOffsetY -= y
+		bitmapIndexStart = uint32(int32(bitmapIndexStart) - (y * int32(bmp.Width())))
+		bitmapRenderLines += y
 		y = 0
 	}
 
-	//fmt.Println("bmpOffset: ", bmpOffsetX, bmpOffsetY)
-
-	// Check if any pixel is still on the canavs
-	if (bmpOffsetX >= bw) || (bmpOffsetY >= bh) || (x >= cw) || (y >= ch) {
-		//fmt.Println("bmp not on screen: ", (bmpOffsetX >= bw), (bmpOffsetY >= bh), (x >= cw), (y <= ch))
-		return 0
-	}
-	//fmt.Println("bmp on screen")
-
-	// Trim BMP from the Right
+	// Trim BMP Lines from the Right
 	if x > cw-bw {
-		//fmt.Println("bmp trim right", cw, bw, x, cw-bw, x > cw-bw)
-		bmpOverflowX = (x + bw - cw)
-		renderPPL -= bmpOverflowX
+		bmpOverflowX := (x + bw - cw)
+		bitmapByteOffset = uint32(int32(bitmapByteOffset) + bmpOverflowX)
+		bitmapRenderLinePixels -= uint32(bmpOverflowX)
 	}
 
 	// Trim BMP from the Bottom
 	if y > ch-bh {
-		//fmt.Println("bmp trim height", ch, bh, y, ch-bh, y > ch-bh)
-		pl -= int((y + bh - ch) * bw)
+		bitmapRenderLines -= (y + bh - ch)
 	}
-
-	caOverflowX = cw - renderPPL
-	bmpOverflowX += bmpOffsetX
 
 	// Prepare Memory pointers
 	var (
-		bmpPtr = (bmpOffsetY * bppl) + bmpOffsetX
-		caPtr  = y*cw + x
+		bmpPtr      = bitmapIndexStart
+		caPtr       = y*cw + x
+		caOverflowX = cw - int32(bitmapRenderLinePixels)
 	)
 
 	var outbyte CanvasCollisionLayers = CANV_CL_NONE
 
+	//	fmt.Println(bitmapByteOffset, bitmapIndexStart, bitmapRenderLinePixels, bitmapRenderLines, "\n", cw, ch, bw, bh, "\n", bmpPtr, caPtr, caOverflowX, "\n", alpha)
 	if alpha == 0x00 {
 		// Only process meta data
 		//================================================================================
-		for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
-
-			//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
-			for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
+		for line := int32(0); line < bitmapRenderLines; line++ {
+			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
 
 				// Only modify pixels Meta data
 				var cpx = (*((*ec).buffer.Memory))[caPtr]
@@ -176,15 +239,13 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, l
 			}
 
 			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-			bmpPtr += bmpOverflowX
+			bmpPtr += uint32(bitmapByteOffset)
 		}
 	} else if alpha == 0xff {
 		// Draw Full Pixel + Meta Data
 		//================================================================================
-		for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
-
-			//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
-			for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
+		for line := int32(0); line < bitmapRenderLines; line++ {
+			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
 
 				var cpx = (*((*ec).buffer.Memory))[caPtr]
 				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
@@ -204,17 +265,15 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, l
 			}
 
 			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-			bmpPtr += bmpOverflowX
+			bmpPtr += uint32(bitmapByteOffset)
 		}
 	} else {
 		// Blend Pixel + Meta Data
 		//================================================================================
 		factor := float64(alpha) / 255.0
 
-		for int(bmpPtr) < pl { //<- until the pointer reached the area the end of the last BMP line to draw
-
-			//fmt.Println("Draw Line", bmpPtr, caPtr, renderPPL, caOverflowX, bmpOverflowX)
-			for i := int32(0); i < renderPPL; i++ { //<- Render all Pixels to draw for the line
+		for line := int32(0); line < bitmapRenderLines; line++ {
+			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
 
 				var cpx = (*((*ec).buffer.Memory))[caPtr]
 
@@ -239,36 +298,11 @@ func (ec *EngineCanvas) BlitBitmap(bmp *canvas.Bitmap, x, y int32, alpha byte, l
 			}
 
 			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-			bmpPtr += bmpOverflowX
+			bmpPtr += uint32(bitmapByteOffset)
 		}
-
 	}
 
 	return outbyte
-}
-
-// Private Helpers
-// ==============================================================================
-
-func (ec *EngineCanvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
-	(*ec).buffer.Memory = px
-	(*(*(*ec).engine).Draw).Draw((*ec).engine, ec)
-}
-
-func (ec *EngineCanvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
-
-	ec.Mouse = *UpdateMouse()
-
-	engine := &(*(*ec).engine)
-	if (*(*engine).Tick).Tick(engine, deltaTime) {
-		ec.wasmcanvas.Apply(ec.canvasDraw)
-
-	} else {
-		engine.switchScene((*(*engine).Unload).Unload(engine))
-
-	}
-
-	return (*ec).canvasTick
 }
 
 // Fill-Jobs
@@ -301,5 +335,4 @@ func (f *sFillJob) Draw(pc uint32, _ uint16, _ uint16, pxs *[]uint32) {
 			(*pxs)[i] = (((*pxs)[i] & 0xff000000) | resetPixel) & resetMask
 		}
 	}
-
 }
