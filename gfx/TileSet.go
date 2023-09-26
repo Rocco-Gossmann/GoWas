@@ -8,8 +8,16 @@ import (
 )
 
 type TileSet struct {
-	gfx   *core.Bitmap
-	tiles []types.Rect
+	gfx    *core.Bitmap
+	tiles  []types.Rect
+	tw, th uint16
+}
+
+func (ts TileSet) GetTileWidth() uint16 {
+	return ts.tw
+}
+func (ts TileSet) GetTileHeight() uint16 {
+	return ts.th
 }
 
 type TilesetBlitOptions struct {
@@ -21,8 +29,7 @@ type TilesetBlitOptions struct {
 
 var defaultOpts = TilesetBlitOptions{}
 
-func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex uint, pOpts *TilesetBlitOptions) core.CanvasCollisionLayers {
-
+func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBlitOptions) core.CanvasCollisionLayers {
 	var ts = (*pTs)
 	if pOpts == nil {
 		pOpts = &defaultOpts
@@ -70,6 +77,7 @@ func (ts *TileSet) InitFromMapSheet(bmp *core.Bitmap, tilepixelwidth, tilepixelh
 		panic(fmt.Sprintf("tileset missaligned: the given bitmaps height must be a multiple of %vpx (tilepixelheight)", tilepixelheight))
 	}
 
+	ts.tw, ts.th = tilepixelwidth, tilepixelheight
 	mw, mh := uint16(bw/tilepixelwidth), uint16(bh/tilepixelheight)
 
 	ts.gfx = bmp
