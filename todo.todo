@@ -1,8 +1,6 @@
 Text-Rendering:
 ================================================================================
 
-✔ Restructure how BlitBitmap receives its params @done (24.9.2023, 07:19:41) As they will become more and more complex
-
 ☐ Printing Text from string to Screen 
     ✔ Implement Bitmap ClipingRect @done (24.9.2023, 16:36:16)
     ☐ TileSets and Maps
@@ -12,5 +10,52 @@ Text-Rendering:
 
 ☐ Tinting Bitmaps on Draw
 
+Mouse Input:
+================================================================================
+    ✔ Browser side @done (26.9.2023, 05:39:15)
+    ☐ Go Side
+        ✔ Process Mouse Position @done (26.9.2023, 05:39:49)
+        ☐ Process Button clicks
+
+Keyboard Input:
+================================================================================
+    ☐ Browser side - Key-Statemanagement
+    ☐ Go Side
+        ☐ KeyStates
+
+Audio:
+================================================================================
+    ☐ Tell Browser to load and provide Audio from within Go <audio> tag
+        ☐ Establish some sort of handle that can be used to identify the sound in both JS and Go
+    ☐ Trigger audio playback from within Go
+    ☐ Cancel audio playback from within Go
+    ☐ Mabe change audio volumne from within Go @low 
 
 
+Documentation:
+================================================================================
+    Usage:
+    ----------------------------------------------------------------------------
+        ☐ Project basics
+        ☐ Engine-Lifecycle
+        ☐ Drawing Stuff
+        ☐ Mouse-Input
+        ☐ Keyboard-Input
+        ☐ Audio-Output
+        ☐ Storing Data in the Browser
+        ☐ Requesting Assets from the Browser
+    
+    Reference:
+    ----------------------------------------------------------------------------
+        ☐ Engine
+        ☐ Mouse
+        ☐ Keyboard
+        ☐ Scene
+        ☐ Canvas
+        ☐ TileMap
+        ✔ TileSet @done (26.9.2023, 05:37:12)
+        ☐ Bitmap
+
+Done:
+================================================================================
+✔ Restructure how BlitBitmap receives its params @done (24.9.2023, 07:19:41) As they will become more and more complex
