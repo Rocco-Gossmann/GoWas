@@ -1,13 +1,14 @@
-Text-Rendering:
+Rendering:
 ================================================================================
-
 ☐ Printing Text from string to Screen 
-    ✔ Implement Bitmap ClipingRect @done (24.9.2023, 16:36:16)
     ☐ TileSets and Maps
-        ☐ TileSets are Bitmaps plus some metadata to find clipping Rects
+        ✔ TileSets are Bitmaps plus some metadata to find clipping Rects @done (26.9.2023, 07:07:20)
         ☐ TileMaps are lists of ClippingRects
+        ☐ Map Drawing
     ☐ Define basic Print Text Functions
 
+☐ Test how drawing a bitmap, that overflows all 4 sides functions @critical 
+☐ Adapt TileSets for SpriteSheets
 ☐ Tinting Bitmaps on Draw
 
 Mouse Input:
@@ -59,3 +60,4 @@ Documentation:
 Done:
 ================================================================================
 ✔ Restructure how BlitBitmap receives its params @done (24.9.2023, 07:19:41) As they will become more and more complex
+✔ Implement Bitmap ClipingRect @done (24.9.2023, 16:36:16)

@@ -7,18 +7,25 @@ import (
 	"github.com/rocco-gossmann/GoWas/types"
 )
 
+type TileSetType uint8
+
+const (
+	TILESET_TYPE_UNINITIALIZED TileSetType = 0
+	TILESET_TYPE_MAP           TileSetType = 1
+	TILESET_TYPE_SPRITESHEET   TileSetType = 2
+)
+
 type TileSet struct {
 	gfx    *core.Bitmap
 	tiles  []types.Rect
 	tw, th uint16
+	tstype TileSetType
 }
 
-func (ts TileSet) GetTileWidth() uint16 {
-	return ts.tw
-}
-func (ts TileSet) GetTileHeight() uint16 {
-	return ts.th
-}
+func (ts TileSet) GetTileWidth() uint16  { return ts.tw }
+func (ts TileSet) GetTileHeight() uint16 { return ts.th }
+func (ts TileSet) Type() TileSetType     { return ts.tstype }
+func (ts TileSet) TileCount() int        { return len(ts.tiles) }
 
 type TilesetBlitOptions struct {
 	X, Y      int32
@@ -30,14 +37,14 @@ type TilesetBlitOptions struct {
 var defaultOpts = TilesetBlitOptions{}
 
 func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBlitOptions) core.CanvasCollisionLayers {
-	var ts = (*pTs)
+	var ts = (*pTs) //<- panics if pTs == nil
 	if pOpts == nil {
 		pOpts = &defaultOpts
 	}
 
 	var opts = (*pOpts)
 
-	if ts.gfx == nil || uint(len(ts.tiles)) > tileindex {
+	if ts.gfx == nil || len(ts.tiles) > tileindex {
 
 		return canvas.Blit(&core.BlitSettings{
 			Bmp: ts.gfx,
@@ -55,12 +62,6 @@ func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBli
 
 func (ts *TileSet) InitFromMapSheet(bmp *core.Bitmap, tilepixelwidth, tilepixelheight uint16) {
 
-	if ts == nil {
-		panic("'ts' can't be nil")
-	}
-	if bmp == nil {
-		panic("'bmp' can't be nil")
-	}
 	if tilepixelwidth == 0 {
 		panic("'tilepixelwidth' must be bigger than 0")
 	}
@@ -82,6 +83,7 @@ func (ts *TileSet) InitFromMapSheet(bmp *core.Bitmap, tilepixelwidth, tilepixelh
 
 	ts.gfx = bmp
 	ts.tiles = make([]types.Rect, mw*mh)
+	ts.tstype = TILESET_TYPE_MAP
 
 	for y := uint16(0); y < mh; y++ {
 		for x := uint16(0); x < mw; x++ {
@@ -92,4 +94,5 @@ func (ts *TileSet) InitFromMapSheet(bmp *core.Bitmap, tilepixelwidth, tilepixelh
 			ts.tiles[i].H = tilepixelheight
 		}
 	}
+
 }
