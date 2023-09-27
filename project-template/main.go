@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoWasTest/scenes"
+	"GoWasProject/scenes"
 
 	"github.com/rocco-gossmann/GoWas"
 	"github.com/rocco-gossmann/GoWas/core"

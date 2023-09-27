@@ -2,7 +2,7 @@ package scenes
 
 import (
 	"GoWasProject/bmps"
-	"GoWasTest/tilesets"
+	"GoWasProject/tilesets"
 	"fmt"
 
 	"github.com/rocco-gossmann/GoWas/core"
