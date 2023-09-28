@@ -17,13 +17,11 @@ const (
 	CANV_CL_2 CanvasCollisionLayers = 0x02000000
 	CANV_CL_3 CanvasCollisionLayers = 0x04000000
 	CANV_CL_4 CanvasCollisionLayers = 0x08000000
-	CANV_CL_5 CanvasCollisionLayers = 0x10000000
-	CANV_CL_6 CanvasCollisionLayers = 0x20000000
 
-	//Bits 0x40000000 and 0x80000000 are reserved for now
+	//Bits 0x10000000 and 0x80000000 are reserved for tile-collision layers 
 
 	CANV_CL_NONE CanvasCollisionLayers = 0
-	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4 | CANV_CL_5 | CANV_CL_6
+	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
 )
 
 type BlitSettings struct {

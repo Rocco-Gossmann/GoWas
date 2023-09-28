@@ -1,4 +1,5 @@
 go 1.21.1
 
-// use ./project-template
-use ./test
+use (
+	./test
+)

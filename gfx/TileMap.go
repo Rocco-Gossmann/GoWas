@@ -1,12 +1,17 @@
 package gfx
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/rocco-gossmann/GoWas/core"
+)
 
 type TileMap struct {
 	init   bool
 	ts     *TileSet
 	memory []byte
 	mw, mh uint32
+	bmp    *core.Bitmap
 }
 
 func (pTm *TileMap) validate() {
@@ -46,6 +51,14 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 	tm.mw = width
 	tm.ts = pTs
 
+	bmp := core.Bitmap{}
+	bmppxwidth := tm.mw * uint32((*(*tm).ts).GetTileWidth())
+	bmppxheight := tm.mh * uint32((*(*tm).ts).GetTileHeight())
+
+	bmpmem := make([]uint32, bmppxheight*bmppxwidth)
+	bmp.Init(uint16(bmppxwidth), &bmpmem)
+	tm.bmp = &bmp
+
 	tm.memory = make([]byte, tm.mw*tm.mh)
 
 	tm.init = true
@@ -76,4 +89,9 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 	(*me).memory[mapIndex] = tileIndex % byte((*((*me).ts)).TileCount())
 
 	return me
+}
+
+func (me *TileMap) BlitTo(ca core.Canvas) {
+	me.validate()
+
 }

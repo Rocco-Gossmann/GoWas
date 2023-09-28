@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/rocco-gossmann/GoWas/types"
+)
 
 type Bitmap struct {
 	width, height uint16
@@ -23,7 +26,15 @@ func (b *Bitmap) Height() uint16 { return b.height }
 func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }
 func (b *Bitmap) Pixels() int    { return len((*(*b).MemoryBuffer.Memory)) }
 
+func (b *Bitmap) CopyFrom(src *Bitmap, dstx, dsty int32, alpha byte, srcclip *types.Rect) {
+	panic("//TODO: Implement")
+}
+
+
 func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
+	if bmp == nil {
+		panic("bmp can't be nil")
+	}
 
 	if pixelsPerLine == 0 {
 		panic("bitmap must have at least 1 pixelPerLine")
@@ -43,7 +54,6 @@ func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
 	bmp.height = uint16(memoryLen / int(pixelsPerLine))
 	bmp.MemoryBuffer.Memory = pixelMemory
 	bmp.MemoryBuffer.PixelPerLine = pixelsPerLine
-
 }
 
 func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) Bitmap {

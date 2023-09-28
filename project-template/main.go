@@ -15,5 +15,4 @@ func main() {
 	})
 
 	e.Run(&scenes.Debug)
-
 }
