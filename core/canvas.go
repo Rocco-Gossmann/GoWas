@@ -18,7 +18,7 @@ const (
 	CANV_CL_3 CanvasCollisionLayers = 0x04000000
 	CANV_CL_4 CanvasCollisionLayers = 0x08000000
 
-	//Bits 0x10000000 and 0x80000000 are reserved for tile-collision layers 
+	//Bits 0x10000000 and 0x80000000 are reserved for tile-collision layers
 
 	CANV_CL_NONE CanvasCollisionLayers = 0
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
@@ -188,6 +188,7 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, x, y int32, alpha byte, layers 
 	if x < 0 {
 		bitmapIndexStart = uint32(int32(bitmapIndexStart) - x)
 		bitmapByteOffset = uint32(int32(bitmapByteOffset) - x)
+		bitmapRenderLinePixels = uint32(int32(bitmapRenderLinePixels) + x)
 		x = 0
 	}
 
