@@ -37,22 +37,22 @@ type TilesetBlitOptions struct {
 var defaultOpts = TilesetBlitOptions{}
 
 func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBlitOptions) core.CanvasCollisionLayers {
-	var ts = (*pTs) //<- panics if pTs == nil
 	if pOpts == nil {
 		pOpts = &defaultOpts
 	}
 
 	var opts = (*pOpts)
 
-	if ts.gfx == nil || len(ts.tiles) > tileindex {
+	if (*pTs).gfx == nil || len((*pTs).tiles) > tileindex {
 
 		return canvas.Blit(&core.BlitSettings{
-			Bmp: ts.gfx,
-			X:   opts.X, Y: opts.Y,
+			Bmp:       (*pTs).gfx,
+			X:         opts.X,
+			Y:         opts.Y,
 			Alpha:     opts.Alpha,
 			Alphazero: opts.Alphazero,
 			Layers:    opts.Layers,
-			Clip:      &(ts.tiles[tileindex]),
+			Clip:      &((*pTs).tiles[tileindex]),
 		})
 
 	} else {
