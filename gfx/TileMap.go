@@ -88,13 +88,57 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 // -----------------------------------------------------------------------------
 // Getters
 // -----------------------------------------------------------------------------
-
 type ToCanvasOpts struct {
-	Position     types.Point
-	Scroll       types.Point
-	ClippingRect types.Rect
+	Scroll types.Point
 }
 
 func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
+
 	me.validate()
+
+	caw, cah := ca.GetWidth(), ca.GetHeight()
+	tw, th := uint32(me.ts.GetTileWidth()), uint32(me.ts.GetTileHeight())
+	offsetX, offsetY := int32(0), int32(0)
+	startX, startY := uint32(0), uint32(0)
+
+	if opts != nil {
+		offsetX = int32(opts.Scroll.X) * -1
+		offsetY = int32(opts.Scroll.Y) * -1
+	}
+
+	// Check for overshoots Horizontal
+	if offsetX < 0 {
+		var swOX = (offsetX * -1)
+		var ox = swOX % int32(tw)
+		var tox = uint32(swOX-ox) / tw
+		startX = tox
+	}
+
+	// Check for overshoots Vertical
+	if offsetY < 0 {
+		var swOY = (offsetY * -1)
+		var oy = swOY % int32(th)
+		var toy = uint32(swOY-oy) / th
+		startY = toy
+	}
+
+	mw := min(me.mw*tw, uint32(caw)+tw) / tw
+	mh := min(me.mh*th, uint32(cah)+th) / th
+
+	//	dstX, dstY := uint16((me.mw+overShootX)*tw), uint16((me.mh+overShootY)*th)
+
+	bopts := TilesetBlitOptions{}
+
+	var tilesDrawn = 0
+	for y := startY; y < startY+mh; y++ {
+		bopts.Y = int32(y*th) + offsetY
+		for x := startX; x < startX+mw; x++ {
+			bopts.X = int32(x*tw) + offsetX
+			me.ts.BlitTo(ca, int(me.memory[(y%me.mh)*me.mw+(x%me.mw)]), &bopts)
+			tilesDrawn++
+		}
+	}
+
+	fmt.Println("Tiles drawn", tilesDrawn)
+
 }
