@@ -39,6 +39,9 @@ type Canvas struct {
 	Mouse      MouseState
 }
 
+func (ca *Canvas) GetWidth() uint16  { return ca.wasmcanvas.Width() }
+func (ca *Canvas) GetHeight() uint16 { return ca.wasmcanvas.Height() }
+
 // Constructors
 // ==============================================================================
 func CreateCanvas(e *Engine, width, height uint16) *Canvas {
