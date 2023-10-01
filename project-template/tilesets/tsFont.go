@@ -9,5 +9,5 @@ import (
 var TsFont = gfx.TileSet{}
 
 func init() {
-	TsFont.InitFromMapSheet(&bmps.AsciiFontBMP, 8, 8)
+	TsFont.InitFromMapSheet(&bmps.DebugTiles, 8, 8)
 }

@@ -21,34 +21,36 @@ type debugScene struct {
 //	return true
 //}
 
-func (s debugScene) Load(e *core.Engine) {
+func (s *debugScene) Load(e *core.Engine) {
 	fmt.Println("Debug-Scene loaded")
 	e.Canvas().FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
 
 	var text = gfx.TileMap{}
-	text.Init(s.tsFont, 20, 5).SetMap([]byte{
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+	text.Init(s.tsFont, 16, 5).SetMap([]byte{
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	})
-
-	s.mapText = &text
+	(*s).mapText = &text
 }
 
-func (s debugScene) Unload(e *core.Engine) *struct{} {
+func (s *debugScene) Unload(e *core.Engine) *struct{} {
 	s.mapText = nil
 	return nil
 }
 
-func (s debugScene) Draw(e *core.Engine, ca *core.Canvas) {
+func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
 	ca.FillColorA(0x00333333, 0x10, core.CANV_CL_ALL)
 
-	//s.tsFont.BlitTo(ca, 65-32, nil) // Print A
+	//s.tsFont.BlitTo(ca, 1, &gfx.TilesetBlitOptions{
+	//	X: -7,
+	//	Y: -7,
+	//}) // Print A
 
 	s.mapText.ToCanvas(ca, &gfx.ToCanvasOpts{
-		Position: types.Point{X: 0, Y: 0},
+		Scroll: types.Point{Y: 4},
 	})
 
 	mouse := ca.Mouse
