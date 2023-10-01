@@ -7,6 +7,7 @@ import (
 
 	"github.com/rocco-gossmann/GoWas/core"
 	"github.com/rocco-gossmann/GoWas/gfx"
+	"github.com/rocco-gossmann/GoWas/types"
 )
 
 type debugScene struct {
@@ -44,7 +45,11 @@ func (s debugScene) Unload(e *core.Engine) *struct{} {
 func (s debugScene) Draw(e *core.Engine, ca *core.Canvas) {
 	ca.FillColorA(0x00333333, 0x10, core.CANV_CL_ALL)
 
-	s.tsFont.BlitTo(ca, 65-32, nil) // Print A
+	//s.tsFont.BlitTo(ca, 65-32, nil) // Print A
+
+	s.mapText.ToCanvas(ca, &gfx.ToCanvasOpts{
+		Position: types.Point{X: 0, Y: 0},
+	})
 
 	mouse := ca.Mouse
 	if mouse.X > 0 || mouse.Y > 0 {

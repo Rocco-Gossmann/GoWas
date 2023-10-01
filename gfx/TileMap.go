@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rocco-gossmann/GoWas/core"
+	"github.com/rocco-gossmann/GoWas/types"
 )
 
 type TileMap struct {
@@ -11,7 +12,6 @@ type TileMap struct {
 	ts     *TileSet
 	memory []byte
 	mw, mh uint32
-	bmp    *core.Bitmap
 }
 
 func (pTm *TileMap) validate() {
@@ -50,21 +50,15 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 	tm.mh = height
 	tm.mw = width
 	tm.ts = pTs
-
-	bmp := core.Bitmap{}
-	bmppxwidth := tm.mw * uint32((*(*tm).ts).GetTileWidth())
-	bmppxheight := tm.mh * uint32((*(*tm).ts).GetTileHeight())
-
-	bmpmem := make([]uint32, bmppxheight*bmppxwidth)
-	bmp.Init(uint16(bmppxwidth), &bmpmem)
-	tm.bmp = &bmp
-
 	tm.memory = make([]byte, tm.mw*tm.mh)
 
 	tm.init = true
 	return tm
 }
 
+// -----------------------------------------------------------------------------
+// Setters
+// -----------------------------------------------------------------------------
 func (me *TileMap) SetMap(mapData []byte) *TileMap {
 	me.validate()
 
@@ -91,7 +85,16 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 	return me
 }
 
-func (me *TileMap) BlitTo(ca core.Canvas) {
-	me.validate()
+// -----------------------------------------------------------------------------
+// Getters
+// -----------------------------------------------------------------------------
 
+type ToCanvasOpts struct {
+	Position     types.Point
+	Scroll       types.Point
+	ClippingRect types.Rect
+}
+
+func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
+	me.validate()
 }

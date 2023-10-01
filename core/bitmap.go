@@ -21,6 +21,9 @@ const (
 	BMP_CHANNEL_BLUE  BitmapFlag = 0x000000ff
 )
 
+// ------------------------------------------------------------------------------
+// Getter
+// ------------------------------------------------------------------------------
 func (b *Bitmap) Width() uint16  { return b.width }
 func (b *Bitmap) Height() uint16 { return b.height }
 func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }
@@ -30,7 +33,9 @@ func (b *Bitmap) CopyFrom(src *Bitmap, dstx, dsty int32, alpha byte, srcclip *ty
 	panic("//TODO: Implement")
 }
 
-
+// ------------------------------------------------------------------------------
+// Constructors
+// ------------------------------------------------------------------------------
 func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
 	if bmp == nil {
 		panic("bmp can't be nil")
