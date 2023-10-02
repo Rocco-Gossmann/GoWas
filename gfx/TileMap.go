@@ -8,10 +8,12 @@ import (
 )
 
 type TileMap struct {
-	init   bool
-	ts     *TileSet
-	memory []byte
-	mw, mh uint32
+	init     bool
+	ts       *TileSet
+	memory   []byte
+	mw, mh   uint32
+	tsOffset int
+	accessTc byte
 }
 
 func (pTm *TileMap) validate() {
@@ -51,6 +53,7 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 	tm.mw = width
 	tm.ts = pTs
 	tm.memory = make([]byte, tm.mw*tm.mh)
+	tm.accessTc = byte(min(255, ts.TileCount()))
 
 	tm.init = true
 	return tm
@@ -59,6 +62,44 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 // -----------------------------------------------------------------------------
 // Setters
 // -----------------------------------------------------------------------------
+func (me *TileMap) SetTileSetOffset(o int) *TileMap {
+	var tc = me.ts.TileCount()
+
+	if o < 0 {
+		me.tsOffset = tc + (o % tc)
+	} else {
+		me.tsOffset = o % tc
+	}
+
+	return me
+}
+
+func (me *TileMap) Clear(tileIndex byte) *TileMap {
+	for i, _ := range me.memory {
+		me.memory[i] = tileIndex
+	}
+
+	return me
+}
+
+func (me *TileMap) SetSequence(sequence string) *TileMap {
+
+	if len(sequence) <= len(me.memory) {
+		ra := []rune(sequence)
+		for i, chr := range ra {
+			me.memory[i] = byte(chr & 0x000000ff)
+		}
+	} else {
+		panic(fmt.Sprintf(
+			"memory overflow detected !!! can't write %v bytes, if only %v are available ",
+			len(sequence),
+			len(me.memory),
+		))
+	}
+
+	return me
+}
+
 func (me *TileMap) SetMap(mapData []byte) *TileMap {
 	me.validate()
 
@@ -74,13 +115,13 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 	me.validate()
 
 	var mapIndex = y*me.mw + x
-	if len((*me).memory) <= int(mapIndex) {
+	if len(me.memory) <= int(mapIndex) {
 		panic("can't set a tile that is not on the Map, check your x and y coordinates and make sure, they are within the maps with and height")
 	}
 
 	// The Tilecount was checked during Init, so it is not bigger than 255.
 	//                                this byte-cast should be fine here
-	(*me).memory[mapIndex] = tileIndex % byte((*((*me).ts)).TileCount())
+	me.memory[mapIndex] = tileIndex % me.accessTc
 
 	return me
 }
@@ -97,6 +138,7 @@ func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
 	me.validate()
 
 	caw, cah := ca.GetWidth(), ca.GetHeight()
+	tc := me.ts.TileCount()
 	tw, th := uint32(me.ts.GetTileWidth()), uint32(me.ts.GetTileHeight())
 	offsetX, offsetY := int32(0), int32(0)
 	startX, startY := uint32(0), uint32(0)
@@ -129,16 +171,22 @@ func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
 
 	bopts := TilesetBlitOptions{}
 
-	var tilesDrawn = 0
+	ti, mi := 0, byte(0)
 	for y := startY; y < startY+mh; y++ {
 		bopts.Y = int32(y*th) + offsetY
 		for x := startX; x < startX+mw; x++ {
 			bopts.X = int32(x*tw) + offsetX
-			me.ts.BlitTo(ca, int(me.memory[(y%me.mh)*me.mw+(x%me.mw)]), &bopts)
-			tilesDrawn++
+
+			mti := (int((y%me.mh)*me.mw + (x % me.mw)))
+			mi = me.memory[mti] % me.accessTc
+			om := 1
+			if mi == 0 {
+				om = 0
+			}
+			ti = (int(mi) + (me.tsOffset * om)) % tc
+
+			me.ts.BlitTo(ca, ti, &bopts)
 		}
 	}
-
-	fmt.Println("Tiles drawn", tilesDrawn)
 
 }
