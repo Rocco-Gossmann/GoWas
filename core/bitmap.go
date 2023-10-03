@@ -28,7 +28,7 @@ const (
 func (b *Bitmap) Width() uint16  { return b.width }
 func (b *Bitmap) Height() uint16 { return b.height }
 func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }
-func (b *Bitmap) Pixels() int    { return len((*(*b).MemoryBuffer.Memory)) }
+func (b *Bitmap) Pixels() int    { return len(*(b.MemoryBuffer).Memory) }
 
 func (b *Bitmap) CopyFrom(src *Bitmap, dstx, dsty int32, alpha byte, srcclip *types.Rect) {
 	panic("//TODO: Implement")
@@ -37,7 +37,7 @@ func (b *Bitmap) CopyFrom(src *Bitmap, dstx, dsty int32, alpha byte, srcclip *ty
 // ------------------------------------------------------------------------------
 // Constructors
 // ------------------------------------------------------------------------------
-func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
+func (bmp *Bitmap) constructor(pixelsPerLine uint16, pixelMemory *[]uint32) {
 	if bmp == nil {
 		panic("bmp can't be nil")
 	}
@@ -64,7 +64,7 @@ func (bmp *Bitmap) Init(pixelsPerLine uint16, pixelMemory *[]uint32) {
 
 func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) *Bitmap {
 	bmp := Bitmap{}
-	bmp.Init(pixelsPerLine, pixelMemory)
+	bmp.constructor(pixelsPerLine, pixelMemory)
 	return &bmp
 }
 
@@ -95,7 +95,7 @@ func CreateBitmapFromCompressed(pixelsPerLine uint16, uncompressedLength int, co
 		}
 	}
 
-	bmp.Init(pixelsPerLine, &memory)
+	bmp.constructor(pixelsPerLine, &memory)
 
 	return &bmp
 }

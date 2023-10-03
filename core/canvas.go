@@ -179,7 +179,7 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, x, y int32, alpha byte, layers 
 	var bitmapRenderLines int32 = int32((*clip).H)
 
 	cw, ch := int32(ec.wasmcanvas.Width()), int32(ec.wasmcanvas.Height())
-	bw, bh := int32((*clip).W), int32((*clip).H)
+	bw, bh := int32(clip.W), int32(clip.H)
 
 	// if the bmp-clip is to far off of one of the four canvas sides
 	// => Render nothing
@@ -231,10 +231,10 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, x, y int32, alpha byte, layers 
 			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
 
 				// Only modify pixels Meta data
-				var cpx = (*((*ec).buffer.Memory))[caPtr]
+				var cpx = (*(ec.buffer.Memory))[caPtr]
 				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
 				cpx |= uint32(layers) * (cpx & uint32(CANV_CL_ALL) >> 24)
-				(*((*ec).buffer.Memory))[caPtr] = cpx
+				(*(ec.buffer.Memory))[caPtr] = cpx
 
 				bmpPtr++ //<- move both pointers formward by one
 				caPtr++
@@ -250,17 +250,17 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, x, y int32, alpha byte, layers 
 		for line := int32(0); line < bitmapRenderLines; line++ {
 			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
 
-				var cpx = (*((*ec).buffer.Memory))[caPtr]
+				var cpx = (*(ec.buffer.Memory))[caPtr]
 				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
 
-				var transparencybit = ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(BMP_OPAQUE)) >> 24
+				var transparencybit = ((*(bmp.MemoryBuffer.Memory))[bmpPtr] & uint32(BMP_OPAQUE)) >> 24
 				cpx |= uint32(layers) * transparencybit
 				var transparencyinvers = (transparencybit ^ 1)
 
 				var px = cpx*transparencyinvers +
-					(*((*bmp).MemoryBuffer.Memory))[bmpPtr]*transparencybit
+					(*(bmp.MemoryBuffer.Memory))[bmpPtr]*transparencybit
 
-				(*((*ec).buffer.Memory))[caPtr] = px
+				(*(ec.buffer.Memory))[caPtr] = px
 
 				bmpPtr++ //<- move both pointers formward by one
 				caPtr++
