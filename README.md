@@ -4,6 +4,8 @@ It is heavily inspired by Engines like Pico-8 and the OneLoneCoders PixelGameEng
 As well as various GameConsoles of the 80s and 90s
 (https://github.com/OneLoneCoder/olcPixelGameEngine)
 
+# Checkout the Demo-Project here.
+https://rocco-gossmann.github.io/GoWas-DemoProject/
 
 # How to set it up.
 In this project, you'll find the " **project-template** " folder.
@@ -24,6 +26,8 @@ To create a build in the templates `./docs` directory, run:
 ```bash
 make
 ```
+The Build will be in the `./docs` Folder  
+
 You can test your project via the `server/server.go` file, that the template comes with.
 ```bash
 go run ./server/server.go
@@ -65,5 +69,4 @@ make dev
 make stop
 ```
 
-The Build be be in the `./docs` Folder
 
