@@ -82,19 +82,22 @@ func (me *TileMap) Clear(tileIndex byte) *TileMap {
 	return me
 }
 
-func (me *TileMap) SetSequence(sequence string) *TileMap {
+func (me *TileMap) SetSequence(sequence string, xoffset uint16, yoffset uint16, ignoreZero bool) *TileMap {
 
-	if len(sequence) <= len(me.memory) {
-		ra := []rune(sequence)
+	var offset = int(uint32(yoffset)*me.mw + uint32(xoffset))
+	var ml = len(me.memory)
+
+	ra := []rune(sequence)
+	if ignoreZero {
 		for i, chr := range ra {
-			me.memory[i] = byte(chr & 0x000000ff)
+			var m = byte(min(1, int32(chr)))
+			me.memory[(i+offset)%ml] = (byte(chr&0x000000ff) * m) +
+				(me.memory[(i+offset)%ml] * (1 - m))
 		}
 	} else {
-		panic(fmt.Sprintf(
-			"memory overflow detected !!! can't write %v bytes, if only %v are available ",
-			len(sequence),
-			len(me.memory),
-		))
+		for i, chr := range ra {
+			me.memory[(i+offset)%ml] = byte(chr & 0x000000ff)
+		}
 	}
 
 	return me
@@ -188,5 +191,4 @@ func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
 			me.ts.BlitTo(ca, ti, &bopts)
 		}
 	}
-
 }

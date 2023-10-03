@@ -10,7 +10,7 @@ import (
 
 func printHelp() {
 	fmt.Printf(`
-usage: go run pngconvert.go source.png  out.go  PackageName   BitmapVarName
+usage: go run png2compressedbmp.go source.png  out.go  PackageName   BitmapVarName
 	source.png    => path+filename of the png image you want to convert
 	out.go        => path+filename of the go file containing the Bitmap definition
 	PackageName   => name of generated files package
@@ -19,11 +19,16 @@ usage: go run pngconvert.go source.png  out.go  PackageName   BitmapVarName
 }
 
 func main() {
+
+	// Make sure all the required intputs exist
+	//------------------------------------------------------------------------------
 	if len(os.Args) != 5 {
 		printHelp()
 		return
 	}
 
+	// Read Input File
+	//------------------------------------------------------------------------------
 	filename := os.Args[1]
 	outfilename := os.Args[2]
 
@@ -37,22 +42,33 @@ func main() {
 
 	xs, xe, ys, ye := img.Bounds().Min.X, img.Bounds().Max.X, img.Bounds().Min.Y, img.Bounds().Max.Y
 
+	// Generate Output File
+	//------------------------------------------------------------------------------
 	outfile, err := os.Create(outfilename)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer outfile.Close()
 
+	// Write Headers
+	//------------------------------------------------------------------------------
 	outfile.WriteString(fmt.Sprintf(`package %v
 
-import "github.com/rocco-gossmann/GoWas/canvas"
+import "github.com/rocco-gossmann/GoWas/core"
 
 var mem_%v = []uint32 {
 `, os.Args[3], os.Args[4]))
 
+	// Write Body
+	//------------------------------------------------------------------------------
+
+	var totalPixels = 0
+	var lastPX uint32 = 0x80000000
+	var repeatCount uint32 = 0
+
 	for y := ys; y < ye; y++ {
-		outfile.WriteString("\t")
 		for x := xs; x < xe; x++ {
+			totalPixels++
 			r, g, b, a := img.At(x, y).RGBA()
 
 			var out uint32 = 0
@@ -66,12 +82,24 @@ var mem_%v = []uint32 {
 			if na == 255 {
 				out |= 0x01000000
 			}
-			outfile.WriteString(fmt.Sprintf("0x%08x, ", out))
+
+			if out != lastPX || repeatCount == 127 {
+				if lastPX != 0x80000000 {
+					outfile.WriteString(fmt.Sprintf("0x%08x, ", lastPX+(repeatCount<<25)))
+				}
+				lastPX = out
+				repeatCount = 0
+			} else {
+				repeatCount++
+			}
 
 		}
-		outfile.WriteString("\n")
 	}
+	outfile.WriteString(fmt.Sprintf("0x%08x, \n", lastPX+(repeatCount<<25)))
+
+	// Write Footer
+	//------------------------------------------------------------------------------
 	outfile.WriteString(fmt.Sprintf(`}
 
-var %v = canvas.CreateBitmap(%v, &mem_%v)`, os.Args[4], xe-xs, os.Args[4]))
+var %v = core.CreateBitmapFromCompressed(%v, %v, &mem_%v)`, os.Args[4], xe-xs, totalPixels, os.Args[4]))
 }
