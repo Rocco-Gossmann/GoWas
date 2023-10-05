@@ -23,10 +23,10 @@ func CreateBitmapFromCompressed(
 ) *Bitmap
 ```
 
-These 2 are less meant to be used directly.
+These 2 are not meant to be used directly for now.
 
 Instead you should create your Bitmaps via the 
-[png2gowasbmp.go](./tools/png2gowasbmp.go) Tool in this repos `tools` folder
+[png2gowasbmp.go](../tools/png2gowasbmp.go) Tool in this repos `tools` folder
 
 
 

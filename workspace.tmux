@@ -1,3 +1,3 @@
 #!/bin/bash
 
-tmux-workspace "GoWas" "lib" -c -v "cd test && make run && make dev && zsh" "nvim && zsh" \
+tmux-workspace "GoWas" "editor" -c "nvim && zsh" -w "server" -c "cd test && make run && make dev && zsh"  \

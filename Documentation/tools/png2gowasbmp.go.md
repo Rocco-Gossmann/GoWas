@@ -25,7 +25,7 @@ Each Pixel/PixelGroup will be represented in the following way.
 
 ```
 Binary:  0000000 a rrrrrrrr gggggggg bbbbbbbb
-            |    |  |        |        |jjjjjjjjj
+            |    |  |        |        |
             |    |  |        |        ---Blue Color 0 - 255
             |    |  |        ------------Green Color 0 - 255
             |    |   --------------------Red Color 0-255
@@ -33,7 +33,7 @@ Binary:  0000000 a rrrrrrrr gggggggg bbbbbbbb
             -----------------------------Repeat 0-127 (0 = draw only once; 127 = draw 128 times)
 ```
 In a compressed BMP definition, each Pixel starts with 7 bits, that tell how often the pixel is repeated.
-In a sesse this you are defining lines of pixels, rathern than pixels themself.
+In a sense you are defining lines of pixels, rathern than pixels themself.
 
 so `0x08000000` would be equivalent to   
 `0x00000000 0x00000000 0x00000000 0x00000000`   
