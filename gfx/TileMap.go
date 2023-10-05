@@ -187,8 +187,9 @@ func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
 				om = 0
 			}
 			ti = (int(mi) + (me.tsOffset * om)) % tc
-
-			me.ts.BlitTo(ca, ti, &bopts)
+			if ti > 0 {
+				me.ts.BlitTo(ca, ti, &bopts)
+			}
 		}
 	}
 }
