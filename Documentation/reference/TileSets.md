@@ -23,6 +23,13 @@ myTileSet.InitFromMapSheet(...)
 myTileSet.InitFromSpriteSheet(...) //<- yet to be implemented
 ```
 
+## Things to Note
+> [!attention]  
+> Things to keep in mind, when using/drawing TileSets
+>
+> - Tile `0` (most top left) is always blank and will never be drawn to the screen.
+
+
 # Functions
 
 ## InitFromMapSheet(bmp, tilewidth, tileheight)
