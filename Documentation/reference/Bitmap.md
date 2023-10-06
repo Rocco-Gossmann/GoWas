@@ -1,5 +1,8 @@
 # Bitmap
 
+> [!warning]
+> If all you want is to load grapics, from Images, please read the [Graphics & Sound](../graphics_and_sound_gfx_snd.md) Section first
+
 Sub Package: `GoWas/core`
 
 A `struct` holding a slice of `uint32` pixels and acompanying MetaData
@@ -25,8 +28,6 @@ func CreateBitmapFromCompressed(
 
 These 2 are not meant to be used directly for now.
 
-Instead you should create your Bitmaps via the 
-[png2gowasbmp.go](../tools/png2gowasbmp.go) Tool in this repos `tools` folder
 
 
 

@@ -101,5 +101,5 @@ var mem_%v = []uint32 {
 	//------------------------------------------------------------------------------
 	outfile.WriteString(fmt.Sprintf(`}
 
-var %v = core.CreateBitmapFromCompressed(%v, %v, &mem_%v)`, os.Args[4], xe-xs, totalPixels, os.Args[4]))
+var BMP%v = core.CreateBitmapFromCompressed(%v, %v, &mem_%v)`, os.Args[4], xe-xs, totalPixels, os.Args[4]))
 }

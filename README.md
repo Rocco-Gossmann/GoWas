@@ -15,8 +15,8 @@ you can find all documentation in the [./Documentation](./Documentation) Folder
 ## Basics
 - [How to get Started ](./Documentation/Setup.md) 
 
-## Tools
-- [PNG2GoWasBMP](./Documentation/tools/png2gowasbmp.go.md)
+## Tooling
+- [Graphics-Import](./Documentation/graphics_and_sound_gfx_snd.md)
 
 ## References
 - [Bitmap](./Documentation/reference/Bitmap.md)

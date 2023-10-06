@@ -3,7 +3,8 @@ Rendering:
     [ ] Test how drawing a bitmap, that overflows all 4 sides functions @critical 
     [ ] Adapt TileSets for SpriteSheets
     [ ] Tinting Bitmaps/TileMaps/Sprites on Draw
-    
+
+
 Maps:
 ================================================================================
     [ ] Test how drawing Maps, that are smaller than the screen behaves @critical
@@ -12,7 +13,8 @@ Maps:
     [ ] Allow to fill columns or rows of Tiles with data @high (Instead of just single tiles or the entire map)
     [ ] Maps Clipping-Rect @low
     [ ] Allow maps scroll.x any y propperties to be negative @low
- 
+
+
 Mouse Input:
 ================================================================================
     [x] Browser side
@@ -20,11 +22,13 @@ Mouse Input:
         [x] Process Mouse Position @done (26.9.2023, 05:39:49)
         [ ] Process Button clicks
 
+
 Keyboard Input:
 ================================================================================
     [ ] Browser side - Key-Statemanagement
     [ ] Go Side
         [ ] KeyStates
+
 
 Audio:
 ================================================================================
@@ -34,15 +38,27 @@ Audio:
     [ ] Cancel audio playback from within Go
     [ ] Mabe change audio volumne from within Go @low 
 
+
 Tooling:
 ================================================================================
+    [x] Automate Assets.png conversion (User should only have to put the PNG into the ./assets folder)
+        [x] Extend Makefile
+        [x] Move tools-scripts into "project-template"
+
+    [ ] convert ./project-template/.tools/ ZSH-Scripts into Go-Scripts
+        [ ] startserver.zsh 
+        [ ] stopserver.zsh 
+        [ ] entr.zsh
+
     [ ] Create Script to remove Demo-Project files from `project-template`
     [ ] make it a `make` task
+
 
 Loading Compressed Data:
 ================================================================================
     [x] Bitmap data
     [ ] mapData
+
 
 # Documentation:
 ================================================================================

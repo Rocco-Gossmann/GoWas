@@ -56,7 +56,7 @@ func (s *debugScene) Load(e *core.Engine) {
 	//-------------------------------------------------------------------------
 	// > Init Background TileSet
 	s.bgSet = &gfx.TileSet{}
-	s.bgSet.InitFromMapSheet(bmps.DebugTiles, 8, 8)
+	s.bgSet.InitFromMapSheet(bmps.BMPdebugtiles, 8, 8)
 
 	// > Init Background Map
 	s.bgMap = &gfx.TileMap{}
@@ -146,5 +146,5 @@ func (s *debugScene) Unload(e *core.Engine) *struct{} {
 }
 
 var Debug = debugScene{
-	cursorBMP: bmps.CursorBMP,
+	cursorBMP: bmps.BMPcursor,
 }
