@@ -45,10 +45,10 @@ Tooling:
         [x] Extend Makefile
         [x] Move tools-scripts into "project-template"
 
-    [ ] convert ./project-template/.tools/ ZSH-Scripts into Go-Scripts
-        [ ] startserver.zsh 
-        [ ] stopserver.zsh 
-        [ ] entr.zsh
+    [x] get rid of ./project-template/.tools/ ZSH-Scripts
+        [x] startserver.zsh 
+        [x] stopserver.zsh 
+        [x] entr.zsh
 
     [ ] Create Script to remove Demo-Project files from `project-template`
     [ ] make it a `make` task
