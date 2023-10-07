@@ -52,8 +52,13 @@ go.sum: go.mod
 	
 start: run
 
+open: run
+	open http://localhost:7353
 
-.phony: echo run stop open clean remake $(BUILDDIR)/
+run: $(BUILDDIR)/main.wasm
+	go run ./.tools/server/server.go
+
+.phony: dev echo clean remake $(BUILDDIR)/
 
 echo: .entr_sourcelist
 	@echo "Boilerplate files: "$(BOILERFILES)
@@ -67,14 +72,9 @@ echo: .entr_sourcelist
 	@echo "Watchfiles:"
 	@echo $(shell cat ./entr_sourcelist)
 
-open: 
-	open http://localhost:7353
-
 dev:
 	find .. -type f \( -name "*png" -o -name "*js" -o -name "*.html" -o -name "*.go" \) -not -iregex '.*/docs/.*' | entr make remake
 
-run:
-	go run ./.tools/server/server.go
 
 remake: 
 	rm -f $(BUILDDIR)/main.wasm
