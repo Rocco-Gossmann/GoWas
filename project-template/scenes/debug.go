@@ -12,8 +12,8 @@ import (
 type debugScene struct {
 	tma float64
 
-	cursorBMP *core.Bitmap
-	text      *gfx.TextDisplay
+	CursorEntity *core.BitmapEntity
+	text         *gfx.TextDisplay
 
 	bgSet    *gfx.TileSet
 	bgMap    *gfx.TileMap
@@ -128,12 +128,9 @@ func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
 	// Draw the Mouse Cursor
 	//-------------------------------------------------------------------------
 	mouse := ca.Mouse
+	s.CursorEntity.MoveTo(int32(mouse.X), int32(mouse.Y))
 	if mouse.X > 0 || mouse.Y > 0 {
-		ca.Blit(&core.BlitSettings{
-			Bmp: s.cursorBMP,
-			X:   int32(mouse.X),
-			Y:   int32(mouse.Y),
-		})
+		s.CursorEntity.ToCanvas(ca)
 	}
 
 }
@@ -146,5 +143,5 @@ func (s *debugScene) Unload(e *core.Engine) *struct{} {
 }
 
 var Debug = debugScene{
-	cursorBMP: bmps.BMPcursor,
+	CursorEntity: bmps.BMPcursor.MakeEntity(),
 }

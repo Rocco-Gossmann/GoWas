@@ -52,13 +52,14 @@ go.sum: go.mod
 	
 start: run
 
-open: run
-	open http://localhost:7353
 
 run: $(BUILDDIR)/main.wasm
 	go run ./.tools/server/server.go
 
-.phony: dev echo clean remake $(BUILDDIR)/
+.phony: dev open echo clean remake $(BUILDDIR)/
+
+open: 
+	open http://localhost:7353
 
 echo: .entr_sourcelist
 	@echo "Boilerplate files: "$(BOILERFILES)

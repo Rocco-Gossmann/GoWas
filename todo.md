@@ -87,6 +87,7 @@ Loading Compressed Data:
         [ ] Scrolling
     [x] TileSet 
     [x] Bitmap
+    [ ] Bitmap Entities
 
 Done:
 ================================================================================

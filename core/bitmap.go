@@ -23,18 +23,6 @@ const (
 )
 
 // ------------------------------------------------------------------------------
-// Getter
-// ------------------------------------------------------------------------------
-func (b *Bitmap) Width() uint16  { return b.width }
-func (b *Bitmap) Height() uint16 { return b.height }
-func (b *Bitmap) PPL() uint16    { return b.MemoryBuffer.PixelPerLine }
-func (b *Bitmap) Pixels() int    { return len(*(b.MemoryBuffer).Memory) }
-
-func (b *Bitmap) CopyFrom(src *Bitmap, dstx, dsty int32, alpha byte, srcclip *types.Rect) {
-	panic("//TODO: Implement")
-}
-
-// ------------------------------------------------------------------------------
 // Constructors
 // ------------------------------------------------------------------------------
 func (bmp *Bitmap) constructor(pixelsPerLine uint16, pixelMemory *[]uint32) {
@@ -60,7 +48,19 @@ func (bmp *Bitmap) constructor(pixelsPerLine uint16, pixelMemory *[]uint32) {
 	bmp.height = uint16(memoryLen / int(pixelsPerLine))
 	bmp.MemoryBuffer.Memory = pixelMemory
 	bmp.MemoryBuffer.PixelPerLine = pixelsPerLine
+
 }
+
+func (me *Bitmap) MakeEntity() *BitmapEntity {
+	var bmp BitmapEntity
+	bmp.canvasBlitOpts.Bmp = me
+	bmp.canvasBlitOpts.Clip = &types.Rect{X: 0, Y: 0, W: me.width, H: me.height}
+	bmp.visible = true
+	return &bmp
+}
+
+func (me *Bitmap) Width() uint16  { return me.width }
+func (me *Bitmap) Height() uint16 { return me.height }
 
 func CreateBitmap(pixelsPerLine uint16, pixelMemory *[]uint32) *Bitmap {
 	bmp := Bitmap{}

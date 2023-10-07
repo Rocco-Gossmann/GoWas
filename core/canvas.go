@@ -24,7 +24,7 @@ const (
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
 )
 
-type BlitSettings struct {
+type CanvasBlitOpts struct {
 	Bmp       *Bitmap               // What to blit
 	X, Y      int32                 // Where to blit it on the screen
 	Alpha     byte                  // how strong transparency is
@@ -89,7 +89,7 @@ func (ec *Canvas) FillColorA(color uint32, alpha byte, layerReset CanvasCollisio
 	}
 }
 
-func (ec *Canvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
+func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 
 	if opts.Bmp == nil {
 		panic("nothing to blit")
@@ -108,7 +108,7 @@ func (ec *Canvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
 
 	} else {
 		// If clip starts outside of BMP === no render
-		if (*opts.Clip).X >= opts.Bmp.Width() || (*opts.Clip).Y >= opts.Bmp.Height() {
+		if (*opts.Clip).X >= bw || (*opts.Clip).Y >= bh {
 			return CANV_CL_NONE
 		}
 
@@ -136,11 +136,7 @@ func (ec *Canvas) Blit(opts *BlitSettings) CanvasCollisionLayers {
 		(*opts.Clip).H -= (bb - bh)
 	}
 
-	return ec.blitBitmapClipped(opts.Bmp, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
-}
-
-func (ec *Canvas) BlitBitmap(bmp *Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers) CanvasCollisionLayers {
-	return ec.blitBitmapClipped(bmp, x, y, alpha, layers, &types.Rect{0, 0, bmp.Width(), bmp.Height()})
+	return ec.blitBitmapClipped(opts.Bmp, bw, bh, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
 }
 
 // Implement go_wasm_canvas
@@ -168,13 +164,13 @@ func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasm
 
 // Private Helpers
 // ==============================================================================
-func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
+func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
 
 	//what to draw
 	var bitmapByteOffset uint32 = uint32((*clip).X)
-	var bitmapIndexStart uint32 = uint32((*clip).Y)*uint32(bmp.PPL()) + uint32(bitmapByteOffset)
+	var bitmapIndexStart uint32 = uint32((*clip).Y)*uint32(bmpw) + uint32(bitmapByteOffset)
 	var bitmapRenderLinePixels uint32 = uint32((*clip).W)
-	bitmapByteOffset += uint32(uint32(bmp.Width()) - bitmapByteOffset - bitmapRenderLinePixels)
+	bitmapByteOffset += uint32(uint32(bmpw) - bitmapByteOffset - bitmapRenderLinePixels)
 
 	var bitmapRenderLines int32 = int32((*clip).H)
 

@@ -45,7 +45,7 @@ func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBli
 
 	if (*pTs).gfx == nil || len((*pTs).tiles) > tileindex {
 
-		return canvas.Blit(&core.BlitSettings{
+		return canvas.Blit(&core.CanvasBlitOpts{
 			Bmp:       (*pTs).gfx,
 			X:         opts.X,
 			Y:         opts.Y,
