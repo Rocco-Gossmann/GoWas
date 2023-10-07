@@ -12,6 +12,7 @@ BMPS:=./bmps
 BOILERFILES:=$(BUILDDIR)/  $(BUILDDIR)/index.html  $(BUILDDIR)/.htaccess 
 
 # Find all JSFILES IN BOILERPLATE folder
+
 JSFILESSRC:=$(foreach dir,$(BOILERPLATE), $(wildcard $(dir)/*.js))
 JSFILES:=$(subst $(BOILERPLATE),$(BUILDDIR),$(JSFILESSRC))
 
@@ -23,7 +24,6 @@ PNGTARGETS:=$(patsubst $(ASSETS)/%.png, $(BMPS)/bmp.%.go, $(PNGFILESRC))
 ################################################################################
 ASSETPREFIX := $(subst ./,,$(ASSETS))
 BMPSPREFIX  := $(subst ./,,$(BMPS))
-
 
 ################################################################################
 # Recipes
@@ -52,9 +52,10 @@ go.sum: go.mod
 	
 start: run
 
-.phony: echo run stop open dev clean remake $(BUILDDIR)/
 
-echo:
+.phony: echo run stop open clean remake $(BUILDDIR)/
+
+echo: .entr_sourcelist
 	@echo "Boilerplate files: "$(BOILERFILES)
 	@echo
 	@echo "PNG Sources: "$(PNGFILESRC)
@@ -62,18 +63,18 @@ echo:
 	@echo
 	@echo "JS Sources: "$(JSFILESSRC)
 	@echo "JS Targets: "$(JSFILES)
+	@echo
+	@echo "Watchfiles:"
+	@echo $(shell cat ./entr_sourcelist)
 
 open: 
 	open http://localhost:7353
 
-run:
-	./.tools/startserver.zsh
-
-stop:
-	./.tools/stopserver.zsh
-
 dev:
-	./.tools/entr.zsh
+	find .. -type f \( -name "*png" -o -name "*js" -o -name "*.html" -o -name "*.go" \) -not -iregex '.*/docs/.*' | entr make remake
+
+run:
+	go run ./.tools/server/server.go
 
 remake: 
 	rm -f $(BUILDDIR)/main.wasm
@@ -84,4 +85,5 @@ $(BUILDDIR)/:
 
 clean:
 	rm -rf $(BUILDDIR) 
+	rm -rf $(BMPS)/bmp.*.go 
 

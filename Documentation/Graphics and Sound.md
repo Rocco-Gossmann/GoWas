@@ -7,8 +7,8 @@ binary.
 The Conversion process is handled by the `Makefile` as long, as you follow the
 following steps.
 
-> [!warning] To follow this process, you need to have finished the
-> [Setup](./Setup.md) first.
+> [!warning] 
+> To follow this process, you need to have finished the [Setup](./Setup.md) first.
 
 1. Put any PNG, you wish to become part of the Project into the `./assets` -
    Folder in your Project
@@ -47,4 +47,5 @@ Here are a few examples of file- to variable name conversions
 | `./assets/1-SpriteSheet.new.png` | `./bmps/1-SpriteSheet.new.go` | `BMP1SpriteSheetnew` |
 
 
-> [!todo] Implement Sound
+> [!todo] 
+> Implement Sound

@@ -24,6 +24,7 @@ myTileSet.InitFromSpriteSheet(...) //<- yet to be implemented
 ```
 
 ## Things to Note
+
 > [!attention]  
 > Things to keep in mind, when using/drawing TileSets
 >
