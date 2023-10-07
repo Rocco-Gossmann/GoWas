@@ -1,6 +1,7 @@
 Rendering:
 ================================================================================
-    [ ] Test how drawing a bitmap, that overflows all 4 sides functions @critical 
+    [x] Test how drawing a bitmap, that overflows all 4 sides functions @critical 
+        [x] Fix Oversized Bitmaps being cut of to early
     [ ] Adapt TileSets for SpriteSheets
     [ ] Tinting Bitmaps/TileMaps/Sprites on Draw
 

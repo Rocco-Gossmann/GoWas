@@ -13,7 +13,9 @@ type debugScene struct {
 	tma float64
 
 	CursorEntity *core.BitmapEntity
-	text         *gfx.TextDisplay
+	bg2          *core.BitmapEntity
+
+	text *gfx.TextDisplay
 
 	bgSet    *gfx.TileSet
 	bgMap    *gfx.TileMap
@@ -85,6 +87,7 @@ func (s *debugScene) Load(e *core.Engine) {
 		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
 	})
 
+	s.bg2.MoveBy(-4, -4).Alpha(0x80, false)
 }
 
 func (me *debugScene) Tick(e *core.Engine, dt float64) bool {
@@ -112,7 +115,6 @@ func (me *debugScene) Tick(e *core.Engine, dt float64) bool {
 }
 
 func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
-
 	// Update FPS Counter
 	s.fpsCnt++
 
@@ -120,7 +122,9 @@ func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
 		Scroll: s.bgScroll,
 	})
 
-	ca.FillColorA(0x00000000, 0x80, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
+	s.bg2.ToCanvas(ca)
+
+	ca.FillColorA(0x00000000, 0xc8, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
 	//													 to darken the backaground a bit
 
 	s.text.ToCanvas(ca) //<- Tell the engine to display the TextDisplay
@@ -132,7 +136,6 @@ func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
 	if mouse.X > 0 || mouse.Y > 0 {
 		s.CursorEntity.ToCanvas(ca)
 	}
-
 }
 
 func (s *debugScene) Unload(e *core.Engine) *struct{} {
@@ -144,4 +147,5 @@ func (s *debugScene) Unload(e *core.Engine) *struct{} {
 
 var Debug = debugScene{
 	CursorEntity: bmps.BMPcursor.MakeEntity(),
+	bg2:          bmps.BMPoversized.MakeEntity(),
 }

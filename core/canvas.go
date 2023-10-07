@@ -167,12 +167,12 @@ func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasm
 func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
 
 	//what to draw
-	var bitmapByteOffset uint32 = uint32((*clip).X)
-	var bitmapIndexStart uint32 = uint32((*clip).Y)*uint32(bmpw) + uint32(bitmapByteOffset)
-	var bitmapRenderLinePixels uint32 = uint32((*clip).W)
+	var bitmapByteOffset uint32 = uint32(clip.X)
+	var bitmapIndexStart uint32 = uint32(clip.Y)*uint32(bmpw) + uint32(bitmapByteOffset)
+	var bitmapRenderLinePixels uint32 = uint32(clip.W)
 	bitmapByteOffset += uint32(uint32(bmpw) - bitmapByteOffset - bitmapRenderLinePixels)
 
-	var bitmapRenderLines int32 = int32((*clip).H)
+	var bitmapRenderLines int32 = int32(clip.H)
 
 	cw, ch := int32(ec.wasmcanvas.Width()), int32(ec.wasmcanvas.Height())
 	bw, bh := int32(clip.W), int32(clip.H)
@@ -186,15 +186,17 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, 
 	// Trim BMP Lines from the Left
 	if x < 0 {
 		bitmapIndexStart = uint32(int32(bitmapIndexStart) - x)
-		bitmapByteOffset = uint32(int32(bitmapByteOffset) - x)
-		bitmapRenderLinePixels = uint32(int32(bitmapRenderLinePixels) + x)
+
+		var trueX = x - max(x, min(0, cw-bw))
+		bitmapByteOffset = uint32(int32(bitmapByteOffset) - trueX)
+		bitmapRenderLinePixels = uint32(int32(bitmapRenderLinePixels) + trueX)
 		x = 0
 	}
 
 	// Trim BMP Lines from the Top
 	if y < 0 {
 		bitmapIndexStart = uint32(int32(bitmapIndexStart) - (y * int32(bmp.Width())))
-		bitmapRenderLines += y
+		bitmapRenderLines += y - max(y, min(0, ch-bh))
 		y = 0
 	}
 
