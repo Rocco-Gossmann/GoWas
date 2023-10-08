@@ -15,6 +15,11 @@ type Engine struct {
 	Run func(scene any)
 }
 
+type EngineState struct {
+	Mouse     MouseState
+	DeltaTime float64
+}
+
 func (e *Engine) Init(s *EngineSetup) {
 	if e == nil {
 		panic("'engine' can't be nil")
@@ -24,7 +29,6 @@ func (e *Engine) Init(s *EngineSetup) {
 	}
 
 	e.canvas = CreateCanvas(e, (*s).WindowWidth, (*s).WindowHeight)
-
 }
 
 func (e *Engine) Canvas() *Canvas { return e.canvas }
@@ -34,7 +38,7 @@ func (e *Engine) SwitchScene(scene any) {
 		hasInterface := false
 
 		if l, ok := interface{}(scene).(Loadable); ok {
-			l.Load(e)
+			l.Load(&engineState, e.canvas)
 		}
 
 		if t, ok := interface{}(scene).(Tickable); ok {

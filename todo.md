@@ -1,3 +1,14 @@
+Bugs:
+================================================================================
+
+TextDisplay:
+================================================================================
+    [x] Add a clear function, that replaces a number of characters with spaces, but leaves the Cursor-Position unaltered
+    [ ] Make Text-Display Moveable on Screen Similar to TileMap
+    [ ] Add Setters and Getters like in BitmapEntity
+        [ ] ScreenOffset 
+        [ ] Alpha
+
 Rendering:
 ================================================================================
     [x] Test how drawing a bitmap, that overflows all 4 sides functions @critical 
@@ -8,20 +19,13 @@ Rendering:
 
 Maps:
 ================================================================================
+    [ ] Rework Setters and Getters to Work like BitmapEntities Do @critical
     [ ] Test how drawing Maps, that are smaller than the screen behaves @critical
     [ ] Maps Collision layers @critical
     [ ] Maps Alpha blending
     [ ] Allow to fill columns or rows of Tiles with data @high (Instead of just single tiles or the entire map)
     [ ] Maps Clipping-Rect @low
     [ ] Allow maps scroll.x any y propperties to be negative @low
-
-
-Mouse Input:
-================================================================================
-    [x] Browser side
-    [ ] Go Side
-        [x] Process Mouse Position @done (26.9.2023, 05:39:49)
-        [ ] Process Button clicks
 
 
 Keyboard Input:
@@ -61,8 +65,9 @@ Loading Compressed Data:
     [ ] mapData
 
 
-# Documentation:
+Documentation:
 ================================================================================
+
 ## Usage:
     [x] Project-Setup 
     [ ] Project - main.go
@@ -101,3 +106,9 @@ Done:
         [x] Map Drawing
     [x] Define basic Print Text Functions
 
+### Mouse Input:
+    [x] Browser side
+    [x] Go Side
+        [x] Process Mouse Position @done (26.9.2023, 05:39:49)
+        [x] Process Button clicks
+    [x] Mouse is not available to Tick function due to being bound to the canvas (Bind mouse to Engine instead)

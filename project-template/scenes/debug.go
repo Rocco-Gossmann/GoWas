@@ -17,7 +17,9 @@ type debugScene struct {
 
 	text *gfx.TextDisplay
 
-	bgSet    *gfx.TileSet
+	bgSet              *gfx.TileSet
+	mouseButtonDisplay *gfx.TileSet
+
 	bgMap    *gfx.TileMap
 	bgScroll types.Point
 
@@ -26,23 +28,29 @@ type debugScene struct {
 	fps     int
 }
 
-func (s *debugScene) Load(e *core.Engine) {
+func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 	fmt.Println("Debug-Scene loaded")
 
 	// Setting the Initial background to light #333333
 	//-------------------------------------------------------------------------
-	e.Canvas().FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
+	ca.FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
+
+	// Load in Mouse Button Display-Tileset
+	//-------------------------------------------------------------------------
+	mbts := gfx.TileSet{}
+	mbts.InitFromMapSheet(bmps.BMPmouse, 32, 32)
+	s.mouseButtonDisplay = &mbts
 
 	// Setting up a Text-Display
 	//-------------------------------------------------------------------------
-	s.text = gfx.InitTextDisplay(e) // Initialize a Text-Display (You can have as many as you want)
+	s.text = gfx.InitTextDisplay(ca) // Initialize a Text-Display (You can have as many as you want)
 
 	s.text. //<- Starting the Text change on a Display
 		SetCursor(0, 0).Echo("@ Test {}()<|>"). //<- Settting a Cursor position and Printing Text, starting from that location
-		SetCursor(-2, 8).Echo("->").            //<- negative coordinates mean "From the Bottom" and/or "From the Right"
+		SetCursor(-2, 0).Echo("->").            //<- negative coordinates mean "From the Bottom" and/or "From the Right"
 
-		SetCursor(0, 7).Echo("Hey you!"). //<- Positive coordinate = "From the Top" and/or "From the Left"
-		Echo("\nYou are finally\nawake.") // <- If you don't specifiy a location, the text
+		SetCursor(0, 6).Echo("Hey you!").                                          //<- Positive coordinate = "From the Top" and/or "From the Left"
+		Echo(" Move the\nmouse over this\nScreen and press\none of it's Buttons.") // <- If you don't specifiy a location, the text
 		//									     continues where the last character was printed
 		//									     You can use \n to force a line break and carriage return from within the text
 
@@ -90,18 +98,20 @@ func (s *debugScene) Load(e *core.Engine) {
 	s.bg2.MoveBy(-4, -4).Alpha(0x80, false)
 }
 
-func (me *debugScene) Tick(e *core.Engine, dt float64) bool {
+func (me *debugScene) Tick(e *core.EngineState) bool {
 
 	// Update Timer
-	me.tma += 24 * dt
+	me.tma += 24 * e.DeltaTime
 	me.text.SetCursor(7, -1).Echo(fmt.Sprint(me.tma)) // <- update the Text display with the current timer value
 
 	// Update FPS
-	me.fpsTime += dt
+	me.fpsTime += e.DeltaTime
 	if me.fpsTime >= 1 {
 
-		me.text.SetCursor(7, -2).Echo("        ").
-			SetCursor(7, -2).Echo(fmt.Sprint(me.fpsCnt))
+		me.text.
+			SetCursor(7, -2).
+			Clear(8). //<-- overwrite the next 8 characters from the cursor with spaces
+			Echo(fmt.Sprint(me.fpsCnt))
 
 		me.fpsTime = 0
 		me.fpsCnt = 0
@@ -114,7 +124,7 @@ func (me *debugScene) Tick(e *core.Engine, dt float64) bool {
 	return true
 }
 
-func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
+func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
 	// Update FPS Counter
 	s.fpsCnt++
 
@@ -127,21 +137,32 @@ func (s *debugScene) Draw(e *core.Engine, ca *core.Canvas) {
 	ca.FillColorA(0x00000000, 0xc8, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
 	//													 to darken the backaground a bit
 
-	s.text.ToCanvas(ca) //<- Tell the engine to display the TextDisplay
+	s.text.
+		SetCursor(5, 13).
+		Clear(9).
+		Echo(fmt.Sprintf("%v, %v", e.Mouse.X, e.Mouse.Y)).
+		ToCanvas(ca) //<- Tell the engine to display the TextDisplay
+
+	// Draw the Mouse Button Display
+	//-------------------------------------------------------------------------
+	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld), &gfx.TilesetBlitOptions{
+		X: 0, Y: 88,
+	})
 
 	// Draw the Mouse Cursor
 	//-------------------------------------------------------------------------
-	mouse := ca.Mouse
-	s.CursorEntity.MoveTo(int32(mouse.X), int32(mouse.Y))
-	if mouse.X > 0 || mouse.Y > 0 {
+	s.CursorEntity.MoveTo(int32(e.Mouse.X), int32(e.Mouse.Y))
+	if e.Mouse.X > 0 || e.Mouse.Y > 0 {
 		s.CursorEntity.ToCanvas(ca)
 	}
+
 }
 
-func (s *debugScene) Unload(e *core.Engine) *struct{} {
+func (s *debugScene) Unload(e *core.EngineState) *struct{} {
 	s.text = nil
 	s.bgMap = nil
 	s.bgSet = nil
+	s.mouseButtonDisplay = nil
 	return nil
 }
 

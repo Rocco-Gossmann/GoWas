@@ -36,7 +36,6 @@ type Canvas struct {
 	wasmcanvas go_wasmcanvas.Canvas
 	engine     *Engine
 	buffer     Buffer
-	Mouse      MouseState
 }
 
 func (ca *Canvas) GetWidth() uint16  { return ca.wasmcanvas.Width() }
@@ -142,20 +141,22 @@ func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 // Implement go_wasm_canvas
 // ==============================================================================
 func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
-	(*ec).buffer.Memory = px
-	(*(*(*ec).engine).Draw).Draw((*ec).engine, ec)
+	ec.buffer.Memory = px
+	(*ec.engine.Draw).Draw(&engineState, ec)
 }
+
+var engineState EngineState
 
 func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
 
-	ec.Mouse = *UpdateMouse()
+	UpdateMouse(&engineState.Mouse)
+	engineState.DeltaTime = deltaTime
 
-	engine := &(*(*ec).engine)
-	if (*(*engine).Tick).Tick(engine, deltaTime) {
+	if (*ec.engine.Tick).Tick(&engineState) {
 		ec.wasmcanvas.Apply(ec.canvasDraw)
 
 	} else {
-		engine.SwitchScene((*(*engine).Unload).Unload(engine))
+		ec.engine.SwitchScene((*ec.engine.Unload).Unload(&engineState))
 
 	}
 
