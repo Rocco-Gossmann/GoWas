@@ -2,6 +2,7 @@ package gfx
 
 import (
 	"math"
+	"strings"
 
 	"github.com/rocco-gossmann/GoWas/core"
 	"github.com/rocco-gossmann/GoWas/ressource"
@@ -26,15 +27,15 @@ func (me *TextDisplay) SetWrap(wrap bool) *TextDisplay {
 	return me
 }
 
-func InitTextDisplay(e *core.Engine) *TextDisplay {
+func InitTextDisplay(ca *core.Canvas) *TextDisplay {
 
-	if e == nil {
-		panic("cant initiate TextDisplay without engine")
+	if ca == nil {
+		panic("cant initiate TextDisplay without a Canvas to initialize it for.")
 	}
 
 	text := TextDisplay{}
-	text.canvasWidth = e.Canvas().GetWidth()
-	text.canvasHeight = e.Canvas().GetHeight()
+	text.canvasWidth = ca.GetWidth()
+	text.canvasHeight = ca.GetHeight()
 
 	text.ts = &TileSet{}
 	text.ts.InitFromMapSheet(ressource.AsciiFontBMP, 8, 8)
@@ -66,6 +67,13 @@ func (me *TextDisplay) SetCursor(x, y int32) *TextDisplay {
 	}
 
 	return me
+}
+
+func (me *TextDisplay) Clear(numOfCharacters uint) *TextDisplay {
+	cx, cy := me.cursorx, me.cursory
+	return me.
+		Echo(strings.Repeat(" ", int(numOfCharacters))).
+		SetCursor(int32(cx), int32(cy))
 }
 
 func (me *TextDisplay) Echo(text string) *TextDisplay {
