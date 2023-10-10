@@ -16,7 +16,7 @@ you can find all documentation in the [./Documentation](./Documentation) Folder
 - [How to get Started ](./Documentation/Setup.md) 
 
 ## Tooling
-- [Graphics-Import](./Documentation/graphics_and_sound_gfx_snd.md)
+- [Graphics-Import](./Documentation/Graphics and Sound.md)
 
 ## References
 - [Bitmap](./Documentation/reference/Bitmap.md)

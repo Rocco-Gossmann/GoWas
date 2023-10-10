@@ -60,7 +60,7 @@ Now your blank slate is ready.
 
 ## Using entr as an auto building tool 
 
-If you have `entr` as available shell commands, you can use the,
+If you have `entr` as available shell command, you can use the,
 following `make` tasks/commands in addition
 
 ```bash

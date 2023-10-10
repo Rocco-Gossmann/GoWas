@@ -1,11 +1,12 @@
 Bugs:
 ================================================================================
+    [x] Documentation: Setup.md => "if you have entr as available shell command[s]"
+    [x] Documentation: Readme.md => Link to Graphics does not work
 
 TextDisplay:
 ================================================================================
     [x] Add a clear function, that replaces a number of characters with spaces, but leaves the Cursor-Position unaltered
-    [ ] Make Text-Display Moveable on Screen Similar to TileMap
-    [ ] Add Setters and Getters like in BitmapEntity
+    [ ] Make Text-Display Moveable on Screen Similar to TileMap [ ] Add Setters and Getters like in BitmapEntity
         [ ] ScreenOffset 
         [ ] Alpha
 
