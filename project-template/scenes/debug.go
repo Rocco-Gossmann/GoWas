@@ -49,10 +49,11 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 		SetCursor(0, 0).Echo("@ Test {}()<|>"). //<- Settting a Cursor position and Printing Text, starting from that location
 		SetCursor(-2, 0).Echo("->").            //<- negative coordinates mean "From the Bottom" and/or "From the Right"
 
-		SetCursor(0, 6).Echo("Hey you!").                                          //<- Positive coordinate = "From the Top" and/or "From the Left"
-		Echo(" Move the\nmouse over this\nScreen and press\none of it's Buttons.") // <- If you don't specifiy a location, the text
+		SetCursor(0, 6).Echo("Hey you!").                                           //<- Positive coordinate = "From the Top" and/or "From the Left"
+		Echo(" Move the\nmouse over this\nScreen and press\none of it's Buttons."). // <- If you don't specifiy a location, the text
 		//									     continues where the last character was printed
 		//									     You can use \n to force a line break and carriage return from within the text
+		SetCursor(5, 13).Echo(fmt.Sprintf("Pressed / Held:"))
 
 	// Preparing a part on the bottom line for showing a constantly changing value
 	s.text.
@@ -132,20 +133,20 @@ func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
 		Scroll: s.bgScroll,
 	})
 
-	s.bg2.ToCanvas(ca)
+	//s.bg2.ToCanvas(ca) //<-- disabled bg2 because it looked silly
 
-	ca.FillColorA(0x00000000, 0xc8, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
+	ca.FillColorA(0x00000000, 0xb0, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
 	//													 to darken the backaground a bit
 
 	s.text.
-		SetCursor(5, 13).
-		Clear(9).
-		Echo(fmt.Sprintf("%v, %v", e.Mouse.X, e.Mouse.Y)).
+		SetCursor(5, 14).Clear(8).
+		SetCursor(5, 11).Clear(9).
+		Echo(fmt.Sprintf("%v, %v\n\n\n     %v", e.Mouse.X, e.Mouse.Y, e.Mouse.PressedOrHeld)).
 		ToCanvas(ca) //<- Tell the engine to display the TextDisplay
 
 	// Draw the Mouse Button Display
 	//-------------------------------------------------------------------------
-	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld), &gfx.TilesetBlitOptions{
+	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&7), &gfx.TilesetBlitOptions{
 		X: 0, Y: 88,
 	})
 
