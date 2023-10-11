@@ -1,3 +1,4 @@
 test
-project-template.tar.gz
+project-template-*.tar.gz
+Documentation-*.tar.gz
 Makefile
