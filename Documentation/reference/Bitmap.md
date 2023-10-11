@@ -1,7 +1,7 @@
 # Bitmap
 
 > [!warning]
-> If all you want is to load grapics, from Images, please read the [Graphics & Sound](../Graphics and Sound.md) Section first
+> If all you want is to load grapics, from Images, please read the [Graphics & Sound](../Graphics_and_Sound.md) Section first
 
 Sub Package: `GoWas/core`
 
