@@ -6,14 +6,17 @@ import "github.com/rocco-gossmann/GoWas/core"
 
 var engineActive *core.Engine
 
-func Init(setup core.EngineSetup) *core.Engine {
+type EngineSetup core.EngineSetup
+
+func Init(setup EngineSetup) *core.Engine {
 
 	if engineActive != nil {
 		panic("Engine.Init was called multiple times. Only one time allowed")
 	}
 
+	es := core.EngineSetup(setup)
 	engine := core.Engine{}
-	engine.Init(&setup)
+	engine.Init(&es)
 	engineActive = &engine
 
 	engine.Run = func(scene any) {

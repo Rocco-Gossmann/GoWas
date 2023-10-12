@@ -16,7 +16,7 @@ import (
 
 func main() {
     e := GoWas.Init(
-        core.EngineSetup{
+        GoWas.EngineSetup{
             WindowWidth:  160, // <- Width of the canvas in pixels
             WindowHeight: 144, // <- Height of the canvas in pixels
         }
