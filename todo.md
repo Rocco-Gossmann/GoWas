@@ -71,18 +71,20 @@ Documentation:
 
 ## Usage:
     [x] Project-Setup 
+    [x] Engine-Lifecycle
     [ ] Project - main.go
     [ ] Scenes
-    [ ] Engine-Lifecycle
+    [ ] Scene-Transitions
     [ ] Drawing Stuff
     [ ] Mouse-Input
     [ ] Keyboard-Input
+    [ ] Requesting Assets from the Browser
     [ ] Audio-Output
     [ ] Storing Data in the Browser
-    [ ] Requesting Assets from the Browser
     
 ## Reference:
     [ ] Engine
+    [x] Engine-State
     [ ] Mouse
     [ ] Keyboard
     [ ] Scene

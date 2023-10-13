@@ -40,7 +40,7 @@ For more Details on how to initialize the GoWas-Engine, please read the
 Now that we have a Frame, we need to define, what our Vehicle will be filled
 with. What levers or wheels are on it.
 
-This is where the `core.Scene` comes in.
+This is where the [`core.Scene`](./Scenes.md) comes in.
 
 The GoWas Core defines 4 Interfaces.
 
@@ -76,8 +76,8 @@ type Unloadable interface {
 
 ### 2a.) Loading the Scene (Getting into the Vehicle and turning the ignition key)
 
-A scenes `Load(*core.EngineState, *core.Canvas)` method is called before the
-Engine starts running its main-loop.
+&nbsp;<pre>Load(*[core.EngineState](./reference/EngineState.md), *[core.Canvas](./reference/Canvas.md))</pre>  
+Is called before the Engine starts running its main-loop.
 
 Here is, where you should initilize your ressources, that the Engine will use
 when it is running.
@@ -88,7 +88,9 @@ In our analogy, this this is the point, where you fill the Cockpit or driver
 cabin of your Vehicle.\
 Do you want to steer it with a Wheel, a Bike-Handle or a Game-Controller.
 
-### 2b.) Ticking (Defining what happens with each Stroke of the Engine)
+### 2b.) Ticking (Defining what happens with each stroke of the Engine)
+
+&nbsp;<pre>Tick(*[core.EngineState](./reference/EngineState.md)) bool </pre>  
 
 The Cockpit is setup, you turned the Key, now the Engine is running and each tick / stroke.
 your Scenes `Tick(*core.EngineState) bool` - Method is called.
@@ -98,8 +100,15 @@ In here, you can do what ever you want with the Ressources you set up in your Sc
 The `Tick(...)` method must however return a `boolean` to tell the engine,
 if it should keep running like this.
 
+> [!waring]
+> This method must return `true` unless you want to switch to another Scene or Stop the Engine  
+> (see [Scene-Transitions](./SceneTransitions.md) for more details)
+
+
 
 ### 2c.) Drawing (Showing the driver what is going on)
+
+&nbsp;<pre>Draw(*[core.EngineState](./reference/EngineState.md))</pre>  
 
 After each Tick, your Scenes `Draw(*core.EngineState, *core.Canvas)` Method is called.
 `*core.Canvas` is our viewport, that can be manipulated in this step.
@@ -111,6 +120,21 @@ set up in your scenes `Load(...)` Method.
 > Drawing and Ticking are separated.
 > once your scenes `Tick(...)` method returns `false` the call to `Draw(...)` is skipped. 
 
-//TODO: Continue here:
+### 3.) Unloading (Shutting down the Vehicle and clearing the drivers cabin) 
+
+&nbsp;<pre>Unload(*[core.EngineState](./reference/EngineState.md)) *[core.Scene](./reference/Scene.md) </pre>  
+
+Once your scenes `Tick(...)`-Method returns a `false`, then Engine will call your scenes `Unload(...)` method.  
+Should your Scene not have an `Unload(...)` method, the Engine will shut down.
+
+The unload method is meant to clear and free all ressources, that where set up/created during your Scenes 
+`Load(...)`, `Tick(...)` or `Draw(...)` method calls.
+
+The `Unload(...)` method itself has to return either a `core.Scene` pointer or `nil`.
+
+if a `*core.Scene` is returned, the Engine will first call its `Load(...)` Method (should you define one) and then continue to run its cycle. 
+
+Should you want to stop the Engines execution, then `Unload(...)` must return `nil`.
+
 
 

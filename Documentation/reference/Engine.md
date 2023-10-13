@@ -34,9 +34,9 @@ The Function will run, until it no longer receives a Scene to Run
 
 #### Parameters
 
-| parameter | type                       | description                                |
-| --------- | -------------------------- | ------------------------------------------ |
-| `scene`   | [`core.Scene`](./Scene.md) | The very first Scene to run in the Project |
+| parameter | type                         | description                                                              |
+| --------- | ---------------------------- | ------------------------------------------------------------------------ |
+| `scene`   | \*[`core.Scene`](./Scene.md) | The Memory address/pointer to the very first Scene to run in the Project |
 
 # EngineSetup
 
