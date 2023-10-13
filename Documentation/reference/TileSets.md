@@ -25,7 +25,7 @@ myTileSet.InitFromSpriteSheet(...) //<- yet to be implemented
 
 ## Things to Note
 
-> [!attention]  
+> [!important]  
 > Things to keep in mind, when using/drawing TileSets
 >
 > - Tile `0` (most top left) is always blank and will never be drawn to the screen.
