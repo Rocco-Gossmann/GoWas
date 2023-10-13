@@ -68,7 +68,7 @@ type Unloadable interface {
 }
 ```
 
-> [!attention]\
+> [!important]\
 > Any struc{} that implements the `Drawable` and/or `Tickable` interface Will be
 > a valid `core.Scene`
 >
@@ -100,7 +100,7 @@ In here, you can do what ever you want with the Ressources you set up in your Sc
 The `Tick(...)` method must however return a `boolean` to tell the engine,
 if it should keep running like this.
 
-> [!waring]
+> [!warning]
 > This method must return `true` unless you want to switch to another Scene or Stop the Engine  
 > (see [Scene-Transitions](./SceneTransitions.md) for more details)
 
@@ -116,7 +116,7 @@ After each Tick, your Scenes `Draw(*core.EngineState, *core.Canvas)` Method is c
 It is more likely however, that you will just pass it through to some components, you 
 set up in your scenes `Load(...)` Method.
 
-> [!notice]  
+> [!note]  
 > Drawing and Ticking are separated.
 > once your scenes `Tick(...)` method returns `false` the call to `Draw(...)` is skipped. 
 
