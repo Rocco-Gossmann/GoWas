@@ -19,7 +19,8 @@ becomes a valid `core.Scene`.
 If a Scene implements it, its `Tick` method is called every time the Engine hits
 a new cycle.
 
-> [!important] If your Scene does not implement the `core.Tickable` interface,
+> [!important] 
+> If your Scene does not implement the `core.Tickable` interface,
 > The Engine will run indefinitly on this Scene.
 
 ```go
