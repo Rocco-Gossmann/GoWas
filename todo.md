@@ -1,7 +1,5 @@
 Bugs:
 ================================================================================
-    [x] Documentation: Setup.md => "if you have entr as available shell command[s]"
-    [x] Documentation: Readme.md => Link to Graphics does not work
 
 TextDisplay:
 ================================================================================
@@ -47,7 +45,7 @@ Audio:
 
 Tooling:
 ================================================================================
-    [x] Automate Assets.png conversion (User should only have to put the PNG into the ./assets folder)
+    [x] Automate Assets.png cnnversion (User should only have to put the PNG into the ./assets folder)
         [x] Extend Makefile
         [x] Move tools-scripts into "project-template"
 
@@ -73,7 +71,7 @@ Documentation:
     [x] Project-Setup 
     [x] Engine-Lifecycle
     [ ] Project - main.go
-    [ ] Scenes
+    [x] Scenes
     [ ] Scene-Transitions
     [ ] Drawing Stuff
     [ ] Mouse-Input
@@ -83,11 +81,10 @@ Documentation:
     [ ] Storing Data in the Browser
     
 ## Reference:
-    [ ] Engine
+    [x] Engine
     [x] Engine-State
     [ ] Mouse
     [ ] Keyboard
-    [ ] Scene
     [ ] Canvas
     [ ] TileMap
         [ ] Concept
@@ -115,3 +112,6 @@ Done:
         [x] Process Mouse Position @done (26.9.2023, 05:39:49)
         [x] Process Button clicks
     [x] Mouse is not available to Tick function due to being bound to the canvas (Bind mouse to Engine instead)
+
+    [x] Documentation: Setup.md => "if you have entr as available shell command[s]"
+    [x] Documentation: Readme.md => Link to Graphics does not work

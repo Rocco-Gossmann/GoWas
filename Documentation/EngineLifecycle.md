@@ -51,14 +51,14 @@ type Loadable interface {
 ```
 
 ```go
-type Drawable interface {
-    Draw(e *EngineState, ec *Canvas)
+type Tickable interface {
+    Tick(e *EngineState) bool
 }
 ```
 
 ```go
-type Tickable interface {
-    Tick(e *EngineState) bool
+type Drawable interface {
+    Draw(e *EngineState, ec *Canvas)
 }
 ```
 

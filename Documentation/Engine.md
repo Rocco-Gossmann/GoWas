@@ -1,6 +1,6 @@
 # The Engine
 
-The Engine is the `core.Engine` is the entrypoint to every application using it.
+The `core.Engine` is the entrypoint to every application using it.
 
 This is the barebones skeleton you should use in your `main.go` file.
 
@@ -8,10 +8,9 @@ This is the barebones skeleton you should use in your `main.go` file.
 package main
 
 import (
-    "GoWasProject/scenes"  //<- This must be defined by yourself
+    "MyProject/scenes"  //<- This must be defined by yourself
 
     "github.com/rocco-gossmann/GoWas"
-    "github.com/rocco-gossmann/GoWas/core"
 )
 
 func main() {
@@ -26,9 +25,11 @@ func main() {
     e.Run(&scenes.Debug)
 }
 ```
+For further information see:
+- [Engine-Reference](./reference/Engine.md)
+- [Engine-State](./reference/EngineState.md)
+- [Engine-Lifecycle](./EngineLifecycle.md)
 
 
 
 
-
-## Engine-Lifecycle
