@@ -9,6 +9,10 @@ import (
 	"github.com/rocco-gossmann/GoWas/types"
 )
 
+const validMouseButtons = core.MOUSE_BTN1 |
+	core.MOUSE_BTN2 |
+	core.MOUSE_BTN3
+
 type debugScene struct {
 	tma float64
 
@@ -146,7 +150,7 @@ func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
 
 	// Draw the Mouse Button Display
 	//-------------------------------------------------------------------------
-	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&7), &gfx.TilesetBlitOptions{
+	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&validMouseButtons), &gfx.TilesetBlitOptions{
 		X: 0, Y: 88,
 	})
 

@@ -43,16 +43,16 @@ const (
 
 type MouseState struct {
 	X, Y          uint16
-	Pressed       uint32
-	Held          uint32
-	Released      uint32
-	PressedOrHeld uint32
+	Pressed       MouseButton
+	Held          MouseButton
+	Released      MouseButton
+	PressedOrHeld MouseButton
 }
 
 // Holding the MouseState itself
 var mouseState struct {
 	X, Y    uint16
-	Buttons uint32 // Held Buttons
+	Buttons MouseButton // Held Buttons
 }
 
 var lastMouseState MouseState
@@ -68,7 +68,7 @@ func onMouseMessage(this js.Value, args []js.Value) interface{} {
 
 		mouseState.X = uint16(data.Get("0").Int())
 		mouseState.Y = uint16(data.Get("1").Int())
-		mouseState.Buttons = uint32(data.Get("2").Int())
+		mouseState.Buttons = MouseButton(data.Get("2").Int())
 
 	}
 	return nil

@@ -74,7 +74,7 @@ Documentation:
     [x] Scenes
     [ ] Scene-Transitions
     [ ] Drawing Stuff
-    [ ] Mouse-Input
+    [x] Mouse-Input
     [ ] Keyboard-Input
     [ ] Requesting Assets from the Browser
     [ ] Audio-Output
@@ -83,7 +83,6 @@ Documentation:
 ## Reference:
     [x] Engine
     [x] Engine-State
-    [ ] Mouse
     [ ] Keyboard
     [ ] Canvas
     [ ] TileMap
