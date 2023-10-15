@@ -17,6 +17,7 @@ type Engine struct {
 
 type EngineState struct {
 	Mouse     MouseState
+	Keyboard  KeyboardState
 	DeltaTime float64
 }
 

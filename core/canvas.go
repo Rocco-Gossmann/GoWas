@@ -150,6 +150,7 @@ var engineState EngineState
 func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
 
 	UpdateMouse(&engineState.Mouse)
+	UpdateKeys(&engineState.Keyboard)
 	engineState.DeltaTime = deltaTime
 
 	if (*ec.engine.Tick).Tick(&engineState) {

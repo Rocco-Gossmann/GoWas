@@ -49,26 +49,62 @@ type MouseState struct {
 	PressedOrHeld MouseButton
 }
 
+const keyboardHistoryLimit = 64
+
+type KeyboardState struct {
+	Pressed       [128]bool
+	Held          [128]bool
+	Released      [128]bool
+	PressedOrHeld [128]bool
+
+	history    [keyboardHistoryLimit]byte
+	historyPtr byte
+}
+
+func (st *KeyboardState) HistoryStr(limit byte) string {
+
+	l := max(0, min(64, limit))
+	var str = make([]rune, l, l)
+	var idx byte
+	var ptr byte = l - 1
+
+	for idx < l {
+		str[idx] = rune(st.history[(keyboardHistoryLimit+(st.historyPtr-ptr))%keyboardHistoryLimit])
+		ptr--
+		idx++
+	}
+
+	return string(str)
+}
+
 // Holding the MouseState itself
 var mouseState struct {
 	X, Y    uint16
 	Buttons MouseButton // Held Buttons
 }
 
+var keyboardState [4]uint32
+
 var lastMouseState MouseState
+var lastKeyboardState KeyboardState
 
 func onMouseMessage(this js.Value, args []js.Value) interface{} {
 	ev := args[0].Get("data")
 	if (ev.Type() != js.Undefined().Type()) && (ev.Get("0").String() == "vblankdone") {
 
 		data := ev.Get("2")
-		if data.Get("length").Int() != 3 {
-			js.Global().Get("console").Call("warn", "mousestate has not the required length expect 3 got", data.Get("length"))
+		if data.Get("length").Int() != 7 {
+			js.Global().Get("console").Call("warn", "mousestate has not the required length expect 7 got", data.Get("length"))
 		}
 
 		mouseState.X = uint16(data.Get("0").Int())
 		mouseState.Y = uint16(data.Get("1").Int())
 		mouseState.Buttons = MouseButton(data.Get("2").Int())
+
+		keyboardState[0] = uint32(data.Get("3").Int())
+		keyboardState[1] = uint32(data.Get("4").Int())
+		keyboardState[2] = uint32(data.Get("5").Int())
+		keyboardState[3] = uint32(data.Get("6").Int())
 
 	}
 	return nil
@@ -76,6 +112,38 @@ func onMouseMessage(this js.Value, args []js.Value) interface{} {
 
 func init() {
 	js.Global().Call("addEventListener", "message", js.FuncOf(onMouseMessage), false)
+}
+
+func UpdateKeys(st *KeyboardState) {
+	for a := 0; a < 4; a++ {
+		for b := 0; b < 32; b++ {
+			offset := uint32(1 << b)
+			idx := a*32 + b
+			bit := keyboardState[a]&offset == offset
+
+			lastKeyboardState.Held[idx] = lastKeyboardState.Held[idx] || lastKeyboardState.Pressed[idx]
+			lastKeyboardState.Released[idx] = lastKeyboardState.Held[idx] && !bit
+			lastKeyboardState.Pressed[idx] = !lastKeyboardState.Held[idx] && bit
+			lastKeyboardState.Held[idx] = bit
+			lastKeyboardState.PressedOrHeld[idx] = lastKeyboardState.Held[idx] || lastKeyboardState.Pressed[idx]
+
+			st.Held[idx] = lastKeyboardState.Held[idx]
+			st.Released[idx] = lastKeyboardState.Released[idx]
+			st.Pressed[idx] = lastKeyboardState.Pressed[idx]
+			st.PressedOrHeld[idx] = lastKeyboardState.PressedOrHeld[idx]
+		}
+	}
+
+	for a := 0; a < 128; a++ {
+		if lastKeyboardState.Pressed[a] {
+			lastKeyboardState.history[lastKeyboardState.historyPtr] = byte(a)
+			lastKeyboardState.historyPtr = (lastKeyboardState.historyPtr + 1) % keyboardHistoryLimit
+		}
+	}
+
+	st.history = lastKeyboardState.history
+	st.historyPtr = lastKeyboardState.historyPtr
+
 }
 
 func UpdateMouse(st *MouseState) {

@@ -1,4 +1,4 @@
-const mouseIOState = new Uint32Array(3);
+const ioState = new Uint32Array(3 + 4);
 
 if (WebAssembly) {
 
@@ -27,6 +27,7 @@ if (WebAssembly) {
                     reactToScreenSize(canv)
 
                     handleMouseInput(canv);
+                    handleKeyboardInput(canv);
                 } break;
 
 
@@ -34,7 +35,7 @@ if (WebAssembly) {
                     const imgDat = new ImageData(ev.data[2], canv.width, canv.height);
                     window.requestAnimationFrame( () => { 
                         ctx.putImageData(imgDat, 0, 0);
-                        const io = new Uint32Array(mouseIOState);
+                        const io = new Uint32Array(ioState);
                         worker.postMessage(["vblankdone", canvasid, io], [io.buffer]) 
                     }); 
                 } break;
@@ -102,24 +103,48 @@ function handleMouseInput(canv) {
 
     canv.addEventListener("mousemove", (ev) => {
         ev.preventDefault();
-        mouseIOState[0] = Math.max(0, Math.floor(((ev.clientX - ev.target.offsetLeft) / ev.target.offsetWidth) * canv.width));
-        mouseIOState[1] = Math.max(0, Math.floor(((ev.clientY - ev.target.offsetTop) / ev.target.offsetHeight) * canv.height));
+        ioState[0] = Math.max(0, Math.floor(((ev.clientX - ev.target.offsetLeft) / ev.target.offsetWidth) * canv.width));
+        ioState[1] = Math.max(0, Math.floor(((ev.clientY - ev.target.offsetTop) / ev.target.offsetHeight) * canv.height));
     }, true)
 
     canv.addEventListener("mousedown", (ev) => {
         ev.preventDefault();
         const which = 1 << ev.button;
-        mouseIOState[2] |= which;
+        ioState[2] |= which;
     }, true)
 
     canv.addEventListener("mouseup", (ev) => {
         ev.preventDefault();
         const which = 1 << ev.button;
-        mouseIOState[2] &= ~which;
+        ioState[2] &= ~which;
     }, true)
     
     canv.addEventListener("mouseout", (ev) => {
         ev.preventDefault();
-        mouseIOState[2] = 0;
+        ioState[2] = 0;
     }, true)
+}
+
+function handleKeyboardInput() {
+	window.addEventListener("keyup", (ev) => {
+		ev.preventDefault();
+		const which = ev.which;
+		const offset = which % 32;
+		const stack = (which - offset) / 32;
+
+		ioState[3+stack] &= ~(1<<offset);
+
+		return ev;
+	})
+	window.addEventListener("keydown", (ev) => {
+		ev.preventDefault();
+
+		const which = ev.which;
+		const offset = which % 32;
+		const stack = (which - offset) / 32;
+
+		ioState[3+stack] |= 1<<offset;
+
+		return ev;
+	})
 }
