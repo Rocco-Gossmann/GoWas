@@ -6,12 +6,13 @@ import (
 
 	"github.com/rocco-gossmann/GoWas/core"
 	"github.com/rocco-gossmann/GoWas/gfx"
+	"github.com/rocco-gossmann/GoWas/io"
 	"github.com/rocco-gossmann/GoWas/types"
 )
 
-const validMouseButtons = core.MOUSE_BTN1 |
-	core.MOUSE_BTN2 |
-	core.MOUSE_BTN3
+const validMouseButtons = io.MOUSE_BTN1 |
+	io.MOUSE_BTN2 |
+	io.MOUSE_BTN3
 
 type debugScene struct {
 	tma float64
@@ -109,7 +110,8 @@ func (me *debugScene) Tick(e *core.EngineState) bool {
 	me.tma += 24 * e.DeltaTime
 	me.text.SetCursor(7, -1).Echo(fmt.Sprint(me.tma)) // <- update the Text display with the current timer value
 
-	me.text.SetCursor(0, 0).SetWrap(true).Echo(e.Keyboard.HistoryStr(20)).SetWrap(false)
+	me.text.SetCursor(0, 0).Echo(e.Keyboard.HistoryStr(18)).
+		SetCursor(0, 1).Clear(8).Echo(fmt.Sprintf("%v", e.Keyboard.HistoryBytes(1)))
 
 	// Update FPS
 	me.fpsTime += e.DeltaTime

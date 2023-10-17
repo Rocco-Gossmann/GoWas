@@ -1,5 +1,7 @@
 package core
 
+import "github.com/rocco-gossmann/GoWas/io"
+
 type EngineSetup struct {
 	WindowHeight, WindowWidth uint16
 }
@@ -16,8 +18,8 @@ type Engine struct {
 }
 
 type EngineState struct {
-	Mouse     MouseState
-	Keyboard  KeyboardState
+	Mouse     io.MouseState
+	Keyboard  io.KeyboardState
 	DeltaTime float64
 }
 
