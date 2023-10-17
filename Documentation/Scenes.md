@@ -74,9 +74,9 @@ scenes `Tick` method. returned `false`.
 Therefore it should be used to unload / free / reset the ressources created in the `Load` method.
 
 The `Unload` method returns a `struct{}` - pointer, that points to the next
-`core.Scene`, that the Engine should the load.
+`core.Scene`, that the Engine should then load.
 
-If it returns `nil` instead, the Engine will stop running and the Program will
+If it returns `nil` instead, the Engine will stop running and the program will
 end.
 
 ```go
@@ -95,7 +95,6 @@ Here is an example for barebones Scene definition
 package myproject_scenes
 
 import (
-    "fmt"
     "github.com/rocco-gossmann/GoWas/core"
 )
 
