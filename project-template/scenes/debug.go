@@ -110,8 +110,8 @@ func (me *debugScene) Tick(e *core.EngineState) bool {
 	me.tma += 24 * e.DeltaTime
 	me.text.SetCursor(7, -1).Echo(fmt.Sprint(me.tma)) // <- update the Text display with the current timer value
 
-	me.text.SetCursor(0, 0).Echo(e.Keyboard.HistoryStr(18)).
-		SetCursor(0, 1).Clear(8).Echo(fmt.Sprintf("%v", e.Keyboard.HistoryBytes(1)))
+	me.text.SetCursor(0, 0).Echo(string(e.Keyboard.HistoryRunes(18))).
+		SetCursor(0, 1).Clear(8).Echo(fmt.Sprintf("%v", e.Keyboard.History(1)))
 
 	// Update FPS
 	me.fpsTime += e.DeltaTime

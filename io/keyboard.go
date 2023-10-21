@@ -1,5 +1,7 @@
 package io
 
+import "fmt"
+
 const keyboardHistoryLimit = 64
 
 type KeyboardKey byte
@@ -133,54 +135,71 @@ const (
 var charMap = make(map[KeyboardKey]rune, 256)
 
 func init() {
-	charMap[KEY_ENTER] = '\n'
-	charMap[KEY_SPACE] = ' '
-	charMap[KEY_0] = '0'
-	charMap[KEY_1] = '1'
-	charMap[KEY_2] = '2'
-	charMap[KEY_3] = '3'
-	charMap[KEY_4] = '4'
-	charMap[KEY_5] = '5'
-	charMap[KEY_6] = '6'
-	charMap[KEY_7] = '7'
-	charMap[KEY_8] = '8'
-	charMap[KEY_9] = '9'
-	charMap[KEY_A] = 'a'
-	charMap[KEY_B] = 'b'
-	charMap[KEY_C] = 'c'
-	charMap[KEY_D] = 'd'
-	charMap[KEY_E] = 'e'
-	charMap[KEY_F] = 'f'
-	charMap[KEY_G] = 'g'
-	charMap[KEY_H] = 'h'
-	charMap[KEY_I] = 'i'
-	charMap[KEY_J] = 'j'
-	charMap[KEY_K] = 'k'
-	charMap[KEY_L] = 'l'
-	charMap[KEY_M] = 'm'
-	charMap[KEY_N] = 'n'
-	charMap[KEY_O] = 'o'
-	charMap[KEY_P] = 'p'
-	charMap[KEY_Q] = 'q'
-	charMap[KEY_R] = 'r'
-	charMap[KEY_S] = 's'
-	charMap[KEY_T] = 't'
-	charMap[KEY_U] = 'u'
-	charMap[KEY_V] = 'v'
-	charMap[KEY_W] = 'w'
-	charMap[KEY_X] = 'x'
-	charMap[KEY_Y] = 'y'
-	charMap[KEY_Z] = 'z'
-	charMap[KEY_BRKOPEN] = '['
-	charMap[KEY_BRKCLOSE] = ']'
-	charMap[KEY_EQUAL] = '+'
-	charMap[KEY_COMMA] = ','
-	charMap[KEY_SLASH] = '?'
-	charMap[KEY_PERIOD] = '.'
-	charMap[KEY_BACKSLASH] = '\\'
-	charMap[KEY_SEMICOLON] = ':'
-	charMap[KEY_DASH] = '-'
-	charMap[KEY_QUOTE] = '"'
+	charMap[KEY_SPACE] = rune(' ')
+	charMap[KEY_0] = rune('0')
+	charMap[KEY_1] = rune('1')
+	charMap[KEY_2] = rune('2')
+	charMap[KEY_3] = rune('3')
+	charMap[KEY_4] = rune('4')
+	charMap[KEY_5] = rune('5')
+	charMap[KEY_6] = rune('6')
+	charMap[KEY_7] = rune('7')
+	charMap[KEY_8] = rune('8')
+	charMap[KEY_9] = rune('9')
+	charMap[KEY_A] = rune('a')
+	charMap[KEY_B] = rune('b')
+	charMap[KEY_C] = rune('c')
+	charMap[KEY_D] = rune('d')
+	charMap[KEY_E] = rune('e')
+	charMap[KEY_F] = rune('f')
+	charMap[KEY_G] = rune('g')
+	charMap[KEY_H] = rune('h')
+	charMap[KEY_I] = rune('i')
+	charMap[KEY_J] = rune('j')
+	charMap[KEY_K] = rune('k')
+	charMap[KEY_L] = rune('l')
+	charMap[KEY_M] = rune('m')
+	charMap[KEY_N] = rune('n')
+	charMap[KEY_O] = rune('o')
+	charMap[KEY_P] = rune('p')
+	charMap[KEY_Q] = rune('q')
+	charMap[KEY_R] = rune('r')
+	charMap[KEY_S] = rune('s')
+	charMap[KEY_T] = rune('t')
+	charMap[KEY_U] = rune('u')
+	charMap[KEY_V] = rune('v')
+	charMap[KEY_W] = rune('w')
+	charMap[KEY_X] = rune('x')
+	charMap[KEY_Y] = rune('y')
+	charMap[KEY_Z] = rune('z')
+	charMap[KEY_MINUS] = rune('-')
+	charMap[KEY_BRKOPEN] = rune('[')
+	charMap[KEY_BRKCLOSE] = rune(']')
+	charMap[KEY_EQUAL] = rune('+')
+	charMap[KEY_COMMA] = rune(',')
+	charMap[KEY_SLASH] = rune('?')
+	charMap[KEY_PERIOD] = rune('.')
+	charMap[KEY_BACKSLASH] = rune('\\')
+	charMap[KEY_SEMICOLON] = rune(';')
+	charMap[KEY_DASH] = rune('-')
+	charMap[KEY_QUOTE] = rune('"')
+	charMap[KEY_EQUAL] = rune('=')
+	charMap[KEY_NUMDIV] = rune('/')
+	charMap[KEY_NUMDEC] = rune('.')
+	charMap[KEY_NUMSUBST] = rune('-')
+	charMap[KEY_NUMADD] = rune('+')
+	charMap[KEY_NUMMULT] = rune('*')
+
+	charMap[KEY_NUM0] = rune('0')
+	charMap[KEY_NUM1] = rune('1')
+	charMap[KEY_NUM2] = rune('2')
+	charMap[KEY_NUM3] = rune('3')
+	charMap[KEY_NUM4] = rune('4')
+	charMap[KEY_NUM5] = rune('5')
+	charMap[KEY_NUM6] = rune('6')
+	charMap[KEY_NUM7] = rune('7')
+	charMap[KEY_NUM8] = rune('8')
+	charMap[KEY_NUM9] = rune('9')
 }
 
 type KeyboardState struct {
@@ -199,15 +218,21 @@ func normalizeLimit(limit byte) byte {
 	return max(0, min(keyboardHistoryLimit, limit))
 }
 
-func (st *KeyboardState) HistoryBytes(limit byte) []byte {
+func (st *KeyboardState) History(limit byte) []KeyboardKey {
 	limit = normalizeLimit(limit)
 	l := limit
-	var str = make([]byte, l, l)
+	var str = make([]KeyboardKey, l, l)
 
-	var idx byte
+	var idx, offs byte
 
 	for idx < limit {
-		str[idx] = byte(st.history[(keyboardHistoryLimit+(st.historyPtr-l))%keyboardHistoryLimit])
+		k := st.history[(keyboardHistoryLimit+(st.historyPtr-l))%keyboardHistoryLimit]
+		if k == 0 {
+			offs++
+		} else {
+			str[idx-offs] = k
+		}
+
 		l--
 		idx++
 	}
@@ -215,20 +240,38 @@ func (st *KeyboardState) HistoryBytes(limit byte) []byte {
 	return str
 }
 
-func (st *KeyboardState) HistoryStr(limit byte) string {
+func (st *KeyboardState) HistoryRunes(limit byte) []rune {
 	limit = normalizeLimit(limit)
 	l := limit
 	var str = make([]rune, l, l)
 
-	var idx byte
+	var idx, offs byte
 
 	for idx < limit {
-		str[idx] = st.historyStr[(keyboardHistoryLimit+(st.historyStrPtr-l))%keyboardHistoryLimit]
+		k := st.historyStr[(keyboardHistoryLimit+(st.historyStrPtr-l))%keyboardHistoryLimit]
+		if k == 0 {
+			offs++
+		} else {
+			str[idx-offs] = k
+		}
 		l--
 		idx++
 	}
 
-	return string(str)
+	fmt.Println(limit, st.historyStrPtr)
+
+	return str
+}
+
+func (st *KeyboardState) HistoryClear() *KeyboardState {
+	for a := 0; a < keyboardHistoryLimit; a++ {
+		st.history[a] = 0
+		st.historyStr[a] = 0
+	}
+	st.historyPtr = 0
+	st.historyStrPtr = 0
+
+	return st
 }
 
 var keyboardState [8]uint32
@@ -257,8 +300,9 @@ func UpdateKeys(st *KeyboardState) {
 	}
 
 	for a := 0; a < 256; a++ {
-		chr, ok := charMap[KeyboardKey(a)]
-		if ok && chr != 0 && lastKeyboardState.Released[a] {
+		key := KeyboardKey(a)
+		chr, ok := charMap[key]
+		if ok && chr != 0 && lastKeyboardState.Released[key] {
 			lastKeyboardState.historyStr[lastKeyboardState.historyStrPtr] = chr
 			lastKeyboardState.historyStrPtr = (lastKeyboardState.historyStrPtr + 1) % keyboardHistoryLimit
 		}
@@ -271,5 +315,7 @@ func UpdateKeys(st *KeyboardState) {
 
 	st.history = lastKeyboardState.history
 	st.historyPtr = lastKeyboardState.historyPtr
+	st.historyStr = lastKeyboardState.historyStr
+	st.historyStrPtr = lastKeyboardState.historyStrPtr
 
 }
