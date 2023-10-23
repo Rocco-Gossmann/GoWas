@@ -208,10 +208,13 @@ type KeyboardState struct {
 	Released      [256]bool
 	PressedOrHeld [256]bool
 
+	HistoryIndex uint
+
 	historyStr    [keyboardHistoryLimit]rune
 	historyStrPtr byte
-	history       [keyboardHistoryLimit]KeyboardKey
-	historyPtr    byte
+
+	history    [keyboardHistoryLimit]KeyboardKey
+	historyPtr byte
 }
 
 func normalizeLimit(limit byte) byte {
@@ -270,6 +273,7 @@ func (st *KeyboardState) HistoryClear() *KeyboardState {
 	}
 	st.historyPtr = 0
 	st.historyStrPtr = 0
+	st.HistoryIndex = 0
 
 	return st
 }
@@ -310,6 +314,7 @@ func UpdateKeys(st *KeyboardState) {
 		if lastKeyboardState.Released[a] {
 			lastKeyboardState.history[lastKeyboardState.historyPtr] = KeyboardKey(a)
 			lastKeyboardState.historyPtr = (lastKeyboardState.historyPtr + 1) % keyboardHistoryLimit
+			lastKeyboardState.HistoryIndex++
 		}
 	}
 

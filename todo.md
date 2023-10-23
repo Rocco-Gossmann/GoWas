@@ -1,13 +1,11 @@
 Bugs:
 ================================================================================
-    Keyboard:
-        [ ] Symbol-Keys are not recognized yet.
-        
 
 TextDisplay:
 ================================================================================
     [x] Add a clear function, that replaces a number of characters with spaces, but leaves the Cursor-Position unaltered
-    [ ] Make Text-Display Moveable on Screen Similar to TileMap [ ] Add Setters and Getters like in BitmapEntity
+    [ ] Make Text-Display Moveable on Screen Similar to TileMap 
+    [ ] Add Setters and Getters like in BitmapEntity
         [ ] ScreenOffset 
         [ ] Alpha
 
@@ -77,15 +75,18 @@ Documentation:
     [ ] Scene-Transitions
     [ ] Drawing Stuff
     [x] Mouse-Input
-    [ ] Keyboard-Input
+    [x] Keyboard-Input
     [ ] Requesting Assets from the Browser
     [ ] Audio-Output
     [ ] Storing Data in the Browser
-    
+
+## Example
+    [ ] Mouse Cursor Demo
+    [ ] Cli-interface / text Adventure type of demo
+
 ## Reference:
     [x] Engine
     [x] Engine-State
-    [ ] Keyboard
     [ ] Canvas
     [ ] TileMap
         [ ] Concept
@@ -116,3 +117,7 @@ Done:
 
     [x] Documentation: Setup.md => "if you have entr as available shell command[s]"
     [x] Documentation: Readme.md => Link to Graphics does not work
+
+
+### Keyboard:
+    [x] Symbol-Keys are not recognized yet.

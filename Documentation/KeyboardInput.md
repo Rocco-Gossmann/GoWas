@@ -32,6 +32,8 @@ type KeyboardState struct {
     Held          [KeyboardKey]bool
     Released      [KeyboardKey]bool
     PressedOrHeld [KeyboardKey]bool
+
+    HistoryIndex  uint
     // ...
 }
 ```
@@ -41,15 +43,22 @@ value defining if a Key has the checked State.
 
 These States are:
 
-| State           | Description                                                                    |
-| --------------- | ------------------------------------------------------------------------------ |
-| `Pressed`       | `true` If the key has been freshly pressed this cycle but was not last cycle   |
-| `Held`          | `true` If the key was pressed last cycle and is still pressed this cycle       |
-| `Released`      | `true` If the Key was pressed/held last cycle but is no longer held this cycle |
-| `PressedOrHeld` | `true` If the key was just pressed this cycle or is already held               |
+| State           | Description                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------- |
+| `Pressed`       | `true` If the key has been freshly pressed this cycle but was not last cycle                         |
+| `Held`          | `true` If the key was pressed last cycle and is still pressed this cycle                             |
+| `Released`      | `true` If the Key was pressed/held last cycle but is no longer held this cycle                       |
+| `PressedOrHeld` | `true` If the key was just pressed this cycle or is already held                                     |
+|                 |                                                                                                      |
+| `HistoryIndex`  | keeps track of how many keys have been released since the last [HistoryClear](#clearing-the-history) |
 
 what keys you can check for their States, you can see in the
 [Key-List](#keylist) further down.
+
+> [!important]\
+> due to a Keyboard having significantly more keys than a Mouse, a check via
+> bitwise opperation, like it is done on the [Mouse-Input](./MouseInput.md) is
+> unfortunatly not possible.
 
 to check if a specific key has a specific state, you can use the following
 method/code:
@@ -89,16 +98,6 @@ that makes them move slower while it is held. This is how you can implement that
 in GoWas
 
 ```go
-func (me *demoScene) Tick(e *core.EngineState) bool {
-
-
-}
-```
-
-A much easier way would be to just check each Cycle/Tick if the Key is still
-Held
-
-```go
 import GoWasIO 'github.com/rocco-gossmann/GoWas/io'
 
 var sneakKey = GoWasIO.KEY_LSHIFT
@@ -129,7 +128,7 @@ access to a history of the last 64 Keys that have been entered.
 > [!notice]\
 > "entered" meaning pressed and released
 
-you can check the history in the following via the following functions.
+you can check the history via the following functions.
 
 ```go
 func (*KeyboardState) History(limit byte) []KeyboardKey
@@ -199,11 +198,12 @@ The last 64 runes are keept in an list, managed by the Engine.
 attached.)
 
 it works exactly as the [Key-History](#key-history), but uses runes, which opens
-this possiblity of a cli like interface for text adventure games for example.
+the possiblity of a command like like interface. (For text adventure games for
+example.)
 
 #### CLI-Like example
-```go
 
+```go
 import "github.com/rocco-gossmann/GoWas/io"
 import "fmt"
 
@@ -225,12 +225,18 @@ func (me *demoScene) Tick(e *core.EngineState) bool {
     }
 
 }
-
 ```
 
 ### Clearing the History
 
+If you processed the history, you can also clear it via:
 
+```go
+func (st *KeyboardState) HistoryClear() *KeyboardState
+```
+
+It removes all history entries, from both the KeyboardKey- and Rune-List.
+Letting you start with a blank slate again
 
 ## Key - List
 
