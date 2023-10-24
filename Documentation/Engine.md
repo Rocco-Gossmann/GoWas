@@ -26,9 +26,9 @@ func main() {
 }
 ```
 For further information see:
-- [Engine-Reference](./reference/Engine.md)
-- [Engine-State](./reference/EngineState.md)
-- [Engine-Lifecycle](./EngineLifecycle.md)
+- [Engine - Lifecycle](./EngineLifecycle.md)
+- [Engine - Reference](./reference/Engine.md)
+- [Engine - State](./reference/EngineState.md)
 
 
 
