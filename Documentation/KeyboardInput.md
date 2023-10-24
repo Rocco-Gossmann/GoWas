@@ -9,6 +9,7 @@ Here is a list of things, it can do:
 <!-- vim-markdown-toc GFM -->
 
 * [Checking specific Keys](#checking-specific-keys)
+    * [Keyboard-State](#keyboard-state)
     * [Let's give an example.](#lets-give-an-example)
 * [Checking key sequences](#checking-key-sequences)
     * [Key-History](#key-history)
@@ -24,6 +25,7 @@ Here is a list of things, it can do:
 [Engine-State's](./reference/EngineState.md) `Keyboard` property comes with the
 following properties:
 
+### Keyboard-State
 ```go
 type KeyboardKey byte
 

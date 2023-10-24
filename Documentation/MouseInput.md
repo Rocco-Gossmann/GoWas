@@ -5,6 +5,15 @@ the `Mouse` property.
 Thus it is provided to your [Scene](./Scenes.md) through the
 [Engine-Lifecycle](./EngineLifecycle.md).
 
+<!-- vim-markdown-toc GFM -->
+
+* [Mouse-State](#mouse-state)
+* [Reading the Position](#reading-the-position)
+* [Reading the Buttons](#reading-the-buttons)
+
+<!-- vim-markdown-toc -->
+
+
 ## Mouse-State
 
 The [Engine-States](./reference/EngineState.md) `Mouse` Propert provides the
