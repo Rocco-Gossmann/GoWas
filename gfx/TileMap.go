@@ -4,11 +4,16 @@ import (
 	"fmt"
 
 	"github.com/rocco-gossmann/GoWas/core"
-	"github.com/rocco-gossmann/GoWas/types"
 )
+
+type tileMapOpts struct {
+	X, Y  int32 // Where to blit it on the screen
+	Alpha byte
+}
 
 type TileMap struct {
 	init     bool
+	opts     tileMapOpts
 	ts       *TileSet
 	memory   []byte
 	mw, mh   uint32
@@ -62,6 +67,7 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 // -----------------------------------------------------------------------------
 // Setters
 // -----------------------------------------------------------------------------
+// Tiles
 func (me *TileMap) SetTileSetOffset(o int) *TileMap {
 	var tc = me.ts.TileCount()
 
@@ -129,14 +135,39 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 	return me
 }
 
+// Display
+func (me *TileMap) SetAlpha(a byte) *TileMap {
+	me.opts.Alpha = a
+	return me
+}
+func (me *TileMap) MoveTo(x, y int32) *TileMap {
+
+	me.opts.X = x
+	me.opts.Y = y
+
+	return me
+}
+func (me *TileMap) MoveBy(x, y int32) *TileMap {
+
+	me.opts.X += x
+	me.opts.Y += y
+
+	return me
+}
+
 // -----------------------------------------------------------------------------
 // Getters
 // -----------------------------------------------------------------------------
-type ToCanvasOpts struct {
-	Scroll types.Point
-}
+func (me *TileMap) X() int32           { return me.opts.X }
+func (me *TileMap) Y() int32           { return me.opts.Y }
+func (me *TileMap) XY() (int32, int32) { return me.opts.X, me.opts.Y }
+func (me *TileMap) Alpha() byte        { return me.opts.Alpha }
 
-func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
+// -----------------------------------------------------------------------------
+// Actions
+// -----------------------------------------------------------------------------
+
+func (me *TileMap) ToCanvas(ca *core.Canvas) {
 
 	me.validate()
 
@@ -146,10 +177,8 @@ func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
 	offsetX, offsetY := int32(0), int32(0)
 	startX, startY := uint32(0), uint32(0)
 
-	if opts != nil {
-		offsetX = int32(opts.Scroll.X) * -1
-		offsetY = int32(opts.Scroll.Y) * -1
-	}
+	offsetX = int32(me.opts.X) * -1
+	offsetY = int32(me.opts.Y) * -1
 
 	// Check for overshoots Horizontal
 	if offsetX < 0 {
@@ -172,7 +201,9 @@ func (me *TileMap) ToCanvas(ca *core.Canvas, opts *ToCanvasOpts) {
 
 	//	dstX, dstY := uint16((me.mw+overShootX)*tw), uint16((me.mh+overShootY)*th)
 
-	bopts := TilesetBlitOptions{}
+	bopts := TilesetBlitOptions{
+		Alpha: me.opts.Alpha,
+	}
 
 	ti, mi := 0, byte(0)
 	for y := startY; y < startY+mh; y++ {

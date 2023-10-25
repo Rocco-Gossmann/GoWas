@@ -15,18 +15,18 @@ type TextDisplay struct {
 	charsPerLine uint16
 	lines        uint16
 	ts           *TileSet
-	mp           *TileMap
+
+	// Internals
+	mp *TileMap
 
 	// Formating
 	cursorx, cursory uint16
 	wrap             bool
 }
 
-func (me *TextDisplay) SetWrap(wrap bool) *TextDisplay {
-	me.wrap = wrap
-	return me
-}
-
+// ==============================================================================
+// Constructors
+// ==============================================================================
 func InitTextDisplay(ca *core.Canvas) *TextDisplay {
 
 	if ca == nil {
@@ -48,6 +48,9 @@ func InitTextDisplay(ca *core.Canvas) *TextDisplay {
 	return &text
 }
 
+// ==============================================================================
+// Setters
+// ==============================================================================
 func (me *TextDisplay) SetCursor(x, y int32) *TextDisplay {
 	x = x % int32(me.charsPerLine)
 	y = y % int32(me.lines)
@@ -126,9 +129,11 @@ func (me *TextDisplay) Echo(text string) *TextDisplay {
 	return me
 }
 
-func (me *TextDisplay) ToCanvas(ca *core.Canvas) {
-	me.mp.ToCanvas(ca, nil)
+func (me *TextDisplay) SetWrap(wrap bool) *TextDisplay {
+	me.wrap = wrap
+	return me
 }
+
 func (me *TextDisplay) setFont(ts *TileSet) *TextDisplay {
 	tw, th := ts.GetTileWidth(), ts.GetTileWidth()
 
@@ -139,4 +144,26 @@ func (me *TextDisplay) setFont(ts *TileSet) *TextDisplay {
 	me.mp = me.mp.Init(me.ts, uint32(me.charsPerLine), uint32(me.lines))
 
 	return me
+}
+
+func (me *TextDisplay) MoveTo(x, y int32) *TextDisplay {
+	me.mp.MoveTo(x*-1, y*-1)
+	return me
+}
+
+func (me *TextDisplay) MoveBy(x, y int32) *TextDisplay {
+	me.mp.MoveBy(x, y)
+	return me
+}
+
+func (me *TextDisplay) SetAlpha(a byte) *TextDisplay {
+	me.mp.SetAlpha(a)
+	return me
+}
+
+// ==============================================================================
+// Actions
+// ==============================================================================
+func (me *TextDisplay) ToCanvas(ca *core.Canvas) {
+	me.mp.ToCanvas(ca)
 }

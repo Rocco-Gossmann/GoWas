@@ -4,10 +4,11 @@ Bugs:
 TextDisplay:
 ================================================================================
     [x] Add a clear function, that replaces a number of characters with spaces, but leaves the Cursor-Position unaltered
-    [ ] Make Text-Display Moveable on Screen Similar to TileMap 
-    [ ] Add Setters and Getters like in BitmapEntity
-        [ ] ScreenOffset 
-        [ ] Alpha
+    [x] Make Text-Display Moveable on Screen Similar to TileMap 
+    [x] Add Setters and Getters like in BitmapEntity
+        [x] ScreenOffset <= @done MoveTo and MoveBy added
+        [x] Alpha
+    [ ] Make Bounderies resizeable (right now bounds are always the canvas size) 
 
 Rendering:
 ================================================================================
@@ -19,20 +20,20 @@ Rendering:
 
 Maps:
 ================================================================================
-    [ ] Rework Setters and Getters to Work like BitmapEntities Do @critical
+    [x] Rework Setters and Getters to Work like BitmapEntities Do @critical
     [ ] Test how drawing Maps, that are smaller than the screen behaves @critical
     [ ] Maps Collision layers @critical
-    [ ] Maps Alpha blending
+    [x] Maps Alpha blending
     [ ] Allow to fill columns or rows of Tiles with data @high (Instead of just single tiles or the entire map)
     [ ] Maps Clipping-Rect @low
-    [ ] Allow maps scroll.x any y propperties to be negative @low
+    [x] Allow maps scroll.x any y propperties to be negative @done Map scroll replaced by x,y coords
 
 
 Keyboard Input:
 ================================================================================
     [x] Browser side - Key-Statemanagement
-    [ ] Go Side
-        [ ] KeyStates
+    [x] Go Side
+        [x] KeyStates
 
 Audio:
 ================================================================================

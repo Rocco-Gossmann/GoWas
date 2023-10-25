@@ -78,6 +78,9 @@ func (b *BitmapEntity) W() uint16            { return b.canvasBlitOpts.Clip.W }
 func (b *BitmapEntity) H() uint16            { return b.canvasBlitOpts.Clip.H }
 func (b *BitmapEntity) WH() (uint16, uint16) { return b.canvasBlitOpts.Clip.W, b.canvasBlitOpts.Clip.H }
 
+// ------------------------------------------------------------------------------
+// Actions
+// ------------------------------------------------------------------------------
 func (b *BitmapEntity) ToCanvas(ca *Canvas) CanvasCollisionLayers {
 	if !b.visible {
 		return CANV_CL_NONE
