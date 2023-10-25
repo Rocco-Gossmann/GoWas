@@ -60,7 +60,7 @@ These States are:
 | `HistoryIndex`  | keeps track of how many keys have been released since the last [HistoryClear](#clearing-the-history) |
 
 what keys you can check for their States, you can see in the
-[Key-List](#keylist) further down.
+[Key - List](#key---list) further down.
 
 > [!important]\
 > due to a Keyboard having significantly more keys than a Mouse, a check via
