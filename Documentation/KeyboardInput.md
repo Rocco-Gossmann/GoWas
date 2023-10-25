@@ -132,7 +132,7 @@ In addition to the current KeyStates the
 [Engine-State's](./reference/EngineState.md) `Keyboard` property also provides
 access to a history of the last 64 Keys that have been entered.
 
-> [!notice]\
+> [!note]\
 > "entered" meaning pressed and released
 
 you can check the history via the following functions.
@@ -177,7 +177,7 @@ func (me *demoScene) Tick(e *core.EngineState) bool {
     var keys []rune = e.Keyboard.History(2)
 
     // If there have been 2 keys pressed and released
-    if listLen == 2 {
+    if len(keys) == 2 {
 
         // If the last key was Enter/Return
         if(keys[1] == io.KEY_ENTER) {
@@ -199,7 +199,7 @@ Some keys have a Human-readable representation. In Go, these are called `rune`s.
 If a key is released, that has a `Rune` assigned, it will be put into the
 Engines `Rune-History`
 
-The last 64 runes are keept in an list, managed by the Engine.
+The last 64 runes are keept in a list, managed by the Engine.
 
 (See the [Key - List](#key---list) below, to learn, what key has what rune
 attached.)
@@ -243,6 +243,7 @@ func (st *KeyboardState) HistoryClear() *KeyboardState
 ```
 
 It removes all history entries, from both the KeyboardKey- and Rune-List.
+It also resets the HistoryIndex back to 0.
 Letting you start with a blank slate again
 
 ## Key - List
