@@ -33,13 +33,12 @@ To run it, simply host the build, in any way you like. The template comes with a
 small Server-Script, that can be used for development. It will host the files
 via `http` on port `7353` of your system.
 
-So running that script via.
+You can running that script either via.
 
 ```bash
 go run ./.tools/server/server.go
 ```
-
-You can also run it by using
+or you can use
 
 ```bash
 make run
