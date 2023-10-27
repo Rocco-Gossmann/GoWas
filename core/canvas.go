@@ -148,6 +148,10 @@ func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
 
 var engineState EngineState
 
+func init() {
+	engineState.ressources = make(map[RessourceHandle]Ressource)
+}
+
 func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
 
 	io.UpdateMouse(&engineState.Mouse)

@@ -21,6 +21,18 @@ type EngineState struct {
 	Mouse     io.MouseState
 	Keyboard  io.KeyboardState
 	DeltaTime float64
+
+	ressources map[RessourceHandle]Ressource
+}
+
+func (me *EngineState) RequestRessource(ressourceType RessourceType, fileName string) RessourceHandle {
+	ressource := _RequestRessource(ressourceType, fileName)
+	me.ressources[ressource.handle] = ressource
+	return ressource.handle
+}
+
+func (me *EngineState) FreeRessource(handle RessourceHandle) {
+	panic("//TODO: Implement")
 }
 
 func (e *Engine) Init(s *EngineSetup) {

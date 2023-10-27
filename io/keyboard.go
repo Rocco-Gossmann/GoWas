@@ -1,7 +1,5 @@
 package io
 
-import "fmt"
-
 const keyboardHistoryLimit = 64
 
 type KeyboardKey byte
@@ -260,8 +258,6 @@ func (st *KeyboardState) HistoryRunes(limit byte) []rune {
 		l--
 		idx++
 	}
-
-	fmt.Println(limit, st.historyStrPtr)
 
 	return str
 }

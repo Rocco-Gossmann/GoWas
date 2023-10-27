@@ -37,10 +37,17 @@ Keyboard Input:
 
 Ressource Loading:
 ================================================================================
-    ☐ Establish some sort of handle that can be used to identify the ressource in both browser and Go
+    ✔ Establish some sort of handle that can be used to identify the ressource in both browser and Go @done (27.10.2023, 06:25:56)
+    ☐ Use Makefile to copy all files in `./project-template/ressource` to `./project-template/build/ressource`
 
     Binary:
     ----------------------------------------------------------------------------
+        ✔ Go Tells Worker to load a ressource @done (27.10.2023, 06:26:00)
+        ✔ Worker immediatly responds with an ID as a Handle @done (27.10.2023, 06:26:02)
+        ☐ Worker then tells main thread to load ressource via AJAx
+        ☐ Main-Thread loads requrested ressource from its `./build/ressource` folder
+        ☐ Main-Thread responds back with Uint8Array holding the the bytes of the loaded ressource to worker
+        ☐ Worker then transferes the bytes to GO
 
     Audio:
     ----------------------------------------------------------------------------
@@ -84,7 +91,7 @@ Documentation:
     ☐ Drawing Stuff
     ✔ Mouse-Input @done (27.10.2023, 05:01:32)
     ✔ Keyboard-Input @done (27.10.2023, 05:01:41)
-    ☐ Requesting Assets from the Browser
+    ☐ Loading Ressources at Runtime
     ☐ Audio-Output
     ☐ Storing Data in the Browser
 

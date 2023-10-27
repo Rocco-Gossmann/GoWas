@@ -30,9 +30,14 @@ type debugScene struct {
 	fpsTime float64
 	fpsCnt  int
 	fps     int
+
+	exampleRessource core.RessourceHandle
 }
 
 func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
+
+	//s.exampleRessource = e.RequestRessource(core.RESTYPE_BINARY, "demo.txt")
+
 	fmt.Println("Debug-Scene loaded")
 
 	// Setting the Initial background to light #333333
