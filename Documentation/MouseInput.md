@@ -5,13 +5,14 @@ the `Mouse` property.
 Thus it is provided to your [Scene](./Scenes.md) through the
 [Engine-Lifecycle](./EngineLifecycle.md).
 
-<!-- vim-markdown-toc GFM -->
+<!-- TOC -->
 
-* [Mouse-State](#mouse-state)
-* [Reading the Position](#reading-the-position)
-* [Reading the Buttons](#reading-the-buttons)
+- [Mouse-Input](#mouse-input)
+    - [Mouse-State](#mouse-state)
+    - [Reading the Position](#reading-the-position)
+    - [Reading the Buttons](#reading-the-buttons)
 
-<!-- vim-markdown-toc -->
+<!-- /TOC -->
 
 
 ## Mouse-State
@@ -64,10 +65,10 @@ func (s *demoScene) Draw(e *core.EngineState, c *core.Canvas) {
 ## Reading the Buttons
 
 Mouse Buttons are provided via the following 4 Properties on the
-[Mouse-State](#mousestate).
+[Mouse-State](#mouse-state).
 
 | Property        | Description                                                       |
-| --------------- | ----------------------------------------------------------------- |
+|-----------------|-------------------------------------------------------------------|
 | `Pressed`       | Buttons that have not been pressed or held last cycle and are now |
 | `Held`          | Buttons that have been pressed last cycle and are still pressed   |
 | `Released`      | Buttons that where pressed or held last cycle and no longer are   |

@@ -1,0 +1,130 @@
+Bugs:
+================================================================================
+
+TextDisplay:
+================================================================================
+    ✔ Add a clear function, that replaces a number of characters with spaces, but leaves the Cursor-Position unaltered @done (27.10.2023, 04:54:27)
+    ✔ Make Text-Display Moveable on Screen Similar to TileMap @done (27.10.2023, 04:54:37)
+    ✔ Add Setters and Getters like in BitmapEntity @done (27.10.2023, 04:54:45)
+        ✔ ScreenOffset <= done MoveTo and MoveBy added @done (27.10.2023, 04:54:57)
+        ✔ Alpha @done (27.10.2023, 04:55:04)
+    ☐ Make bounderies resizeable (right now bounds are always the canvas size)
+
+Rendering:
+================================================================================
+    ✔ Test how drawing a bitmap, that overflows all 4 sides functions @critical @done (27.10.2023, 04:55:57)
+        ✔ Fix Oversized Bitmaps being cut of to early @done (27.10.2023, 04:56:05)
+    ☐ Adapt TileSets for SpriteSheets
+    ☐ Tinting Bitmaps/TileMaps/Sprites on Draw
+
+
+Maps:
+================================================================================
+    ✔ Rework Setters and Getters to Work like BitmapEntities Do @critical @done (27.10.2023, 04:56:23)
+    ☐ Test how drawing Maps, that are smaller than the screen behaves @critical
+    ☐ Maps Collision layers @critical
+    ✔ Maps Alpha blending @done (27.10.2023, 04:57:29)
+    ☐ Allow to fill columns or rows of Tiles with data @high (Instead of just single tiles or the entire map)
+    ☐ Maps Clipping-Rect @low
+    ✔ Allow maps scroll.x any y propperties to be negative @done Map scroll replaced by x,y coords @done (27.10.2023, 04:57:19)
+
+
+Keyboard Input:
+================================================================================
+    ✔ Browser side - Key-Statemanagement @done (27.10.2023, 04:57:39)
+    ✔ Go Side @done (27.10.2023, 04:57:46)
+        ✔ KeyStates @done (27.10.2023, 04:57:51)
+
+Ressource Loading:
+================================================================================
+    ☐ Establish some sort of handle that can be used to identify the ressource in both browser and Go
+
+    Binary:
+    ----------------------------------------------------------------------------
+
+    Audio:
+    ----------------------------------------------------------------------------
+        ☐ Tell Browser to load and provide Audio from within Go <audio> tag
+        ☐ Function to make the browser free the loaded Audio again
+        ☐ Trigger audio playback from within Go
+        ☐ Cancel audio playback from within Go
+        ☐ Mabe change audio volumne from within Go @low
+
+
+Tooling:
+================================================================================
+    ✔ Automate Assets.png cnnversion (User should only have to put the PNG into the ./assets folder) @done (27.10.2023, 04:58:23)
+        ✔ Extend Makefile @done (27.10.2023, 04:58:29)
+        ✔ Move tools-scripts into "project-template" @done (27.10.2023, 04:58:34)
+
+    ✔ get rid of ./project-template/.tools/ ZSH-Scripts @done (27.10.2023, 04:58:39)
+        ✔ startserver.zsh @done (27.10.2023, 04:58:48)
+        ✘ stopserver.zsh @cancelled (27.10.2023, 04:59:01)
+        ✔ entr.zsh @done (27.10.2023, 04:59:33)
+
+    ☐ Create Script to remove Demo-Project files from `project-template`
+    ☐ make it a `make` task
+
+
+Loading Compressed Data:
+================================================================================
+    ✔ Bitmap data @done (27.10.2023, 05:00:11)
+    ☐ mapData
+
+
+Documentation:
+================================================================================
+
+## Usage:
+    ✔ Project-Setup @done (27.10.2023, 05:00:32)
+    ✔ Engine-Lifecycle @done (27.10.2023, 05:00:38)
+    ☐ Project - main.go
+    ✔ Scenes @done (27.10.2023, 05:01:11)
+    ☐ Scene-Transitions
+    ☐ Drawing Stuff
+    ✔ Mouse-Input @done (27.10.2023, 05:01:32)
+    ✔ Keyboard-Input @done (27.10.2023, 05:01:41)
+    ☐ Requesting Assets from the Browser
+    ☐ Audio-Output
+    ☐ Storing Data in the Browser
+
+## Example
+    ☐ Mouse Cursor Demo
+    ☐ Cli-interface / text Adventure type of demo
+
+## Reference:
+    ✔ Engine @done (27.10.2023, 05:02:12)
+    ✔ Engine-State @done (27.10.2023, 05:02:16)
+    ☐ Canvas
+    ☐ TileMap
+        ☐ Concept
+        ☐ Map creation
+        ☐ Map Editing
+        ☐ Scrolling
+    ✔ TileSet @done (27.10.2023, 05:02:45)
+    ✔ Bitmap @done (27.10.2023, 05:02:49)
+    ☐ Bitmap Entities
+
+Done:
+================================================================================
+    ✔ Restructure how BlitBitmap receives its params @done (24.9.2023, 07:19:41) As they will become more and more complex @done (27.10.2023, 05:05:01)
+    ✔ Implement Bitmap ClipingRect @done (24.9.2023, 16:36:16) @done (27.10.2023, 05:05:09)
+    ✔ Printing Text from string to Screen  @done (27.10.2023, 05:05:25) @done (27.10.2023, 05:05:33)
+    ✔ TileSets and Maps @done (27.10.2023, 05:05:41) plus some metadata to find clipping Rects @done (26.9.2023, 07:07:20)
+        ✔ TileMaps are lists of ClippingRects @done (27.10.2023, 05:06:03)
+        ✔ Map Drawing @done (27.10.2023, 05:06:13)
+    ✔ Define basic Print Text Functions @done (27.10.2023, 05:06:21)
+    ✔ Documentation: Readme.md => Link to Graphics does not work @done (27.10.2023, 05:06:27)
+
+### Mouse Input:
+    ✔ Browser side @done (27.10.2023, 05:06:38)
+    ✔ Go Side @done (27.10.2023, 05:06:42)
+        ✔ Process Mouse Position @done (26.9.2023, 05:39:49) @done (27.10.2023, 05:07:19)
+        ✔ Process Button clicks @done (27.10.2023, 05:07:24)
+    ✔ Mouse is not available to Tick function due to being bound to the canvas (Bind mouse to Engine instead) @done (27.10.2023, 05:07:30)
+
+    ✔ Documentation: Setup.md => "if you have entr as available shell command[s]" @done (27.10.2023, 05:07:37)
+
+
+### Keyboard:
+    ✔ Symbol-Keys are not recognized yet. @done (27.10.2023, 05:07:46)

@@ -6,19 +6,20 @@ through the [Engine-Lifecycle](./EngineLifecycle.md).
 
 Here is a list of things, it can do:
 
-<!-- vim-markdown-toc GFM -->
+<!-- TOC -->
 
-* [Checking specific Keys](#checking-specific-keys)
-    * [Keyboard-State](#keyboard-state)
-    * [Let's give an example.](#lets-give-an-example)
-* [Checking key sequences](#checking-key-sequences)
-    * [Key-History](#key-history)
-    * [Rune-History](#rune-history)
-        * [CLI-Like example](#cli-like-example)
-    * [Clearing the History](#clearing-the-history)
-* [Key - List](#key---list)
+- [Keyboard-Input](#keyboard-input)
+    - [Checking specific Keys](#checking-specific-keys)
+        - [Keyboard-State](#keyboard-state)
+        - [Let's give an example.](#lets-give-an-example)
+    - [Checking key sequences](#checking-key-sequences)
+        - [Key-History](#key-history)
+        - [Rune-History](#rune-history)
+            - [CLI-Like example](#cli-like-example)
+        - [Clearing the History](#clearing-the-history)
+    - [Key - List](#key---list)
 
-<!-- vim-markdown-toc -->
+<!-- /TOC -->
 
 ## Checking specific Keys
 
