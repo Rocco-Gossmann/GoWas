@@ -1,9 +1,8 @@
-package gfx
+package core
 
 import (
 	"fmt"
 
-	"github.com/rocco-gossmann/GoWas/core"
 	"github.com/rocco-gossmann/GoWas/types"
 )
 
@@ -16,7 +15,7 @@ const (
 )
 
 type TileSet struct {
-	gfx    *core.Bitmap
+	gfx    *Bitmap
 	tiles  []types.Rect
 	tw, th uint16
 	tstype TileSetType
@@ -31,12 +30,12 @@ type TilesetBlitOptions struct {
 	X, Y      int32
 	Alpha     byte
 	Alphazero bool
-	Layers    core.CanvasCollisionLayers
+	Layers    CanvasCollisionLayers
 }
 
 var defaultOpts = TilesetBlitOptions{}
 
-func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBlitOptions) core.CanvasCollisionLayers {
+func (pTs *TileSet) BlitTo(canvas *Canvas, tileindex int, pOpts *TilesetBlitOptions) CanvasCollisionLayers {
 	if pOpts == nil {
 		pOpts = &defaultOpts
 	}
@@ -45,7 +44,7 @@ func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBli
 
 	if (*pTs).gfx == nil || len((*pTs).tiles) > tileindex {
 
-		return canvas.Blit(&core.CanvasBlitOpts{
+		return canvas.Blit(&CanvasBlitOpts{
 			Bmp:       (*pTs).gfx,
 			X:         opts.X,
 			Y:         opts.Y,
@@ -56,11 +55,11 @@ func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex int, pOpts *TilesetBli
 		})
 
 	} else {
-		return core.CANV_CL_NONE
+		return CANV_CL_NONE
 	}
 }
 
-func (ts *TileSet) InitFromMapSheet(bmp *core.Bitmap, tilepixelwidth, tilepixelheight uint16) {
+func (ts *TileSet) InitFromMapSheet(bmp *Bitmap, tilepixelwidth, tilepixelheight uint16) {
 
 	if tilepixelwidth == 0 {
 		panic("'tilepixelwidth' must be bigger than 0")

@@ -1,6 +1,8 @@
 package core
 
 import (
+	"syscall/js"
+
 	"github.com/rocco-gossmann/GoWas/io"
 	"github.com/rocco-gossmann/GoWas/types"
 	"github.com/rocco-gossmann/go_wasmcanvas"
@@ -8,6 +10,7 @@ import (
 
 type CanvasFlag uint32
 type CanvasCollisionLayers uint32
+type CanvasRenderLayers uint8
 
 const (
 	// Collisiion Layers These layers are processed when a sprite is drawn
@@ -23,7 +26,14 @@ const (
 
 	CANV_CL_NONE CanvasCollisionLayers = 0
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
+
+	CANV_RL_SCENE CanvasRenderLayers = 0
+	CANV_RL_TEXT  CanvasRenderLayers = 1
 )
+
+type _RenderLayer interface {
+	ToCanvas(*Canvas)
+}
 
 type CanvasBlitOpts struct {
 	Bmp       *Bitmap               // What to blit
@@ -37,11 +47,17 @@ type Canvas struct {
 	wasmcanvas go_wasmcanvas.Canvas
 	engine     *Engine
 	buffer     Buffer
+
+	layers       [2]_RenderLayer
+	layerOrder   [2]CanvasRenderLayers
+	layerEnable  [2]bool
+	renderLayers []_RenderLayer
 }
 
 func (ca *Canvas) GetWidth() uint16  { return ca.wasmcanvas.Width() }
 func (ca *Canvas) GetHeight() uint16 { return ca.wasmcanvas.Height() }
 
+// ==============================================================================
 // Constructors
 // ==============================================================================
 func CreateCanvas(e *Engine, width, height uint16) *Canvas {
@@ -56,9 +72,23 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 		buffer:     Buffer{PixelPerLine: width},
 	}
 
+	ec.layers[CANV_RL_SCENE] = interface{}(ec).(_RenderLayer)
+	ec.layerEnable[CANV_RL_SCENE] = true
+
+	ec.layers[CANV_RL_TEXT] = e.textDisplay
+	ec.layerEnable[CANV_RL_TEXT] = false
+
+	ec.layerOrder[CANV_RL_SCENE] = CANV_RL_SCENE
+	ec.layerOrder[CANV_RL_TEXT] = CANV_RL_TEXT
+
+	ec.renderLayers = make([]_RenderLayer, 0, 2)
+
+	ec.reorderLayers()
+
 	return &ec
 }
 
+// ==============================================================================
 // Methods
 // ==============================================================================
 func (ec *Canvas) Run() {
@@ -70,6 +100,7 @@ func (ec *Canvas) Run() {
 	ec.wasmcanvas.Run((*ec).canvasTick)
 }
 
+// ==============================================================================
 // Drawing Functions
 // ==============================================================================
 func (ec *Canvas) FillRGBA(r, g, b, alpha byte, layerReset CanvasCollisionLayers) {
@@ -139,17 +170,34 @@ func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 	return ec.blitBitmapClipped(opts.Bmp, bw, bh, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
 }
 
-// Implement go_wasm_canvas
-// ==============================================================================
-func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
-	ec.buffer.Memory = px
+func (ec *Canvas) ToCanvas(c *Canvas) {
 	(*ec.engine.Draw).Draw(&engineState, ec)
 }
 
+// ==============================================================================
+// Implement go_wasm_canvas
+// ==============================================================================
+
 var engineState EngineState
+
+func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
+	ec.buffer.Memory = px
+	for _, layer := range ec.layers {
+		layer.ToCanvas(ec)
+	}
+}
+
+func _ReceiveRessourceFromJS(this js.Value, args []js.Value) interface{} {
+	return engineState.reseiveRessource(args)
+}
+func _MarkRessourceNotFound(this js.Value, args []js.Value) interface{} {
+	return engineState.markRessourceNotFound(args)
+}
 
 func init() {
 	engineState.ressources = make(map[RessourceHandle]Ressource)
+	js.Global().Set("sendRessourceToGo", js.FuncOf(_ReceiveRessourceFromJS))
+	js.Global().Set("markRessourceNotFoundInGo", js.FuncOf(_MarkRessourceNotFound))
 }
 
 func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasmcanvas.CanvasTickFunction {
@@ -157,6 +205,9 @@ func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasm
 	io.UpdateMouse(&engineState.Mouse)
 	io.UpdateKeys(&engineState.Keyboard)
 	engineState.DeltaTime = deltaTime
+	engineState.canvas = ec
+	engineState.engine = ec.engine
+	engineState.Text = ec.engine.textDisplay
 
 	if (*ec.engine.Tick).Tick(&engineState) {
 		ec.wasmcanvas.Apply(ec.canvasDraw)
@@ -169,6 +220,7 @@ func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasm
 	return (*ec).canvasTick
 }
 
+// ==============================================================================
 // Private Helpers
 // ==============================================================================
 func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
@@ -313,6 +365,35 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, 
 	return outbyte
 }
 
+func (me *Canvas) disableLayer(l CanvasRenderLayers) {
+	if !me.layerEnable[l] {
+		return
+	}
+
+	me.layerEnable[l] = true
+	me.reorderLayers()
+}
+
+func (me *Canvas) enableLayer(l CanvasRenderLayers) {
+
+	if me.layerEnable[l] {
+		return
+	}
+
+	me.layerEnable[l] = true
+	me.reorderLayers()
+}
+
+func (me *Canvas) reorderLayers() {
+	me.renderLayers = me.renderLayers[0:0]
+	for _, canvasLayer := range me.layerOrder {
+		if me.layerEnable[canvasLayer] {
+			me.renderLayers = append(me.renderLayers, me.layers[canvasLayer])
+		}
+	}
+}
+
+// ==============================================================================
 // Fill-Jobs
 // ==============================================================================
 type sFillJob struct {

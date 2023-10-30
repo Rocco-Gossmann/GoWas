@@ -1,11 +1,8 @@
-package gfx
+package core
 
 import (
 	"math"
 	"strings"
-
-	"github.com/rocco-gossmann/GoWas/core"
-	"github.com/rocco-gossmann/GoWas/ressource"
 )
 
 type TextDisplay struct {
@@ -27,7 +24,7 @@ type TextDisplay struct {
 // ==============================================================================
 // Constructors
 // ==============================================================================
-func InitTextDisplay(ca *core.Canvas) *TextDisplay {
+func InitTextDisplay(ca *Canvas) *TextDisplay {
 
 	if ca == nil {
 		panic("cant initiate TextDisplay without a Canvas to initialize it for.")
@@ -38,7 +35,7 @@ func InitTextDisplay(ca *core.Canvas) *TextDisplay {
 	text.canvasHeight = ca.GetHeight()
 
 	text.ts = &TileSet{}
-	text.ts.InitFromMapSheet(ressource.AsciiFontBMP, 8, 8)
+	text.ts.InitFromMapSheet(AsciiFontBMP, 8, 8)
 
 	text.setFont(text.ts)
 	text.wrap = true
@@ -164,6 +161,6 @@ func (me *TextDisplay) SetAlpha(a byte) *TextDisplay {
 // ==============================================================================
 // Actions
 // ==============================================================================
-func (me *TextDisplay) ToCanvas(ca *core.Canvas) {
+func (me *TextDisplay) ToCanvas(ca *Canvas) {
 	me.mp.ToCanvas(ca)
 }

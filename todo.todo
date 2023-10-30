@@ -16,6 +16,7 @@ Rendering:
         ✔ Fix Oversized Bitmaps being cut of to early @done (27.10.2023, 04:56:05)
     ☐ Adapt TileSets for SpriteSheets
     ☐ Tinting Bitmaps/TileMaps/Sprites on Draw
+    ☐ Collision Layers
 
 
 Maps:
@@ -38,16 +39,21 @@ Keyboard Input:
 Ressource Loading:
 ================================================================================
     ✔ Establish some sort of handle that can be used to identify the ressource in both browser and Go @done (27.10.2023, 06:25:56)
-    ☐ Use Makefile to copy all files in `./project-template/ressource` to `./project-template/build/ressource`
+    ✔ Use Makefile to copy all files in `./project-template/ressource` to `./project-template/build/ressource` @done (29.10.2023, 02:17:44)
+    ✔ Freeing requested Ressources @done (29.10.2023, 02:25:18)
 
     Binary:
     ----------------------------------------------------------------------------
         ✔ Go Tells Worker to load a ressource @done (27.10.2023, 06:26:00)
         ✔ Worker immediatly responds with an ID as a Handle @done (27.10.2023, 06:26:02)
-        ☐ Worker then tells main thread to load ressource via AJAx
-        ☐ Main-Thread loads requrested ressource from its `./build/ressource` folder
-        ☐ Main-Thread responds back with Uint8Array holding the the bytes of the loaded ressource to worker
-        ☐ Worker then transferes the bytes to GO
+        ✔ test if worker can load stuff via AJAx @done (28.10.2023, 06:10:21)
+        ✔ worker loads file from the `./build/ressource` Folder @done (29.10.2023, 02:40:43)
+        ☐ if no file is found or failed to load, tell go about that
+        ✔ Worker then transferes the bytes to GO @done (29.10.2023, 02:40:53)
+
+        ✘ Worker then tells main thread to load ressource via AJAx @cancelled (28.10.2023, 06:10:23)   <- worker can load files on its own
+        ✘ Main-Thread loads requrested ressource from its `./build/ressource` folder @cancelled (28.10.2023, 06:10:24)<- worker can load files on its own
+        ✘ Main-Thread responds back with Uint8Array holding the the bytes of the loaded ressource to worker @cancelled (28.10.2023, 06:10:30) <- worker can load files on its own
 
     Audio:
     ----------------------------------------------------------------------------
@@ -79,6 +85,13 @@ Loading Compressed Data:
     ☐ mapData
 
 
+Examples:
+================================================================================
+    ☐ Text Display
+    ☐ Mouse Input
+    ☐ Keyboard Input
+    ☐ TileMaps Backgrounds
+
 Documentation:
 ================================================================================
 
@@ -102,6 +115,9 @@ Documentation:
 ## Reference:
     ✔ Engine @done (27.10.2023, 05:02:12)
     ✔ Engine-State @done (27.10.2023, 05:02:16)
+    ☐ UI
+        ☐ Labels
+        ☐ Buttons
     ☐ Canvas
     ☐ TileMap
         ☐ Concept

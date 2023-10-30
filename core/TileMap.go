@@ -1,9 +1,7 @@
-package gfx
+package core
 
 import (
 	"fmt"
-
-	"github.com/rocco-gossmann/GoWas/core"
 )
 
 type tileMapOpts struct {
@@ -167,7 +165,7 @@ func (me *TileMap) Alpha() byte        { return me.opts.Alpha }
 // Actions
 // -----------------------------------------------------------------------------
 
-func (me *TileMap) ToCanvas(ca *core.Canvas) {
+func (me *TileMap) ToCanvas(ca *Canvas) {
 
 	me.validate()
 

@@ -1,7 +1,14 @@
 package core
 
-import "github.com/rocco-gossmann/GoWas/io"
+import (
+	"syscall/js"
 
+	"github.com/rocco-gossmann/GoWas/io"
+)
+
+// ==============================================================================
+// Types
+// ==============================================================================
 type EngineSetup struct {
 	WindowHeight, WindowWidth uint16
 }
@@ -15,26 +22,87 @@ type Engine struct {
 	Unload *Unloadable
 
 	Run func(scene any)
+
+	textDisplay *TextDisplay
 }
 
 type EngineState struct {
 	Mouse     io.MouseState
 	Keyboard  io.KeyboardState
 	DeltaTime float64
+	Text      *TextDisplay
 
 	ressources map[RessourceHandle]Ressource
+
+	canvas *Canvas
+	engine *Engine
 }
 
+// ==============================================================================
+// Ressource Processing Framework
+// ==============================================================================
+
+type _ResourceProcessorFunc func(*Ressource, []js.Value)
+
+func (me *EngineState) _ProcessRessource(args []js.Value, handler _ResourceProcessorFunc) interface{} {
+	ressourceHandle := RessourceHandle(args[0].Int())
+	if res, ok := me.ressources[ressourceHandle]; ok {
+		handler(&res, args)
+		me.ressources[ressourceHandle] = res
+	}
+
+	return nil
+}
+
+// ==============================================================================
+// Ressource Processing Functions
+// ==============================================================================
+func (me *EngineState) _ProcessReadRessource(res *Ressource, args []js.Value) {
+	res.state = RESSTATE_PROCESSING
+	res.jsData = args[1]
+	res._Process()
+}
+
+func (me *EngineState) _ProcessNotFoundRessource(res *Ressource, _ []js.Value) {
+	res.state = RESSTATE_NOTFOUND
+}
+
+// ==============================================================================
+// Ressource Ressource Functions
+// ==============================================================================
 func (me *EngineState) RequestRessource(ressourceType RessourceType, fileName string) RessourceHandle {
 	ressource := _RequestRessource(ressourceType, fileName)
 	me.ressources[ressource.handle] = ressource
 	return ressource.handle
 }
 
-func (me *EngineState) FreeRessource(handle RessourceHandle) {
-	panic("//TODO: Implement")
+func (me *EngineState) reseiveRessource(args []js.Value) interface{} {
+	return me._ProcessRessource(args, me._ProcessReadRessource)
 }
 
+func (me *EngineState) markRessourceNotFound(args []js.Value) interface{} {
+	return me._ProcessRessource(args, me._ProcessNotFoundRessource)
+}
+
+func (me *EngineState) FreeRessource(handle RessourceHandle) {
+	delete(me.ressources, handle)
+}
+
+// ==============================================================================
+// TextDisplay
+// ==============================================================================
+
+func (me *EngineState) EnableTextLayer() {
+	me.canvas.enableLayer(CANV_RL_TEXT)
+}
+
+func (me *EngineState) DisableTextLayer() {
+	me.canvas.disableLayer(CANV_RL_TEXT)
+}
+
+// ==============================================================================
+// Methods
+// ==============================================================================
 func (e *Engine) Init(s *EngineSetup) {
 	if e == nil {
 		panic("'engine' can't be nil")
@@ -44,6 +112,7 @@ func (e *Engine) Init(s *EngineSetup) {
 	}
 
 	e.canvas = CreateCanvas(e, (*s).WindowWidth, (*s).WindowHeight)
+	e.textDisplay = InitTextDisplay(e.canvas)
 }
 
 func (e *Engine) Canvas() *Canvas { return e.canvas }

@@ -5,19 +5,23 @@ BUILDDIR:= ./docs
 BOILERPLATE:=./boilerplate
 ASSETS:=./assets
 BMPS:=./bmps
+RESSOURCE:=./ressources
 
 ################################################################################
 # File-Lists
 ################################################################################
-BOILERFILES:=$(BUILDDIR)/  $(BUILDDIR)/index.html  $(BUILDDIR)/.htaccess 
+BOILERFILES:=$(BUILDDIR)/ $(BUILDDIR)/index.html  $(BUILDDIR)/.htaccess 
 
 # Find all JSFILES IN BOILERPLATE folder
-
 JSFILESSRC:=$(foreach dir,$(BOILERPLATE), $(wildcard $(dir)/*.js))
 JSFILES:=$(subst $(BOILERPLATE),$(BUILDDIR),$(JSFILESSRC))
 
 PNGFILESRC:=$(wildcard $(ASSETS)/*.png)
 PNGTARGETS:=$(patsubst $(ASSETS)/%.png, $(BMPS)/bmp.%.go, $(PNGFILESRC))
+
+RESSOURCETARGETDIR:=$(BUILDDIR)/$(RESSOURCE)
+RESSOURCEFILESRC:=$(foreach dir,$(RESSOURCE), $(wildcard $(dir)/*))
+RESSOURCETARGETS:=$(patsubst $(RESSOURCE)/%, $(RESSOURCETARGETDIR)/%, $(RESSOURCEFILESRC))
 
 ################################################################################
 # Internal
@@ -28,7 +32,7 @@ BMPSPREFIX  := $(subst ./,,$(BMPS))
 ################################################################################
 # Recipes
 ################################################################################
-$(BUILDDIR)/main.wasm: main.go $(BOILERFILES) $(JSFILES) $(PNGTARGETS)
+$(BUILDDIR)/main.wasm: main.go $(BOILERFILES) $(JSFILES) $(PNGTARGETS) $(RESSOURCETARGETS)
 	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o $@ .
 
 $(BMPS)/bmp.%.go: $(ASSETS)/%.png
@@ -44,6 +48,9 @@ $(BUILDDIR)/%.html: $(BOILERPLATE)/%.html
 $(BUILDDIR)/%.js: $(BOILERPLATE)/%.js
 	cp $^ $@ 
 
+$(RESSOURCETARGETDIR)/%: $(RESSOURCE)/%
+	cp $^ $@
+
 setup: go.sum
 	@echo "setup done"
 
@@ -52,16 +59,15 @@ go.sum: go.mod
 	
 start: run
 
-
 run: $(BUILDDIR)/main.wasm
 	go run ./.tools/server/server.go
 
-.phony: dev open echo clean remake $(BUILDDIR)/
+.phony: dev open echo clean remake $(BUILDDIR)/ $(RESSOURCETARGETDIR)
 
 open: 
 	open http://localhost:7353
 
-echo: .entr_sourcelist
+echo: 
 	@echo "Boilerplate files: "$(BOILERFILES)
 	@echo
 	@echo "PNG Sources: "$(PNGFILESRC)
@@ -70,11 +76,14 @@ echo: .entr_sourcelist
 	@echo "JS Sources: "$(JSFILESSRC)
 	@echo "JS Targets: "$(JSFILES)
 	@echo
+	@echo "Ressource Sources:" $(RESSOURCEFILESRC)
+	@echo "Ressource Targets:" $(RESSOURCETARGETS)
+	@echo
 	@echo "Watchfiles:"
-	@echo $(shell cat ./entr_sourcelist)
+	@echo $(shell find .. -type f \( -path "*/ressources/*" -o -name "*.png" -o -name "*.js" -o -name "*.html" -o -name "*.go" \) -not -iregex '.*/docs/.*')
 
 dev:
-	find .. -type f \( -name "*png" -o -name "*js" -o -name "*.html" -o -name "*.go" \) -not -iregex '.*/docs/.*' | entr make remake
+	find .. -type f \( -path "*/ressources/*" -o -name "*.png" -o -name "*.js" -o -name "*.html" -o -name "*.go" \) -not -iregex '.*/docs/.*' | entr make remake
 
 
 remake: 
@@ -83,6 +92,7 @@ remake:
 
 $(BUILDDIR)/:
 	mkdir $(BUILDDIR)
+	mkdir -p $(RESSOURCETARGETDIR)
 
 clean:
 	rm -rf $(BUILDDIR) 
