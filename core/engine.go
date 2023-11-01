@@ -113,6 +113,8 @@ func (e *Engine) Init(s *EngineSetup) {
 
 	e.canvas = CreateCanvas(e, (*s).WindowWidth, (*s).WindowHeight)
 	e.textDisplay = InitTextDisplay(e.canvas)
+	e.canvas.layers[CANV_RL_TEXT] = e.textDisplay
+	engineState.Text = e.textDisplay
 }
 
 func (e *Engine) Canvas() *Canvas { return e.canvas }

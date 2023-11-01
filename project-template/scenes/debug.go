@@ -19,7 +19,8 @@ type debugScene struct {
 	fpsCnt    int
 	fps       int
 
-	fpsLabel *ui.Label
+	fpsLabel  *ui.Label
+	timeLabel *ui.Label
 
 	exampleRessource core.RessourceHandle
 }
@@ -34,7 +35,11 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 
 	e.EnableTextLayer()
 
-	s.fpsLabel = ui.CreateLabel(e.Text, 4)
+	e.Text.SetCursor(0, -2).Echo("FPS:\nTime:") //<-- Print some static text, that won't change
+
+	// Create A UI-Label that we can change without having to worry about the current TextDisplay-State
+	s.fpsLabel = ui.CreateLabel(e.Text, 6, -2, 4)
+	s.timeLabel = ui.CreateLabel(e.Text, 6, -1, 10)
 
 	// Load in Mouse Button Display-Tileset
 	//-------------------------------------------------------------------------
@@ -55,12 +60,6 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 	//		//																				  continues where the last character was printed
 	//		//									     										  You can use \n to force a line break and carriage return from within the text
 	//		SetCursor(5, 13).Echo(fmt.Sprintf("Pressed / Held:"))
-	//
-	//	// Preparing a part on the bottom line for showing a constantly changing value
-	//	s.text.
-	//		SetWrap(false). //<- Disable automatic wrapping, as the the printed value would wrap arround to the first line
-	//		//					 otherwise
-	//		SetCursor(0, -2).Echo("FPS:\nTimer:")
 	//
 	// Text stays persistent per Text-Display you don't need to reset it each frame
 
@@ -109,22 +108,19 @@ func (me *debugScene) Tick(e *core.EngineState) bool {
 	me.totaltime += e.DeltaTime
 	me.tma += 24 * e.DeltaTime // <-background scroll timer
 
-	//me.text.SetCursor(7, -1).Echo(fmt.Sprint(me.totaltime)) // <- update the Text display with the current timer value
+	me.timeLabel.Text(fmt.Sprint(me.totaltime))
 
 	//me.text.SetCursor(0, 0).Echo(string(e.Keyboard.HistoryRunes(20))).
 	//	SetCursor(0, 2).Clear(5).Echo(fmt.Sprintf("%v", e.Keyboard.History(1)))
 
-	//// Update FPS
-	//if me.fpsTime >= 1 {
+	// Update FPS
+	if me.fpsTime >= 1 {
 
-	//	me.text.
-	//		SetCursor(7, -2).
-	//		Clear(8). //<-- overwrite the next 8 characters from the cursor with spaces
-	//		Echo(fmt.Sprint(me.fpsCnt))
+		me.fpsLabel.Text(fmt.Sprint(me.fpsCnt)) //<-display the text via the created ui.Label
 
-	//	me.fpsTime = 0
-	//	me.fpsCnt = 0
-	//}
+		me.fpsTime = 0
+		me.fpsCnt = 0
+	}
 
 	//// Update Background-Scroll
 	//me.bgScroll = int32(me.tma)
@@ -136,11 +132,12 @@ func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
 	// Update FPS Counter
 	s.fpsCnt++
 
+	ca.FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
 	//s.bgMap.
 	//	MoveTo(s.bgScroll, s.bgScroll).
 	//	ToCanvas(ca)
 
-	ca.FillColorA(0x00000000, 0xb0, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
+	//ca.FillColorA(0x00000000, 0xb0, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
 	//													 to darken the backaground a bit
 
 	//	s.text.

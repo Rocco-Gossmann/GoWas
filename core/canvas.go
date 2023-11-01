@@ -32,7 +32,7 @@ const (
 )
 
 type _RenderLayer interface {
-	ToCanvas(*Canvas)
+	ToCanvas(c *Canvas)
 }
 
 type CanvasBlitOpts struct {
@@ -43,6 +43,7 @@ type CanvasBlitOpts struct {
 	Layers    CanvasCollisionLayers // What collision layers the drawn object occupies
 	Clip      *types.Rect           // Clipping Rectangle to only draw a certain area of the bitmap
 }
+
 type Canvas struct {
 	wasmcanvas go_wasmcanvas.Canvas
 	engine     *Engine
@@ -56,6 +57,10 @@ type Canvas struct {
 
 func (ca *Canvas) GetWidth() uint16  { return ca.wasmcanvas.Width() }
 func (ca *Canvas) GetHeight() uint16 { return ca.wasmcanvas.Height() }
+
+func (ec *Canvas) ToCanvas(c *Canvas) {
+	(*ec.engine.Draw).Draw(&engineState, ec)
+}
 
 // ==============================================================================
 // Constructors
@@ -72,16 +77,22 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 		buffer:     Buffer{PixelPerLine: width},
 	}
 
-	ec.layers[CANV_RL_SCENE] = interface{}(ec).(_RenderLayer)
-	ec.layerEnable[CANV_RL_SCENE] = true
+	if inter, ok := interface{}(&ec).(_RenderLayer); ok {
+		ec.layers[CANV_RL_SCENE] = inter
+		ec.layerEnable[CANV_RL_SCENE] = true
+	} else {
+		panic("failed to assign canvas interface to itself")
+	}
 
-	ec.layers[CANV_RL_TEXT] = e.textDisplay
 	ec.layerEnable[CANV_RL_TEXT] = false
 
 	ec.layerOrder[CANV_RL_SCENE] = CANV_RL_SCENE
 	ec.layerOrder[CANV_RL_TEXT] = CANV_RL_TEXT
 
 	ec.renderLayers = make([]_RenderLayer, 0, 2)
+
+	engineState.canvas = &ec
+	engineState.engine = e
 
 	ec.reorderLayers()
 
@@ -170,10 +181,6 @@ func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 	return ec.blitBitmapClipped(opts.Bmp, bw, bh, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
 }
 
-func (ec *Canvas) ToCanvas(c *Canvas) {
-	(*ec.engine.Draw).Draw(&engineState, ec)
-}
-
 // ==============================================================================
 // Implement go_wasm_canvas
 // ==============================================================================
@@ -182,7 +189,7 @@ var engineState EngineState
 
 func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
 	ec.buffer.Memory = px
-	for _, layer := range ec.layers {
+	for _, layer := range ec.renderLayers {
 		layer.ToCanvas(ec)
 	}
 }
@@ -204,10 +211,8 @@ func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasm
 
 	io.UpdateMouse(&engineState.Mouse)
 	io.UpdateKeys(&engineState.Keyboard)
+
 	engineState.DeltaTime = deltaTime
-	engineState.canvas = ec
-	engineState.engine = ec.engine
-	engineState.Text = ec.engine.textDisplay
 
 	if (*ec.engine.Tick).Tick(&engineState) {
 		ec.wasmcanvas.Apply(ec.canvasDraw)
@@ -370,12 +375,11 @@ func (me *Canvas) disableLayer(l CanvasRenderLayers) {
 		return
 	}
 
-	me.layerEnable[l] = true
+	me.layerEnable[l] = false
 	me.reorderLayers()
 }
 
 func (me *Canvas) enableLayer(l CanvasRenderLayers) {
-
 	if me.layerEnable[l] {
 		return
 	}
@@ -391,6 +395,7 @@ func (me *Canvas) reorderLayers() {
 			me.renderLayers = append(me.renderLayers, me.layers[canvasLayer])
 		}
 	}
+
 }
 
 // ==============================================================================

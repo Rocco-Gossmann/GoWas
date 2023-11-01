@@ -167,8 +167,6 @@ func (me *TileMap) Alpha() byte        { return me.opts.Alpha }
 
 func (me *TileMap) ToCanvas(ca *Canvas) {
 
-	me.validate()
-
 	caw, cah := ca.GetWidth(), ca.GetHeight()
 	tc := me.ts.TileCount()
 	tw, th := uint32(me.ts.GetTileWidth()), uint32(me.ts.GetTileHeight())

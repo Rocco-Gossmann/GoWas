@@ -37,12 +37,22 @@ func InitTextDisplay(ca *Canvas) *TextDisplay {
 	text.ts = &TileSet{}
 	text.ts.InitFromMapSheet(AsciiFontBMP, 8, 8)
 
-	text.setFont(text.ts)
+	text.SetFont(text.ts)
+	text.mp.SetTileSetOffset(64)
 	text.wrap = true
 
-	text.mp.SetTileSetOffset(64)
-
 	return &text
+}
+
+// ==============================================================================
+// Getters
+// ==============================================================================
+func (me *TextDisplay) Wrap() bool {
+	return me.wrap
+}
+
+func (me *TextDisplay) Cursor() (uint16, uint16) {
+	return me.cursorx, me.cursory
 }
 
 // ==============================================================================
@@ -131,7 +141,7 @@ func (me *TextDisplay) SetWrap(wrap bool) *TextDisplay {
 	return me
 }
 
-func (me *TextDisplay) setFont(ts *TileSet) *TextDisplay {
+func (me *TextDisplay) SetFont(ts *TileSet) *TextDisplay {
 	tw, th := ts.GetTileWidth(), ts.GetTileWidth()
 
 	me.charsPerLine = uint16(math.Floor(float64(me.canvasWidth) / float64(tw)))
