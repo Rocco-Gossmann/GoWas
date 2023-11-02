@@ -2,4 +2,5 @@ go 1.21.1
 
 use (
 	./test
+	./examples/ui-labels
 )
