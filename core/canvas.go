@@ -27,8 +27,8 @@ const (
 	CANV_CL_NONE CanvasCollisionLayers = 0
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
 
-	CANV_RL_SCENE CanvasRenderLayers = 0
-	CANV_RL_TEXT  CanvasRenderLayers = 1
+	CANV_RL_SCENE CanvasRenderLayers = 1
+	CANV_RL_TEXT  CanvasRenderLayers = 2
 )
 
 type _RenderLayer interface {
@@ -49,10 +49,16 @@ type Canvas struct {
 	engine     *Engine
 	buffer     Buffer
 
-	layers       [2]_RenderLayer
-	layerOrder   [2]CanvasRenderLayers
-	layerEnable  [2]bool
+	layers       [3]_RenderLayer
+	layerOrder   [3]CanvasRenderLayers
+	layerEnable  [3]bool
 	renderLayers []_RenderLayer
+}
+
+type ClearLayer struct{}
+
+func (ec *ClearLayer) ToCanvas(c *Canvas) {
+	c.FillRGBA(0, 0, 0, 255, CANV_CL_NONE)
 }
 
 func (ca *Canvas) GetWidth() uint16  { return ca.wasmcanvas.Width() }
@@ -76,6 +82,8 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 		wasmcanvas: go_wasmcanvas.Create(width, height),
 		buffer:     Buffer{PixelPerLine: width},
 	}
+
+	ec.layers[0] = &ClearLayer{}
 
 	if inter, ok := interface{}(&ec).(_RenderLayer); ok {
 		ec.layers[CANV_RL_SCENE] = inter

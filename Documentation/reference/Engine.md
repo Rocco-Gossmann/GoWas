@@ -5,7 +5,7 @@ This is the entry point to your project. It provides 2 Methods to get started.
 ## Init
 
 ```go
-Init(setup core.EngineSetup) *core.Engine
+Init(setup GoWas.EngineSetup) *core.Engine
 ```
 
 Sets the base parameters and environment for to run the Entire thing.
@@ -14,7 +14,7 @@ Sets the base parameters and environment for to run the Entire thing.
 
 | parameter | type                               | description                            |
 | --------- | ---------------------------------- | -------------------------------------- |
-| `setup`   | [`core.EngineSetup`](#enginesetup) | Base-Parameters for running the Engine |
+| `setup`   | [`GoWas.EngineSetup`](#enginesetup) | Base-Parameters for running the Engine |
 
 #### Returns
 
@@ -40,10 +40,13 @@ The Function will run, until it no longer receives a Scene to Run
 
 # EngineSetup
 
-a struct passed to `core.Engine.Init` to define the basic parameters.
+a struct passed to `GoWas.Init` to define the basic parameters for the Engine to Run
 
 ```go
-type core.EngineSetup struct {
+type GoWas.EngineSetup struct {
 	WindowHeight, WindowWidth uint16 //<- The dimensions of the canvas to draw on
+
+	AutoClearPixels bool //<- If true, the Pixels of the screen are reset 
+	//                        to black at the start of each drawing cycle
 }
 ```

@@ -11,6 +11,9 @@ import (
 // ==============================================================================
 type EngineSetup struct {
 	WindowHeight, WindowWidth uint16
+
+	// If set, all Pixels and Collisions on screen are reset to 0 each frame
+	AutoClearPixels bool
 }
 
 type Engine struct {
@@ -115,6 +118,10 @@ func (e *Engine) Init(s *EngineSetup) {
 	e.textDisplay = InitTextDisplay(e.canvas)
 	e.canvas.layers[CANV_RL_TEXT] = e.textDisplay
 	engineState.Text = e.textDisplay
+
+	if s.AutoClearPixels {
+		e.canvas.enableLayer(0)
+	}
 }
 
 func (e *Engine) Canvas() *Canvas { return e.canvas }
