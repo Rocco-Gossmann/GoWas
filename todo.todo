@@ -104,6 +104,12 @@ Documentation:
     ✔ Scenes @done (27.10.2023, 05:01:11)
     ☐ Scene-Transitions
     ☐ Drawing Stuff
+        ✔ Layers @done (3.11.2023, 06:46:34)
+        ☐ Components
+        ☐ Assets
+            ☐ loading
+            ☐ component conversion
+
     ✔ Mouse-Input @done (27.10.2023, 05:01:32)
     ✔ Keyboard-Input @done (27.10.2023, 05:01:41)
     ☐ Loading Ressources at Runtime
