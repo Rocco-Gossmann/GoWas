@@ -47,7 +47,7 @@ The default formation looks like this. (The Top layer is drawn last.)
 ![Layer-System.img](./_img/graphics_layers.png)
 
 
-> ![important]   
+> [!important]   
 > Right now only the `Text / UI` and `Scene.Draw` layers are implemented.
 
 ### Layer Descriptions
