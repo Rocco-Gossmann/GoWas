@@ -20,9 +20,7 @@ you can find all documentation in the [./Documentation](./Documentation) Folder
     - [Engine - State](./Documentation/reference/EngineState.md)<br> <br>
 - [Mouse - Input](./Documentation/MouseInput.md) 
 - [Keyboard - Input](./Documentation/KeyboardInput.md) 
-
-## Tooling
-- [Graphics-Import](./Documentation/Graphics_and_Sound.md)
+- [Graphics & Sound](./Documentation/Graphics_and_Sound.md)
 
 ## References
 - [Bitmap](./Documentation/reference/Bitmap.md)
