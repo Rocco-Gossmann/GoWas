@@ -27,8 +27,11 @@ const (
 	CANV_CL_NONE CanvasCollisionLayers = 0
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
 
-	CANV_RL_SCENE CanvasRenderLayers = 1
-	CANV_RL_TEXT  CanvasRenderLayers = 2
+	CANV_RL_MAP1    CanvasRenderLayers = 1
+	CANV_RL_SCENE   CanvasRenderLayers = 2
+	CANV_RL_SPRITES CanvasRenderLayers = 3
+	CANV_RL_MAP2    CanvasRenderLayers = 4
+	CANV_RL_TEXT    CanvasRenderLayers = 5
 )
 
 type _RenderLayer interface {
@@ -49,16 +52,20 @@ type Canvas struct {
 	engine     *Engine
 	buffer     Buffer
 
-	layers       [3]_RenderLayer
-	layerOrder   [3]CanvasRenderLayers
-	layerEnable  [3]bool
+	clearlayer ClearLayer
+
+	layers       [6]_RenderLayer
+	layerOrder   [6]CanvasRenderLayers
+	layerEnable  [6]bool
 	renderLayers []_RenderLayer
 }
 
-type ClearLayer struct{}
+type ClearLayer struct {
+	color uint32
+}
 
 func (ec *ClearLayer) ToCanvas(c *Canvas) {
-	c.FillRGBA(0, 0, 0, 255, CANV_CL_NONE)
+	c.FillColorA(ec.color, 255, CANV_CL_NONE)
 }
 
 func (ca *Canvas) GetWidth() uint16  { return ca.wasmcanvas.Width() }
@@ -83,7 +90,9 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 		buffer:     Buffer{PixelPerLine: width},
 	}
 
-	ec.layers[0] = &ClearLayer{}
+	ec.layers[0] = &(ec.clearlayer)
+	ec.layers[CANV_RL_MAP1] = &engineState.Map1
+	ec.layers[CANV_RL_MAP2] = &engineState.Map2
 
 	if inter, ok := interface{}(&ec).(_RenderLayer); ok {
 		ec.layers[CANV_RL_SCENE] = inter
@@ -92,12 +101,13 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 		panic("failed to assign canvas interface to itself")
 	}
 
-	ec.layerEnable[CANV_RL_TEXT] = false
-
+	ec.layerOrder[CANV_RL_MAP1] = CANV_RL_MAP1
+	ec.layerOrder[CANV_RL_MAP2] = CANV_RL_MAP2
 	ec.layerOrder[CANV_RL_SCENE] = CANV_RL_SCENE
+	ec.layerOrder[CANV_RL_SPRITES] = CANV_RL_SPRITES
 	ec.layerOrder[CANV_RL_TEXT] = CANV_RL_TEXT
 
-	ec.renderLayers = make([]_RenderLayer, 0, 2)
+	ec.renderLayers = make([]_RenderLayer, 0, 5)
 
 	engineState.canvas = &ec
 	engineState.engine = e
@@ -403,7 +413,6 @@ func (me *Canvas) reorderLayers() {
 			me.renderLayers = append(me.renderLayers, me.layers[canvasLayer])
 		}
 	}
-
 }
 
 // ==============================================================================

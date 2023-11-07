@@ -25,20 +25,14 @@ func (pTm *TileMap) validate() {
 	}
 }
 
-func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
+func (tm *TileMap) Init(ts *TileSet, width, height uint32) *TileMap {
 
 	if tm == nil {
 		panic("tilemap is nil")
 	}
 
-	var ts = (*pTs)
-
 	if tm.init {
 		panic("cant initialize a map twice")
-	}
-
-	if ts.TileCount() > 255 {
-		panic("Maps can't use Tilesets that have more than 255 tiles")
 	}
 
 	if width == 0 {
@@ -48,15 +42,11 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 		panic("map height must be bigger than 0")
 	}
 
-	if ts.Type() != TILESET_TYPE_MAP {
-		panic(" can't create TileMap from a Tileset, that is not of Type TILESET_TYPE_MAP")
-	}
+	tm.SetTileSet(ts)
 
 	tm.mh = height
 	tm.mw = width
-	tm.ts = pTs
 	tm.memory = make([]byte, tm.mw*tm.mh)
-	tm.accessTc = byte(min(255, ts.TileCount()))
 
 	tm.init = true
 	return tm
@@ -65,6 +55,29 @@ func (tm *TileMap) Init(pTs *TileSet, width, height uint32) *TileMap {
 // -----------------------------------------------------------------------------
 // Setters
 // -----------------------------------------------------------------------------
+func (me *TileMap) SetTileSet(ts *TileSet) *TileMap {
+	if ts != nil {
+
+		tileCount := ts.TileCount()
+
+		if tileCount > 255 {
+			panic("Maps can't use Tilesets that have more than 255 tiles")
+		}
+
+		if ts.Type() != TILESET_TYPE_MAP {
+			panic(" can't create TileMap from a Tileset, that is not of Type TILESET_TYPE_MAP")
+		}
+
+		me.ts = ts
+		me.accessTc = byte(min(255, tileCount))
+
+	} else {
+		me.ts = nil
+	}
+
+	return me
+}
+
 // Tiles
 func (me *TileMap) SetTileSetOffset(o int) *TileMap {
 	var tc = me.ts.TileCount()
@@ -156,6 +169,9 @@ func (me *TileMap) MoveBy(x, y int32) *TileMap {
 // -----------------------------------------------------------------------------
 // Getters
 // -----------------------------------------------------------------------------
+
+func (me *TileMap) HasTileSet() bool { return me.ts != nil }
+
 func (me *TileMap) X() int32           { return me.opts.X }
 func (me *TileMap) Y() int32           { return me.opts.Y }
 func (me *TileMap) XY() (int32, int32) { return me.opts.X, me.opts.Y }
@@ -166,6 +182,10 @@ func (me *TileMap) Alpha() byte        { return me.opts.Alpha }
 // -----------------------------------------------------------------------------
 
 func (me *TileMap) ToCanvas(ca *Canvas) {
+
+	if me.ts == nil {
+		return
+	}
 
 	caw, cah := ca.GetWidth(), ca.GetHeight()
 	tc := me.ts.TileCount()

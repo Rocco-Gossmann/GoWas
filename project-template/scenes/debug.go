@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"GoWasProject/bmps"
 	"fmt"
 
 	"github.com/rocco-gossmann/GoWas/core"
@@ -27,19 +28,17 @@ type debugScene struct {
 
 func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 
-	s.exampleRessource = e.RequestRessource(core.RESTYPE_BINARY, "demo.txt")
+	s.initTextDisplay(e)
+	s.initMaps(e)
 
-	// Setting the Initial background to light #333333
-	//-------------------------------------------------------------------------
-	ca.FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
+	e.SetLayerOrder(
+		core.CANV_RL_MAP2,  // Top most layer is drawn above all (Map2 has transparency to tint everything)
+		core.CANV_RL_TEXT,  // Then the text
+		core.CANV_RL_SCENE, // Scene.Draw below the text
+		core.CANV_RL_MAP1,  // Map 1 as the background
 
-	e.EnableTextLayer()
-
-	e.Text.SetCursor(0, -2).Echo("FPS:\nTime:") //<-- Print some static text, that won't change
-
-	// Create A UI-Label that we can change without having to worry about the current TextDisplay-State
-	s.fpsLabel = ui.CreateLabel(e.Text, 6, -2, 4)
-	s.timeLabel = ui.CreateLabel(e.Text, 6, -1, 10)
+		core.CANV_RL_SPRITES, // Sprites don't matter for now, so they are covered by Map 1
+	)
 
 	// Load in Mouse Button Display-Tileset
 	//-------------------------------------------------------------------------
@@ -63,82 +62,27 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 	//
 	// Text stays persistent per Text-Display you don't need to reset it each frame
 
-	// Setup Background Map
-	//-------------------------------------------------------------------------
-	// > Init Background TileSet
-	//s.bgSet = &core.TileSet{}
-	//s.bgSet.InitFromMapSheet(bmps.BMPdebugtiles, 8, 8)
-
 	// > Init Background Map
 	//	s.bgMap = &core.TileMap{}
 	//	s.bgMap.
-	//		Init(s.bgSet, 22, 22).
-	//		SetMap([]byte{
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//			12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
-	//			7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
-	//		})
 
 	fmt.Println("Debug-Scene loaded")
 }
 
 func (me *debugScene) Tick(e *core.EngineState) bool {
 
-	// Update Timers
-	me.fpsTime += e.DeltaTime
-	me.totaltime += e.DeltaTime
-	me.tma += 24 * e.DeltaTime // <-background scroll timer
-
-	me.timeLabel.Text(fmt.Sprint(me.totaltime))
-
-	//me.text.SetCursor(0, 0).Echo(string(e.Keyboard.HistoryRunes(20))).
-	//	SetCursor(0, 2).Clear(5).Echo(fmt.Sprintf("%v", e.Keyboard.History(1)))
-
-	// Update FPS
-	if me.fpsTime >= 1 {
-
-		me.fpsLabel.Text(fmt.Sprint(me.fpsCnt)) //<-display the text via the created ui.Label
-
-		me.fpsTime = 0
-		me.fpsCnt = 0
-	}
-
-	//// Update Background-Scroll
-	//me.bgScroll = int32(me.tma)
+	me.updateTimes(e)
 
 	return true
 }
 
 func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
-	// Update FPS Counter
-	s.fpsCnt++
 
-	ca.FillColorA(0x00333333, 0xff, core.CANV_CL_ALL)
+	s.countFPS()
+
 	//s.bgMap.
 	//	MoveTo(s.bgScroll, s.bgScroll).
 	//	ToCanvas(ca)
-
-	//ca.FillColorA(0x00000000, 0xb0, core.CANV_CL_ALL) // Filling the canvas with a half transparent black
-	//													 to darken the backaground a bit
 
 	//	s.text.
 	//		SetCursor(5, 14).Clear(8).
@@ -171,3 +115,104 @@ func (s *debugScene) Unload(e *core.EngineState) *struct{} {
 var Debug = debugScene{
 	// CursorEntity: bmps.BMPcursor.MakeEntity(),
 }
+
+// Helpers
+// ------------------------------------------------------------------------------
+
+// /*Map Test
+// ------------------------------------------------------------------------------
+func (s *debugScene) initMaps(e *core.EngineState) {
+	// Setup Background Map
+	//-------------------------------------------------------------------------
+	// > Init Background TileSet
+	tileSet := core.TileSet{}
+	tileSet.InitFromMapSheet(bmps.BMPdebugtiles, 8, 8)
+
+	e.EnableMap1Layer(&tileSet)
+	e.Map1.SetAlpha(0x40).SetMap([]byte{
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
+		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
+	})
+
+	e.EnableMap2Layer(&tileSet)
+	e.Map2.SetAlpha(0x70).SetMap([]byte{
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+	})
+}
+
+// /*Text Display Test
+// ------------------------------------------------------------------------------
+func (s *debugScene) initTextDisplay(e *core.EngineState) {
+	// Text-Layer
+	//-------------------------------------------------------------------------
+	e.EnableTextLayer()
+	e.Text.SetCursor(0, -2).Echo("FPS:\nTime:") //<-- Print some static text, that won't change
+	// Create A UI-Label that we can change without having to worry about the current TextDisplay-State
+	s.fpsLabel = ui.CreateLabel(e.Text, 6, -2, 4)
+	s.timeLabel = ui.CreateLabel(e.Text, 6, -1, 10)
+}
+
+func (me *debugScene) updateTimes(e *core.EngineState) {
+	// Update Timers
+	me.fpsTime += e.DeltaTime
+	me.totaltime += e.DeltaTime
+	me.tma += 24 * e.DeltaTime // <-background scroll timer
+
+	me.timeLabel.Text(fmt.Sprint(me.totaltime))
+
+	// Update FPS
+	if me.fpsTime >= 1 {
+
+		me.fpsLabel.Text(fmt.Sprint(me.fpsCnt)) //<-display the text via the created ui.Label
+
+		me.fpsTime = 0
+		me.fpsCnt = 0
+	}
+}
+
+func (me *debugScene) countFPS() {
+	me.fpsCnt++
+}
+
+//*/

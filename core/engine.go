@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"github.com/rocco-gossmann/GoWas/io"
@@ -14,6 +15,11 @@ type EngineSetup struct {
 
 	// If set, all Pixels and Collisions on screen are reset to 0 each frame
 	AutoClearPixels bool
+
+	AutoClearColor uint32 // 0x00 RR GG BB   24bit color that the screen clears to if AutoClearPixels is true
+
+	// [Default: 32] How many tiles in width and height the Maps for Layers Map1 and Map2 will have
+	TileMapWidth, TileMapHeight uint32
 }
 
 type Engine struct {
@@ -27,6 +33,7 @@ type Engine struct {
 	Run func(scene any)
 
 	textDisplay *TextDisplay
+	tileSet     TileSet
 }
 
 type EngineState struct {
@@ -34,6 +41,8 @@ type EngineState struct {
 	Keyboard  io.KeyboardState
 	DeltaTime float64
 	Text      *TextDisplay
+	Map1      TileMap
+	Map2      TileMap
 
 	ressources map[RessourceHandle]Ressource
 
@@ -98,15 +107,57 @@ func (me *EngineState) FreeRessource(handle RessourceHandle) {
 func (me *EngineState) EnableTextLayer() {
 	me.canvas.enableLayer(CANV_RL_TEXT)
 }
-
 func (me *EngineState) DisableTextLayer() {
 	me.canvas.disableLayer(CANV_RL_TEXT)
+}
+
+func (me *EngineState) EnableMap1Layer(tileSet *TileSet) {
+	if tileSet != nil {
+		me.Map1.SetTileSet(tileSet)
+	}
+
+	if me.Map1.HasTileSet() {
+		me.canvas.enableLayer(CANV_RL_MAP1)
+	}
+}
+func (me *EngineState) DisableMap1Layer() {
+	me.canvas.disableLayer(CANV_RL_MAP1)
+}
+
+func (me *EngineState) EnableMap2Layer(tileSet *TileSet) {
+	if tileSet != nil {
+		me.Map2.SetTileSet(tileSet)
+	}
+
+	if me.Map2.HasTileSet() {
+		me.canvas.enableLayer(CANV_RL_MAP2)
+	}
+}
+func (me *EngineState) DisableMap2Layer() {
+	me.canvas.disableLayer(CANV_RL_MAP2)
+}
+
+func (me *EngineState) SetLayerOrder(
+	topMost CanvasRenderLayers,
+	belowTop CanvasRenderLayers,
+	middle CanvasRenderLayers,
+	belowMiddle CanvasRenderLayers,
+	last CanvasRenderLayers,
+) {
+	me.canvas.layerOrder[1] = last
+	me.canvas.layerOrder[2] = belowMiddle
+	me.canvas.layerOrder[3] = middle
+	me.canvas.layerOrder[4] = belowTop
+	me.canvas.layerOrder[5] = topMost
+
+	me.canvas.reorderLayers()
 }
 
 // ==============================================================================
 // Methods
 // ==============================================================================
 func (e *Engine) Init(s *EngineSetup) {
+	fmt.Println("[core.engine.Init] run")
 	if e == nil {
 		panic("'engine' can't be nil")
 	}
@@ -114,13 +165,25 @@ func (e *Engine) Init(s *EngineSetup) {
 		panic("'setup' can't be nil")
 	}
 
+	if s.TileMapWidth == 0 {
+		s.TileMapWidth = 32
+	}
+	if s.TileMapHeight == 0 {
+		s.TileMapHeight = 32
+	}
+
+	engineState.Map1.Init(nil, s.TileMapWidth, s.TileMapHeight)
+	engineState.Map2.Init(nil, s.TileMapWidth, s.TileMapHeight)
+
 	e.canvas = CreateCanvas(e, (*s).WindowWidth, (*s).WindowHeight)
 	e.textDisplay = InitTextDisplay(e.canvas)
 	e.canvas.layers[CANV_RL_TEXT] = e.textDisplay
+
 	engineState.Text = e.textDisplay
 
 	if s.AutoClearPixels {
 		e.canvas.enableLayer(0)
+		e.canvas.clearlayer.color = s.AutoClearColor
 	}
 }
 

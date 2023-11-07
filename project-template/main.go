@@ -14,6 +14,9 @@ func main() {
 
 		AutoClearPixels: true,
 		AutoClearColor:  0x00333333,
+
+		TileMapWidth:  22,
+		TileMapHeight: 22,
 	})
 
 	e.Run(&scenes.Debug)
