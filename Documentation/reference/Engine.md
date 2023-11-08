@@ -46,7 +46,14 @@ a struct passed to `GoWas.Init` to define the basic parameters for the Engine to
 type GoWas.EngineSetup struct {
 	WindowHeight, WindowWidth uint16 //<- The dimensions of the canvas to draw on
 
-	AutoClearPixels bool //<- If true, the Pixels of the screen are reset 
-	//                        to black at the start of each drawing cycle
+	AutoClearPixels bool //<- [Default: false] If true, the Pixels of the screen are reset 
+	//                        to black or a  at the start of each drawing cycle
+
+	AutoClearColor uint32 // <- [Default: 0x00000000] 0x00RRGGBB 24bit color 
+	//                          that the screen clears to if AutoClearPixels is true
+
+	TileMapWidth, TileMapHeight uint32 // <- [Default: 32] How many tiles in 
+	//                                       width and height the Maps for Layers 
+	//                                       Map1 and Map2 will have
 }
 ```

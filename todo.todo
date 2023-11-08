@@ -24,6 +24,7 @@ Maps:
     ✔ Rework Setters and Getters to Work like BitmapEntities Do @critical @done (27.10.2023, 04:56:23)
     ☐ Test how drawing Maps, that are smaller than the screen behaves @critical
     ☐ Maps Collision layers @critical
+    ☐ MoveTo negative direction does not loop the map @critical 
     ✔ Maps Alpha blending @done (27.10.2023, 04:57:29)
     ☐ Allow to fill columns or rows of Tiles with data @high (Instead of just single tiles or the entire map)
     ☐ Maps Clipping-Rect @low

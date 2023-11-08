@@ -46,10 +46,6 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 	//mbts.InitFromMapSheet(bmps.BMPmouse, 32, 32)
 	//s.mouseButtonDisplay = &mbts
 
-	// Setting up a Text-Display
-	//-------------------------------------------------------------------------
-	// s.text = core.InitTextDisplay(ca) // Initialize a Text-Display (You can have as many as you want)
-
 	//	s.text. //<- Starting the Text change on a Display
 	//		SetCursor(0, 0).Echo("--- start typing ---"). //<- Settting a Cursor position and Printing Text, starting from that location
 	//		SetCursor(-15, 2).Echo("<- last key").        //<- negative coordinates mean "From the Bottom" and/or "From the Right"
