@@ -9,7 +9,7 @@ Tilemaps are a 2-dimensional grid of bytes, where each entry points to an Entry 
 
 - [Tile Maps](#tile-maps)
 - [Build in Map Layers](#build-in-map-layers)
-- [Creating your own Layers](#creating-your-own-layers)
+- [Creating your own TileMaps](#creating-your-own-tilemaps)
 
 <!-- /TOC -->
 
@@ -36,7 +36,8 @@ func (me *ExampleScene) Load(state *core.EngineState, canvas *core.Canvas) {
     );
     // ...
 ```
-with That, you can then enable your chosen Map-Layer through the [Engine](./EngineState.md#layer-control) State](./EngineState.md#layer-control)
+
+with That, you can then enable your chosen Map-Layer through the [Engine State](./EngineState.md#display-layer-control)
 ```go
     // ... 
     state.EnableMap1Layer(&tileSet)
@@ -52,5 +53,17 @@ And Start filling it with Data
 
 
 
-# Creating your own Layers
+# Creating your own TileMaps
 
+If you don't want to remain bound to the 2 Layers, that GoWas comes with, you can also
+define your own maps, that can be rendered on the [Scene.Draw Layer](../Graphics_and_Sound.md#display-layers)
+during the your Scenes [Draw-Lifecycle-hook](../Scenes.md#drawable)
+
+To do so, you first must define where your Map will live inside your applications.
+
+```go 
+    myMap := core.TileMap{}
+    //...
+```
+
+//TODO: Continue here
