@@ -1,6 +1,6 @@
 # GoWas - a (GO) + (W)eb(as)sembly Engine
 
-A Go and WASM based Engine.  
+A Go and WASM-based Engine.  
 It is heavily inspired by Engines like Pico-8 and the OneLoneCoders PixelGameEngine
 (https://github.com/OneLoneCoder/olcPixelGameEngine)
 

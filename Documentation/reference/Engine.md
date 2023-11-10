@@ -8,12 +8,12 @@ This is the entry point to your project. It provides 2 Methods to get started.
 Init(setup GoWas.EngineSetup) *core.Engine
 ```
 
-Sets the base parameters and environment for to run the Entire thing.
+Sets the base parameters and environment to run the entire thing.
 
 #### Parameters
 
-| parameter | type                               | description                            |
-| --------- | ---------------------------------- | -------------------------------------- |
+| parameter | type                                | description                            |
+|-----------|-------------------------------------|----------------------------------------|
 | `setup`   | [`GoWas.EngineSetup`](#enginesetup) | Base-Parameters for running the Engine |
 
 #### Returns
@@ -28,14 +28,14 @@ Run(scene *core.Scene)
 ```
 
 Tells the Engine what Scene to run First.\
-The Function will run, until it no longer receives a Scene to Run
+This Function will run until it no longer receives a Scene to Run
 
 (See [Engine-Lifecycle](../Engine.md#enginelifecycle) for further information)
 
 #### Parameters
 
-| parameter | type                         | description                                                              |
-| --------- | ---------------------------- | ------------------------------------------------------------------------ |
+| parameter | type                           | description                                                              |
+|-----------|--------------------------------|--------------------------------------------------------------------------|
 | `scene`   | \*[`core.Scene`](../Scenes.md) | The Memory address/pointer to the very first Scene to run in the Project |
 
 # EngineSetup

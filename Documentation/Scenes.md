@@ -1,7 +1,7 @@
 # Scenes
 
 A scene is a `struct{}` you define yourself. It hooks into the
-[engines Lifecycle](./EngineLifecycle.md) to manipulate and change it in various
+[Engines Lifecycle](./EngineLifecycle.md) to manipulate and change it in various
 ways.
 
 ```go
@@ -10,8 +10,8 @@ type myScene struct {}
 
 ## Lifecycle-Hooks
 
-In total there are 4 Interface a Scene `struct{}` can implement. By Implementing
-at least either the `Tickable` and / or the `Drawable` Interface, The Scene
+In total, there are 4 Interfaces a Scene `struct{}` can implement. By Implementing
+at least either the `Tickable` and/or the `Drawable`` Interface, The Scene
 becomes a valid `core.Scene`.
 
 ### Tickable
@@ -49,11 +49,11 @@ type Drawable interface {
 
 ### Loadable
 
-If a Scene implements it, its `Load` method is called before the Engine
-starts / continues ticking.
+If a Scene implements it, its `Load` method is called before the Engine 
+starts/continues ticking.
 
-It is only called once and should therefore be used to load / reserve / define
-ressources that the. `Tick(...)` and/or `Draw(...)` methods may need.
+It is only called once and should therefore be used to load/reserve/define 
+resources that the. `Tick(...)` and/or `Draw(...)` methods may need.
 
 ```go
 type Loadable interface {
@@ -68,10 +68,10 @@ type Loadable interface {
 If a Scene implements it, its `Unload` method is called before the Engine
 continues ticking.
 
-Like the `Loadable` interface, this is also only called once but only after a
-scenes `Tick` method. returned `false`.
+Like the `Loadable` interface, this is also only called once but only after a 
+scene's `Tick` method. returned `false`.
 
-Therefore it should be used to unload / free / reset the ressources created in the `Load` method.
+Therefore it should be used to unload/free/reset the resources created in the `Load` method.
 
 The `Unload` method returns a `struct{}` - pointer, that points to the next
 `core.Scene`, that the Engine should load and run next.
@@ -89,7 +89,7 @@ type Unloadable interface {
 
 ## Barebones Example
 
-Here is an example for barebones Scene definition
+Here is an example of a barebones Scene definition
 
 ```go
 package myproject_scenes

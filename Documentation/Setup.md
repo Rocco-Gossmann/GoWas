@@ -17,15 +17,15 @@ The Project uses `make` as its Build-System
 `project-template.tar.gz` from the
 [Releases-Section](https://github.com/Rocco-Gossmann/GoWas/releases)
 
-2.) Either way, extract the content of that folder into your own project-folder
+2.) Either way, extract the content of that folder into your project folder
 
-3.) Run the `make setup` command inside your project-folder. This will download
+3.) Run the `make setup` command inside your project folder. This will download
 the required packages
 
 ## Building the Project
 
 To build the project, simply run `make`, that is all.\
-The results will be build to the `./docs`-folder inside your project-folder.
+The results will be built into the `./docs`-folder inside your project folder.
 
 ## Running the Build
 
@@ -33,7 +33,7 @@ To run it, simply host the build, in any way you like. The template comes with a
 small Server-Script, that can be used for development. It will host the files
 via `http` on port `7353` of your system.
 
-You can running that script either via.
+You can run that script either via.
 
 ```bash
 go run ./.tools/server/server.go
@@ -47,19 +47,20 @@ make run
 and then opening any Browser and navigating to `http://localhost:7353` should be
 fine.
 
-## Getting started for Real
+## Getting Started for Real
 
-remove all the `*.go` files from the project rename the package inside `go.mod`
-remove `go.work` and run `make setup` again.
+- remove all the `*.go` files from the project 
+- rename the package inside `go.mod`
+- remove `go.work` and run `make setup` again.
 
 Now your blank slate is ready.
 
 > [!todo] 
 > Create a `make` task and tool-script to automate all of this.
 
-## Using entr as an auto building tool 
+## Using entr as an auto-building tool 
 
-If you have `entr` as available shell command, you can use the,
+If you have `entr` as an available shell command, you can use the,
 following `make` tasks/commands in addition
 
 ```bash

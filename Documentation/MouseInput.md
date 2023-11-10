@@ -1,6 +1,6 @@
 # Mouse-Input
 
-The Mouse-Input is bound to the [Engine-State](./reference/EngineState.md) as
+The mouse input is bound to the [Engine State](./reference/EngineState.md) as
 the `Mouse` property.
 Thus it is provided to your [Scene](./Scenes.md) through the
 [Engine-Lifecycle](./EngineLifecycle.md).
@@ -17,7 +17,7 @@ Thus it is provided to your [Scene](./Scenes.md) through the
 
 ## Mouse-State
 
-The [Engine-States](./reference/EngineState.md) `Mouse` Propert provides the
+The [Engine-States](./reference/EngineState.md) `Mouse` Property provides the
 Following Structure.
 
 ```go
@@ -33,7 +33,7 @@ type MouseState struct {
 
 ## Reading the Position
 
-The Cursors position is based on your Viewports/Canvases resolution provided.
+The cursor's position is based on your Viewports/Canvases resolution provided.
 You can set them in the [`GoWas.Init(...)`](./Engine.md) call in your `main`
 function.
 
@@ -65,7 +65,7 @@ func (s *demoScene) Draw(e *core.EngineState, c *core.Canvas) {
 ## Reading the Buttons
 
 Mouse Buttons are provided via the following 4 Properties on the
-[Mouse-State](#mouse-state).
+[Mouse State](#mouse-state).
 
 | Property        | Description                                                       |
 |-----------------|-------------------------------------------------------------------|
@@ -74,7 +74,7 @@ Mouse Buttons are provided via the following 4 Properties on the
 | `Released`      | Buttons that where pressed or held last cycle and no longer are   |
 | `PressedOrHeld` | the Pressed and Held property combined for convinience            |
 
-You interact with these via `Bitwise` opperations. For that you are provided 
+You interact with these via `Bitwise` operations. For that, you are provided 
 the `core.MOUSE_BTN1` to `core.MOUSE_BTN32` constants.
 
 ```go

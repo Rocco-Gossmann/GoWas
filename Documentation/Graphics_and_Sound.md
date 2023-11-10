@@ -53,19 +53,18 @@ The default formation looks like this. (The Top layer is drawn last.)
 ### Layer Descriptions
 
 Each layer comes with: 
-- a Go `core.`Name, that is used for [Rearranging Layers](#rearranging-layers)
-
-and with Exception of the `Scene.Draw` Layer each Layer also has
+- a Go `core.`Name, that is used for Rearranging Layers.
+With the exception of the `Scene.Draw` Layer, each Layer also has:
 
 - a Direct-Access property in the [`core.EngineState`](./reference/EngineState.md) (provided via [`core.Scene` Lifecycle-Hooks](./Scenes.md))   
 - and enable and disable functions inside the [`core.EngineState`](./reference/EngineState.md)
 
 
-| Layer | Description | Direct-Access | Go<br>`core.` Name | EngineState<br>En- /Disable |
-| - | - | - | - | - |
-| Text / UI | meant to display Text and [`ui` - elements](./reference/UI.md)  | `engineState.Text` | `CANV_RL_TEXT` | see [EngineState](./reference/EngineState.md#layer-control) | 
-| Map 2 |   | `engineState.Map2` | `CANV_RL_MAP2` |  see [EngineState](./reference/EngineState.md#layer-control) | 
-| Sprites |   | `engineState.Sprites` | `CANV_RL_SPRITES` |  see [EngineState](./reference/EngineState.md#layer-control) |
+| Layer     | Description                                                    | Direct-Access         | Go<br>`core.` Name | EngineState<br>En- /Disable                                 |
+|-----------|----------------------------------------------------------------|-----------------------|--------------------|-------------------------------------------------------------|
+| Text / UI | meant to display Text and [`ui` - elements](./reference/UI.md) | `engineState.Text`    | `CANV_RL_TEXT`     | see [EngineState](./reference/EngineState.md#layer-control) |
+| Map 2     |                                                                | `engineState.Map2`    | `CANV_RL_MAP2`     | see [EngineState](./reference/EngineState.md#layer-control) |
+| Sprites   |                                                                | `engineState.Sprites` | `CANV_RL_SPRITES`  | see [EngineState](./reference/EngineState.md#layer-control) |
 | Scene.Draw |  Displays everything rendered by the core.Scene    | [Scene.Draw-Lifecyclehook](./Scenes.md#drawable) | `CANV_RL_SCENE` | En-/Disables automatically if the Scene has the Lifecycle-hook | |
 | Map 1 |   | `engineState.Map1` | `CANV_RL_MAP1` |   see [EngineState](./reference/EngineState.md#layer-control) |
 
@@ -128,10 +127,10 @@ The Bitmap is available via a `*core.Bitmap` pointer.
 
 The PNGs Filename is converted into a VariableName, but due to the nature of
 variable names, not all characters of a filename can be put into a
-variable name, theirefore all characters, that don't match the following regexp
+variable name, therefore all characters, that don't match the following regexp
 are stripped from the file name `[A-Za-z0-9_]`
 
-Here are a few examples of file- to variable name conversions
+Here are a few examples of file-to-variable name conversions
 
 | Asset-File                       | Go-File                       | Go-Variable          |
 |----------------------------------|-------------------------------|----------------------|

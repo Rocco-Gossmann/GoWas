@@ -1,7 +1,6 @@
 # Keyboard-Input
-
-The Keyboard-Input is bound to the [Engine-State](./reference/EngineState.md) as
-the `Keyboard` property. Thus it is provided to your [Scene](./Scenes.md)
+The keyboard input is bound to the engine state as the `Keyboard` property. 
+Thus it is provided to your [Scene](./Scenes.md)
 through the [Engine-Lifecycle](./EngineLifecycle.md).
 
 Here is a list of things, it can do:
@@ -52,7 +51,7 @@ value defining if a Key has the checked State.
 These States are:
 
 | State           | Description                                                                                          |
-| --------------- | ---------------------------------------------------------------------------------------------------- |
+|-----------------|------------------------------------------------------------------------------------------------------|
 | `Pressed`       | `true` If the key has been freshly pressed this cycle but was not last cycle                         |
 | `Held`          | `true` If the key was pressed last cycle and is still pressed this cycle                             |
 | `Released`      | `true` If the Key was pressed/held last cycle but is no longer held this cycle                       |
@@ -250,7 +249,7 @@ Letting you start with a blank slate again
 ## Key - List
 
 | Key                | Value | Rune  | Description             |
-| ------------------ | ----- | ----- | ----------------------- |
+|--------------------|-------|-------|-------------------------|
 | `io.KEY_BACKSPACE` | 8     |       |                         |
 | `io.KEY_TAB`       | 9     |       |                         |
 | `io.KEY_ENTER`     | 13    |       |                         |

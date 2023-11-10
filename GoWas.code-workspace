@@ -10,5 +10,23 @@
 			"path": "project-template"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"grammarly.files.include": [
+			"**/*.txt",
+			"**/*.md"
+		],
+		"[markdown]": {
+			"editor.unicodeHighlight.ambiguousCharacters": false,
+			"editor.unicodeHighlight.invisibleCharacters": false,
+			"diffEditor.ignoreTrimWhitespace": false,
+			"editor.wordWrap": "off",
+			"editor.quickSuggestions": {
+				"comments": "off",
+				"strings": "off",
+				"other": "off"
+			},
+			"editor.formatOnSave": true
+		}
+	},
+
 }

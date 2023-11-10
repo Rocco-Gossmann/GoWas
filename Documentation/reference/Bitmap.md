@@ -5,11 +5,11 @@
 
 Sub Package: `GoWas/core`
 
-A `struct` holding a slice of `uint32` pixels and acompanying MetaData
+A `struct` holding a slice of `uint32` pixels and accompanying MetaData
 
 ## Constructors
 
-Their are 2 ways to create A Bitmap.
+There are 2 ways to create A Bitmap.
 
 ```go
 func CreateBitmap(
@@ -46,11 +46,11 @@ func (me *core.Bitmap) MakeEntity() *core.BitmapEntity
 
 ## Usage Guide
 
-In order for GoWas to be able to do anything usefull with a Bitmap (Like rendering it), it needs to be either converted.
-Or passed to a Processor (A Tileset consturctor for example).
+For GoWas to be able to do anything useful with a Bitmap (Like rendering it), it needs to be converted
+or passed to a Processor (A Tileset constructor for example).
 
 
-### Bitmap-Enties
+### Bitmap-Entities
 
 If you want to use the Bitmap by itself, it must be
 converted into a [`core.BitmapEntity`](./BitmapEntity.md).  
@@ -71,8 +71,8 @@ entity.ToCanvas(canvasinstance /*<- also defined somewhere else */)
 
 ### TileSets
 
-Bitmaps can also act as a source for a [`gfx.TileSet`](./TileSets.md)  
-, which can then be further converted into a [`gfx.TileMap`](./TileMap.md) (WIP)
+Bitmaps can also act as a source for a [`TileSet`](./TileSets.md)  
+, which can then be further converted into a [`TileMap`](./TileMap.md)
 
 
 ```go
