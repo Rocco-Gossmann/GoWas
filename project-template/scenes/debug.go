@@ -72,36 +72,36 @@ func (me *debugScene) Tick(e *core.EngineState) bool {
 	return true
 }
 
-func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
-
-	s.countFPS()
-
-	//s.bgMap.
-	//	MoveTo(s.bgScroll, s.bgScroll).
-	//	ToCanvas(ca)
-
-	//	s.text.
-	//		SetCursor(5, 14).Clear(8).
-	//		SetCursor(5, 11).Clear(9).
-	//		Echo(fmt.Sprintf("%v, %v\n\n\n     %v", e.Mouse.X, e.Mouse.Y, e.Mouse.PressedOrHeld)).
-	//		ToCanvas(ca) //<- Tell the engine to display the TextDisplay
-	//
-	//	// Draw the Mouse Button Display
-	//	//-------------------------------------------------------------------------
-	//	// This is not going to stay as it is. It will be replaced by propper sprites, that function similar to
-	//	// How BitmapEntitys, Maps and TextDisplays do
-	//	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&validMouseButtons), &core.TilesetBlitOptions{
-	//		X: 0, Y: 88,
-	//	})
-
-	// Draw the Mouse Cursor
-	//-------------------------------------------------------------------------
-	// s.CursorEntity.MoveTo(int32(e.Mouse.X), int32(e.Mouse.Y))
-	// if e.Mouse.X > 0 || e.Mouse.Y > 0 {
-	// 	s.CursorEntity.ToCanvas(ca)
-	// }
-
-}
+//func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
+//
+//	s.countFPS()
+//
+//	//s.bgMap.
+//	//	MoveTo(s.bgScroll, s.bgScroll).
+//	//	ToCanvas(ca)
+//
+//	//	s.text.
+//	//		SetCursor(5, 14).Clear(8).
+//	//		SetCursor(5, 11).Clear(9).
+//	//		Echo(fmt.Sprintf("%v, %v\n\n\n     %v", e.Mouse.X, e.Mouse.Y, e.Mouse.PressedOrHeld)).
+//	//		ToCanvas(ca) //<- Tell the engine to display the TextDisplay
+//	//
+//	//	// Draw the Mouse Button Display
+//	//	//-------------------------------------------------------------------------
+//	//	// This is not going to stay as it is. It will be replaced by propper sprites, that function similar to
+//	//	// How BitmapEntitys, Maps and TextDisplays do
+//	//	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&validMouseButtons), &core.TilesetBlitOptions{
+//	//		X: 0, Y: 88,
+//	//	})
+//
+//	// Draw the Mouse Cursor
+//	//-------------------------------------------------------------------------
+//	// s.CursorEntity.MoveTo(int32(e.Mouse.X), int32(e.Mouse.Y))
+//	// if e.Mouse.X > 0 || e.Mouse.Y > 0 {
+//	// 	s.CursorEntity.ToCanvas(ca)
+//	// }
+//
+//}
 
 func (s *debugScene) Unload(e *core.EngineState) *struct{} {
 	e.FreeRessource(s.exampleRessource)
@@ -124,8 +124,8 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 	tileSet := core.TileSet{}
 	tileSet.InitFromMapSheet(bmps.BMPdebugtiles, 8, 8)
 
-	e.EnableMap1Layer(&tileSet)
-	e.Map1.SetAlpha(0x40).SetMap([]byte{
+	// e.EnableMap1Layer(&tileSet)
+	e.Map1.SetAlpha(core.CANV_ALPHA_NONE).SetMap([]byte{
 		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
 		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
 		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
@@ -151,7 +151,7 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 	})
 
 	e.EnableMap2Layer(&tileSet)
-	e.Map2.SetAlpha(0x70).SetMap([]byte{
+	e.Map2.SetAlpha(core.CANV_ALPHA_NONE).SetMap([]byte{
 		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
 		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
@@ -182,7 +182,7 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 func (s *debugScene) initTextDisplay(e *core.EngineState) {
 	// Text-Layer
 	//-------------------------------------------------------------------------
-	e.EnableTextLayer()
+	//	e.EnableTextLayer()
 	e.Text.SetCursor(0, -2).Echo("FPS:\nTime:") //<-- Print some static text, that won't change
 	// Create A UI-Label that we can change without having to worry about the current TextDisplay-State
 	s.fpsLabel = ui.CreateLabel(e.Text, 6, -2, 4)

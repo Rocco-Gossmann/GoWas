@@ -12,8 +12,16 @@ TextDisplay:
 
 Rendering:
 ================================================================================
+    ☐ Rendering Rework
+        ✔ 1. Skip setting pixels, that have already been drawn to @done (13.11.2023, 07:18:33)
+        ✔ 2. Reverse Render-Layer order @done (13.11.2023, 07:18:34)
+        ☐ Debugging, Debugging, Debugging
+        ☐ TileMap.SetAlpha(CANV_ALPHA_NONE) is rendered as CANV_ALPHA_FULL
+        ☐ Text-Layer is glitching (as if not all pixels are set opaque, some are blended)
+
     ✔ Test how drawing a bitmap, that overflows all 4 sides functions @critical @done (27.10.2023, 04:55:57)
         ✔ Fix Oversized Bitmaps being cut of to early @done (27.10.2023, 04:56:05)
+
     ☐ Adapt TileSets for SpriteSheets
     ☐ Tinting Bitmaps/TileMaps/Sprites on Draw
     ☐ Collision Layers

@@ -6,7 +6,7 @@ import (
 
 type tileMapOpts struct {
 	X, Y  int32 // Where to blit it on the screen
-	Alpha byte
+	Alpha CanvasAlpha
 }
 
 type TileMap struct {
@@ -147,7 +147,7 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 }
 
 // Display
-func (me *TileMap) SetAlpha(a byte) *TileMap {
+func (me *TileMap) SetAlpha(a CanvasAlpha) *TileMap {
 	me.opts.Alpha = a
 	return me
 }
@@ -175,7 +175,7 @@ func (me *TileMap) HasTileSet() bool { return me.ts != nil }
 func (me *TileMap) X() int32           { return me.opts.X }
 func (me *TileMap) Y() int32           { return me.opts.Y }
 func (me *TileMap) XY() (int32, int32) { return me.opts.X, me.opts.Y }
-func (me *TileMap) Alpha() byte        { return me.opts.Alpha }
+func (me *TileMap) Alpha() CanvasAlpha { return me.opts.Alpha }
 
 // -----------------------------------------------------------------------------
 // Actions

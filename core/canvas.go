@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"github.com/rocco-gossmann/GoWas/io"
@@ -11,6 +12,7 @@ import (
 type CanvasFlag uint32
 type CanvasCollisionLayers uint32
 type CanvasRenderLayers uint8
+type CanvasAlpha byte
 
 const (
 	// Collisiion Layers These layers are processed when a sprite is drawn
@@ -22,16 +24,41 @@ const (
 	CANV_CL_3 CanvasCollisionLayers = 0x04000000
 	CANV_CL_4 CanvasCollisionLayers = 0x08000000
 
-	//Bits 0x10000000 and 0x80000000 are reserved for tile-collision layers
+	CANV_STAT_RENDERED uint32 = 0x80000000
 
+	CANV_STAT_BLEND_MASK      byte   = 0x07
+	CANV_STAT_BLEND_BITOFFSET byte   = 28
+	CANV_STAT_BLEND           uint32 = uint32(CANV_STAT_BLEND_MASK) << CANV_STAT_BLEND_BITOFFSET
+
+	CANV_STAT_BLEND_BIT_1 uint32 = 1 << CANV_STAT_BLEND_BITOFFSET
+
+	CANV_STAT_BLEND_BIT_2_OFFSET        = 29
+	CANV_STAT_BLEND_BIT_2        uint32 = 1 << CANV_STAT_BLEND_BIT_2_OFFSET
+
+	CANV_STAT_BLEND_BIT_3_OFFSET        = 30
+	CANV_STAT_BLEND_BIT_3        uint32 = 1 << CANV_STAT_BLEND_BIT_3_OFFSET
+
+	CANV_STAT_BLEND_BIT_4_OFFSET        = 31
+	CANV_STAT_BLEND_BIT_4        uint32 = 1 << CANV_STAT_BLEND_BIT_4_OFFSET
+
+	//Bits 0x40000000 and 0x80000000 are reserved for tile-collision layers
 	CANV_CL_NONE CanvasCollisionLayers = 0
 	CANV_CL_ALL  CanvasCollisionLayers = CANV_CL_1 | CANV_CL_2 | CANV_CL_3 | CANV_CL_4
 
-	CANV_RL_MAP1    CanvasRenderLayers = 1
-	CANV_RL_SCENE   CanvasRenderLayers = 2
+	CANV_RL_TEXT    CanvasRenderLayers = 1
+	CANV_RL_MAP2    CanvasRenderLayers = 2
 	CANV_RL_SPRITES CanvasRenderLayers = 3
-	CANV_RL_MAP2    CanvasRenderLayers = 4
-	CANV_RL_TEXT    CanvasRenderLayers = 5
+	CANV_RL_SCENE   CanvasRenderLayers = 4
+	CANV_RL_MAP1    CanvasRenderLayers = 5
+
+	CANV_ALPHA_NONE CanvasAlpha = 0x00
+	CANV_ALPHA_1    CanvasAlpha = 0x01
+	CANV_ALPHA_2    CanvasAlpha = 0x02
+	CANV_ALPHA_3    CanvasAlpha = 0x03
+	CANV_ALPHA_4    CanvasAlpha = 0x04
+	CANV_ALPHA_5    CanvasAlpha = 0x05
+	CANV_ALPHA_6    CanvasAlpha = 0x06
+	CANV_ALPHA_FULL CanvasAlpha = 0x07
 )
 
 type _RenderLayer interface {
@@ -41,7 +68,7 @@ type _RenderLayer interface {
 type CanvasBlitOpts struct {
 	Bmp       *Bitmap               // What to blit
 	X, Y      int32                 // Where to blit it on the screen
-	Alpha     byte                  // how strong transparency is
+	Alpha     CanvasAlpha           // how strong transparency is
 	Alphazero bool                  // if true, an alpha value of 0 mean "draw nothing", otherwise 0 would mean ignore alpha
 	Layers    CanvasCollisionLayers // What collision layers the drawn object occupies
 	Clip      *types.Rect           // Clipping Rectangle to only draw a certain area of the bitmap
@@ -114,6 +141,32 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 
 	ec.reorderLayers()
 
+	// Define Pixel-Shaders
+	//==============================================================================
+	// Pixel not rendered or blended yet
+	pixelShaders[0] = ec._PixelShader__None          //0x0000 //<-- this should not happen, but just in case
+	pixelShaders[1] = ec._PixelShader__OnlyCollision //0x0001 //<--No Alpha
+	pixelShaders[2] = ec._PixelShader__Full          //0x0010
+	pixelShaders[3] = ec._PixelShader__BlendStart    //0x1011
+
+	// Pixel Fully Rendered
+	pixelShaders[4] = ec._PixelShader__None          //0x0100 //<-- thiese should also not happen, but just in case
+	pixelShaders[5] = ec._PixelShader__OnlyCollision //0x0101 //<-- No Alpha
+	pixelShaders[6] = ec._PixelShader__OnlyCollision //0x0110
+	pixelShaders[7] = ec._PixelShader__OnlyCollision //0x0111
+
+	// Pixel Blended, but not fully rendered
+	pixelShaders[8] = ec._PixelShader__None          //0x1000 //<-- thiese should also not happen, but just in case
+	pixelShaders[9] = ec._PixelShader__OnlyCollision //0x1001 //<-- No Alpha
+	pixelShaders[10] = ec._PixelShader__BlendToFull  //0x1010
+	pixelShaders[11] = ec._PixelShader__Blend        //0x1011
+
+	// Pixel Fully Rendered ( + Transparency bit does not matter)
+	pixelShaders[12] = ec._PixelShader__None          //0x1100 //<-- thiese should also not happen, but just in case
+	pixelShaders[13] = ec._PixelShader__OnlyCollision //0x1101 //<-- No Alpha
+	pixelShaders[14] = ec._PixelShader__OnlyCollision //0x1110
+	pixelShaders[15] = ec._PixelShader__OnlyCollision //0x1111
+
 	return &ec
 }
 
@@ -156,8 +209,8 @@ func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 	}
 
 	// Handle Alpha
-	if opts.Alpha == 0 && !opts.Alphazero {
-		opts.Alpha = 0xff
+	if opts.Alpha == CANV_ALPHA_NONE && !opts.Alphazero {
+		opts.Alpha = CANV_ALPHA_FULL
 	}
 
 	// Set Clipping Bounderys
@@ -196,7 +249,7 @@ func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 		(*opts.Clip).H -= (bb - bh)
 	}
 
-	return ec.blitBitmapClipped(opts.Bmp, bw, bh, opts.X, opts.Y, opts.Alpha, opts.Layers, opts.Clip)
+	return ec.blitBitmapClipped(opts.Bmp, bw, bh, opts.X, opts.Y, &(opts.Alpha), opts.Layers, opts.Clip)
 }
 
 // ==============================================================================
@@ -206,8 +259,14 @@ func (ec *Canvas) Blit(opts *CanvasBlitOpts) CanvasCollisionLayers {
 var engineState EngineState
 
 func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
+	for idx, pixel := range *px {
+		(*px)[idx] = pixel & (^CANV_STAT_RENDERED) & (^CANV_STAT_BLEND)
+	}
+
 	ec.buffer.Memory = px
-	for _, layer := range ec.renderLayers {
+
+	for i, layer := range ec.renderLayers {
+		fmt.Println(i)
 		layer.ToCanvas(ec)
 	}
 }
@@ -246,7 +305,115 @@ func (ec *Canvas) canvasTick(c *go_wasmcanvas.Canvas, deltaTime float64) go_wasm
 // ==============================================================================
 // Private Helpers
 // ==============================================================================
-func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, alpha byte, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
+
+// PixelShaders
+// ==============================================================================
+type _PixelShaderFunction func(
+	uint32,
+	*CanvasCollisionLayers,
+	*int32,
+	CanvasCollisionLayers,
+	*Bitmap,
+	*uint32,
+	CanvasAlpha,
+)
+
+func (ec *Canvas) _PixelShader__None(
+	uint32,
+	*CanvasCollisionLayers,
+	*int32,
+	CanvasCollisionLayers,
+	*Bitmap,
+	*uint32,
+	CanvasAlpha,
+) {
+}
+
+func (ec *Canvas) _PixelShader__OnlyCollision(
+	cpx uint32,
+	outbyte *CanvasCollisionLayers,
+	caPtr *int32,
+	layers CanvasCollisionLayers,
+	_ *Bitmap,
+	_ *uint32,
+	_ CanvasAlpha,
+) {
+	// Only modify pixels Meta data
+	cpx |= uint32(layers) * (cpx & uint32(CANV_CL_ALL) >> 24)
+	(*(ec.buffer.Memory))[*caPtr] = cpx
+}
+
+func (ec *Canvas) _PixelShader__Full(
+	cpx uint32,
+	outbyte *CanvasCollisionLayers,
+	caPtr *int32,
+	layers CanvasCollisionLayers,
+	bmp *Bitmap,
+	bmpPtr *uint32,
+	_ CanvasAlpha,
+) {
+	var transparencybit = ((*(bmp.MemoryBuffer.Memory))[*bmpPtr] & uint32(BMP_OPAQUE)) >> 24
+	cpx |= uint32(layers) * transparencybit
+	var transparencyinvers = (transparencybit ^ 1)
+
+	var px = cpx*transparencyinvers +
+		(*(bmp.MemoryBuffer.Memory))[*bmpPtr]*transparencybit
+
+	(*(ec.buffer.Memory))[*caPtr] = px | CANV_STAT_RENDERED
+}
+
+func (ec *Canvas) _PixelShader__Blend(
+	cpx uint32,
+	outbyte *CanvasCollisionLayers,
+	caPtr *int32,
+	layers CanvasCollisionLayers,
+	bmp *Bitmap,
+	bmpPtr *uint32,
+	alpha CanvasAlpha,
+) {
+	var factor float64 = float64(alpha) / 7.0
+	opaque := ((*((*bmp).MemoryBuffer.Memory))[*bmpPtr] & uint32(BMP_OPAQUE)) >> 24
+
+	go_wasmcanvas.BlendPixel(
+		&cpx,
+		(*((*bmp).MemoryBuffer.Memory))[*bmpPtr],
+		float64(opaque)*(factor),
+	)
+
+	cpx |= uint32(layers) * opaque
+
+	(*((*ec).buffer.Memory))[*caPtr] = cpx&(^uint32(CANV_STAT_BLEND)) | (uint32(alpha) << CANV_STAT_BLEND_BITOFFSET)
+}
+
+func (ec *Canvas) _PixelShader__BlendStart(
+	cpx uint32,
+	outbyte *CanvasCollisionLayers,
+	caPtr *int32,
+	layers CanvasCollisionLayers,
+	bmp *Bitmap,
+	bmpPtr *uint32,
+	alpha CanvasAlpha,
+) {
+	ec._PixelShader__Full(cpx, outbyte, caPtr, layers, bmp, bmpPtr, alpha)
+	(*((*ec).buffer.Memory))[*caPtr] = ((*((*ec).buffer.Memory))[*caPtr] & (^uint32(CANV_STAT_RENDERED))) | uint32(alpha)<<uint32(CANV_STAT_BLEND_BITOFFSET)
+}
+
+func (ec *Canvas) _PixelShader__BlendToFull(
+	cpx uint32,
+	outbyte *CanvasCollisionLayers,
+	caPtr *int32,
+	layers CanvasCollisionLayers,
+	bmp *Bitmap,
+	bmpPtr *uint32,
+	alpha CanvasAlpha,
+) {
+	ec._PixelShader__Blend(cpx, outbyte, caPtr, layers, bmp, bmpPtr, alpha)
+	(*((*ec).buffer.Memory))[*caPtr] |= CANV_STAT_RENDERED
+}
+
+var pixelShaders [16]_PixelShaderFunction
+
+func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, alpha *CanvasAlpha, layers CanvasCollisionLayers, clip *types.Rect) CanvasCollisionLayers {
 
 	//what to draw
 	var bitmapByteOffset uint32 = uint32(clip.X)
@@ -303,86 +470,51 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, 
 
 	var outbyte CanvasCollisionLayers = CANV_CL_NONE
 
-	//	fmt.Println(bitmapByteOffset, bitmapIndexStart, bitmapRenderLinePixels, bitmapRenderLines, "\n", cw, ch, bw, bh, "\n", bmpPtr, caPtr, caOverflowX, "\n", alpha)
-	if alpha == 0x00 {
-		// Only process meta data
-		//================================================================================
-		for line := int32(0); line < bitmapRenderLines; line++ {
-			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
+	var shaderFNCIndex int = 0
 
-				// Only modify pixels Meta data
-				var cpx = (*(ec.buffer.Memory))[caPtr]
-				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
-				cpx |= uint32(layers) * (cpx & uint32(CANV_CL_ALL) >> 24)
-				(*(ec.buffer.Memory))[caPtr] = cpx
-
-				bmpPtr++ //<- move both pointers formward by one
-				caPtr++
-				//fmt.Println("drawn pixel", bmpPtr, caPtr)
-			}
-
-			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-			bmpPtr += uint32(bitmapByteOffset)
-		}
-	} else if alpha == 0xff {
-		// Draw Full Pixel + Meta Data
-		//================================================================================
-		for line := int32(0); line < bitmapRenderLines; line++ {
-			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
-
-				var cpx = (*(ec.buffer.Memory))[caPtr]
-				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
-
-				var transparencybit = ((*(bmp.MemoryBuffer.Memory))[bmpPtr] & uint32(BMP_OPAQUE)) >> 24
-				cpx |= uint32(layers) * transparencybit
-				var transparencyinvers = (transparencybit ^ 1)
-
-				var px = cpx*transparencyinvers +
-					(*(bmp.MemoryBuffer.Memory))[bmpPtr]*transparencybit
-
-				(*(ec.buffer.Memory))[caPtr] = px
-
-				bmpPtr++ //<- move both pointers formward by one
-				caPtr++
-				//fmt.Println("drawn pixel", bmpPtr, caPtr)
-			}
-
-			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-			bmpPtr += uint32(bitmapByteOffset)
-		}
+	if *alpha == CANV_ALPHA_NONE {
+		shaderFNCIndex = 1
+	} else if *alpha == CANV_ALPHA_FULL {
+		shaderFNCIndex = 2
 	} else {
-		// Blend Pixel + Meta Data
-		//================================================================================
-		factor := float64(alpha) / 255.0
+		shaderFNCIndex = 3
+	}
 
-		for line := int32(0); line < bitmapRenderLines; line++ {
-			for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
+	var shaderFNC int
 
-				var cpx = (*((*ec).buffer.Memory))[caPtr]
+	fmt.Println("ShaderFNCIndex:", shaderFNCIndex, *alpha)
 
-				opaque := ((*((*bmp).MemoryBuffer.Memory))[bmpPtr] & uint32(BMP_OPAQUE)) >> 24
+	for line := int32(0); line < bitmapRenderLines; line++ {
+		for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
+			var cpx = (*(ec.buffer.Memory))[caPtr]
 
-				// Mixel Meta
-				outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
-
-				go_wasmcanvas.BlendPixel(
-					&cpx,
-					(*((*bmp).MemoryBuffer.Memory))[bmpPtr],
-					float64(opaque)*factor,
+			shaderFNC = shaderFNCIndex + // Base function based on alpha
+				int(((cpx&CANV_STAT_RENDERED)>>31)*4) + // Fully rendered
+				int( // Pixel Blend
+					cpx&CANV_STAT_BLEND_BIT_1>>uint32(CANV_STAT_BLEND_BITOFFSET)|
+						cpx&CANV_STAT_BLEND_BIT_2>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET)|
+						cpx&CANV_STAT_BLEND_BIT_3>>uint32(CANV_STAT_BLEND_BIT_3_OFFSET)|
+						cpx&CANV_STAT_BLEND_BIT_4>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET),
 				)
 
-				cpx |= uint32(layers) * opaque
+			outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
 
-				(*((*ec).buffer.Memory))[caPtr] = cpx
+			pixelShaders[shaderFNC](
+				cpx,
+				&outbyte,
+				&caPtr,
+				layers,
+				bmp,
+				&bmpPtr,
+				*alpha,
+			)
 
-				bmpPtr++ //<- move both pointers formward by one
-				caPtr++
-				//fmt.Println("drawn pixel", bmpPtr, caPtr)
-			}
-
-			caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
-			bmpPtr += uint32(bitmapByteOffset)
+			bmpPtr++ //<- move both pointers formward by one
+			caPtr++
 		}
+
+		caPtr += caOverflowX //<- reset canvas Pointer to next lines X Coord
+		bmpPtr += uint32(bitmapByteOffset)
 	}
 
 	return outbyte
@@ -409,6 +541,7 @@ func (me *Canvas) enableLayer(l CanvasRenderLayers) {
 func (me *Canvas) reorderLayers() {
 	me.renderLayers = me.renderLayers[0:0]
 	for _, canvasLayer := range me.layerOrder {
+		fmt.Println("Layer Order:", canvasLayer)
 		if me.layerEnable[canvasLayer] {
 			me.renderLayers = append(me.renderLayers, me.layers[canvasLayer])
 		}

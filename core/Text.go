@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"math"
 	"strings"
 )
@@ -88,39 +89,74 @@ func (me *TextDisplay) Clear(numOfCharacters uint) *TextDisplay {
 
 func (me *TextDisplay) Echo(text string) *TextDisplay {
 
-	seq := make([]rune, me.lines*me.charsPerLine)
+	var displayTextArrLength = me.lines * me.charsPerLine
+	seq := make([]rune, displayTextArrLength)
 
 	seqIndex := 0
 	cursorx, cursory := uint16(me.cursorx), uint16(me.cursory)
 	printValid := true
 	for _, chr := range []rune(text) {
+		if cursory*me.charsPerLine+cursorx >= displayTextArrLength {
+			break
+		}
 
+		// If line overflow is tetected
 		if cursorx >= me.charsPerLine {
+			// IF line wrap is turned on
 			if me.wrap {
+				// Set cursor to start of next line
 				cursorx = 0
 				cursory++
 			} else {
+				// stop printing, until you encounter a "\n"
 				printValid = false
 			}
 		}
 
+		// When encountering a Line-Break "\n"
 		if chr == '\n' {
+			// Characters left to render
 			var dst = me.charsPerLine - cursorx
+
+			// Fill remaining character of line with 0
 			for dst > 0 {
 				seq[seqIndex] = 0
 				seqIndex++
 				dst--
 			}
 
+			// If line wrap is on
 			if me.wrap {
+				// Set Cursor X after then end of the line and let the code above
+				// handle the rest
 				cursorx = me.charsPerLine
+
 			} else {
+				// else set cursor to start of the next line
+				// and enable printing again
 				cursory++
 				cursorx = 0
 				printValid = true
 			}
 
 		} else if printValid {
+
+			defer (func() {
+				if r := recover(); r != nil {
+					fmt.Printf(
+						"hit panic(%v) invalid index: %v on cursor: %vx%v for char(%c) of Text with length: %v\n",
+						r,
+						seqIndex,
+						cursorx,
+						cursory,
+						chr,
+						len(seq),
+					)
+				}
+				seqIndex++
+				cursorx++
+			})()
+
 			seq[seqIndex] = chr
 			seqIndex++
 			cursorx++
@@ -163,7 +199,7 @@ func (me *TextDisplay) MoveBy(x, y int32) *TextDisplay {
 	return me
 }
 
-func (me *TextDisplay) SetAlpha(a byte) *TextDisplay {
+func (me *TextDisplay) SetAlpha(a CanvasAlpha) *TextDisplay {
 	me.mp.SetAlpha(a)
 	return me
 }

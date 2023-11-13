@@ -28,7 +28,7 @@ func (ts TileSet) TileCount() int        { return len(ts.tiles) }
 
 type TilesetBlitOptions struct {
 	X, Y      int32
-	Alpha     byte
+	Alpha     CanvasAlpha
 	Alphazero bool
 	Layers    CanvasCollisionLayers
 }
@@ -93,5 +93,4 @@ func (ts *TileSet) InitFromMapSheet(bmp *Bitmap, tilepixelwidth, tilepixelheight
 			ts.tiles[i].H = tilepixelheight
 		}
 	}
-
 }

@@ -9,11 +9,11 @@ import (
 func main() {
 
 	e := GoWas.Init(GoWas.EngineSetup{
-		WindowWidth:  160,
-		WindowHeight: 144,
+		WindowWidth:  128, // 160
+		WindowHeight: 8,   // 144
 
 		AutoClearPixels: true,
-		AutoClearColor:  0x00333333,
+		//		AutoClearColor:  0x00333333,
 
 		TileMapWidth:  22,
 		TileMapHeight: 22,

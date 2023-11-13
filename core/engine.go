@@ -144,11 +144,13 @@ func (me *EngineState) SetLayerOrder(
 	belowMiddle CanvasRenderLayers,
 	last CanvasRenderLayers,
 ) {
-	me.canvas.layerOrder[1] = last
-	me.canvas.layerOrder[2] = belowMiddle
+	me.canvas.layerOrder[5] = last
+	me.canvas.layerOrder[4] = belowMiddle
 	me.canvas.layerOrder[3] = middle
-	me.canvas.layerOrder[4] = belowTop
-	me.canvas.layerOrder[5] = topMost
+	me.canvas.layerOrder[2] = belowTop
+	me.canvas.layerOrder[1] = topMost
+
+	fmt.Println(me.canvas.layerOrder, me.canvas.layerEnable)
 
 	me.canvas.reorderLayers()
 }

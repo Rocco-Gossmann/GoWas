@@ -31,7 +31,7 @@ func (me *BitmapEntity) Clip(offsetX, offsetY, width, height uint16) *BitmapEnti
 	return me
 }
 
-func (me *BitmapEntity) Alpha(alpha byte, zeroIsInvisible bool) *BitmapEntity {
+func (me *BitmapEntity) Alpha(alpha CanvasAlpha, zeroIsInvisible bool) *BitmapEntity {
 
 	me.canvasBlitOpts.Alpha = alpha
 	me.canvasBlitOpts.Alphazero = zeroIsInvisible
