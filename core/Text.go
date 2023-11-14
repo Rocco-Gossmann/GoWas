@@ -199,8 +199,8 @@ func (me *TextDisplay) MoveBy(x, y int32) *TextDisplay {
 	return me
 }
 
-func (me *TextDisplay) SetAlpha(a CanvasAlpha) *TextDisplay {
-	me.mp.SetAlpha(a)
+func (me *TextDisplay) AlphaSet(a CanvasAlpha) *TextDisplay {
+	me.mp.AlphaSet(a)
 	return me
 }
 

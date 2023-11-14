@@ -5,8 +5,9 @@ import (
 )
 
 type tileMapOpts struct {
-	X, Y  int32 // Where to blit it on the screen
-	Alpha CanvasAlpha
+	X, Y      int32 // Where to blit it on the screen
+	Alpha     CanvasAlpha
+	AlphaZero bool
 }
 
 type TileMap struct {
@@ -147,10 +148,18 @@ func (me *TileMap) SetTile(x, y uint32, tileIndex byte) *TileMap {
 }
 
 // Display
-func (me *TileMap) SetAlpha(a CanvasAlpha) *TileMap {
+func (me *TileMap) AlphaSet(a CanvasAlpha) *TileMap {
 	me.opts.Alpha = a
+	me.opts.AlphaZero = a == CANV_ALPHA_NONE || me.opts.AlphaZero
 	return me
 }
+
+func (me *TileMap) AlphaReset() *TileMap {
+	me.opts.Alpha = CANV_ALPHA_NONE
+	me.opts.AlphaZero = false
+	return me
+}
+
 func (me *TileMap) MoveTo(x, y int32) *TileMap {
 
 	me.opts.X = x
@@ -215,10 +224,9 @@ func (me *TileMap) ToCanvas(ca *Canvas) {
 	mw := min(me.mw*tw, uint32(caw)+tw) / tw
 	mh := min(me.mh*th, uint32(cah)+th) / th
 
-	//	dstX, dstY := uint16((me.mw+overShootX)*tw), uint16((me.mh+overShootY)*th)
-
 	bopts := TilesetBlitOptions{
-		Alpha: me.opts.Alpha,
+		Alpha:     me.opts.Alpha,
+		Alphazero: me.opts.AlphaZero,
 	}
 
 	ti, mi := 0, byte(0)

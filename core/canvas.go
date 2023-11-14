@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"syscall/js"
 
 	"github.com/rocco-gossmann/GoWas/io"
@@ -52,12 +51,14 @@ const (
 	CANV_RL_MAP1    CanvasRenderLayers = 5
 
 	CANV_ALPHA_NONE CanvasAlpha = 0x00
-	CANV_ALPHA_1    CanvasAlpha = 0x01
-	CANV_ALPHA_2    CanvasAlpha = 0x02
-	CANV_ALPHA_3    CanvasAlpha = 0x03
-	CANV_ALPHA_4    CanvasAlpha = 0x04
-	CANV_ALPHA_5    CanvasAlpha = 0x05
-	CANV_ALPHA_6    CanvasAlpha = 0x06
+	CANV_ALPHA_0    CanvasAlpha = 0x00
+	CANV_ALPHA_1    CanvasAlpha = 0x06
+	CANV_ALPHA_2    CanvasAlpha = 0x05
+	CANV_ALPHA_3    CanvasAlpha = 0x04
+	CANV_ALPHA_4    CanvasAlpha = 0x03
+	CANV_ALPHA_5    CanvasAlpha = 0x02
+	CANV_ALPHA_6    CanvasAlpha = 0x01
+	CANV_ALPHA_7    CanvasAlpha = 0x07
 	CANV_ALPHA_FULL CanvasAlpha = 0x07
 )
 
@@ -84,7 +85,7 @@ type Canvas struct {
 	layers       [6]_RenderLayer
 	layerOrder   [6]CanvasRenderLayers
 	layerEnable  [6]bool
-	renderLayers []_RenderLayer
+	renderLayers []*_RenderLayer
 }
 
 type ClearLayer struct {
@@ -128,13 +129,20 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 		panic("failed to assign canvas interface to itself")
 	}
 
+	// fmt.Println("Layer Text: ", &ec.layers[CANV_RL_TEXT])
+	// fmt.Println("Layer Map2: ", &ec.layers[CANV_RL_MAP2])
+	// fmt.Println("Layer Scene: ", &ec.layers[CANV_RL_SCENE])
+	// fmt.Println("Layer Sprites: ", &ec.layers[CANV_RL_SPRITES])
+	// fmt.Println("Layer Map1: ", &ec.layers[CANV_RL_MAP1])
+	// fmt.Println("Layer Clear: ", &ec.layers[0])
+
 	ec.layerOrder[CANV_RL_MAP1] = CANV_RL_MAP1
 	ec.layerOrder[CANV_RL_MAP2] = CANV_RL_MAP2
 	ec.layerOrder[CANV_RL_SCENE] = CANV_RL_SCENE
 	ec.layerOrder[CANV_RL_SPRITES] = CANV_RL_SPRITES
 	ec.layerOrder[CANV_RL_TEXT] = CANV_RL_TEXT
 
-	ec.renderLayers = make([]_RenderLayer, 0, 5)
+	ec.renderLayers = make([]*_RenderLayer, 0, 6)
 
 	engineState.canvas = &ec
 	engineState.engine = e
@@ -265,9 +273,9 @@ func (ec *Canvas) canvasDraw(c uint32, w, h uint16, px *[]uint32) {
 
 	ec.buffer.Memory = px
 
-	for i, layer := range ec.renderLayers {
-		fmt.Println(i)
-		layer.ToCanvas(ec)
+	for _, layer := range ec.renderLayers {
+		//fmt.Println(layer)
+		(*layer).ToCanvas(ec)
 	}
 }
 
@@ -316,7 +324,7 @@ type _PixelShaderFunction func(
 	*Bitmap,
 	*uint32,
 	CanvasAlpha,
-)
+) uint32
 
 func (ec *Canvas) _PixelShader__None(
 	uint32,
@@ -326,7 +334,8 @@ func (ec *Canvas) _PixelShader__None(
 	*Bitmap,
 	*uint32,
 	CanvasAlpha,
-) {
+) uint32 {
+	return 0
 }
 
 func (ec *Canvas) _PixelShader__OnlyCollision(
@@ -337,10 +346,12 @@ func (ec *Canvas) _PixelShader__OnlyCollision(
 	_ *Bitmap,
 	_ *uint32,
 	_ CanvasAlpha,
-) {
+) uint32 {
 	// Only modify pixels Meta data
 	cpx |= uint32(layers) * (cpx & uint32(CANV_CL_ALL) >> 24)
 	(*(ec.buffer.Memory))[*caPtr] = cpx
+
+	return 0
 }
 
 func (ec *Canvas) _PixelShader__Full(
@@ -351,7 +362,7 @@ func (ec *Canvas) _PixelShader__Full(
 	bmp *Bitmap,
 	bmpPtr *uint32,
 	_ CanvasAlpha,
-) {
+) uint32 {
 	var transparencybit = ((*(bmp.MemoryBuffer.Memory))[*bmpPtr] & uint32(BMP_OPAQUE)) >> 24
 	cpx |= uint32(layers) * transparencybit
 	var transparencyinvers = (transparencybit ^ 1)
@@ -359,7 +370,9 @@ func (ec *Canvas) _PixelShader__Full(
 	var px = cpx*transparencyinvers +
 		(*(bmp.MemoryBuffer.Memory))[*bmpPtr]*transparencybit
 
-	(*(ec.buffer.Memory))[*caPtr] = px | CANV_STAT_RENDERED
+	(*(ec.buffer.Memory))[*caPtr] = px | (CANV_STAT_RENDERED * transparencybit)
+
+	return transparencybit
 }
 
 func (ec *Canvas) _PixelShader__Blend(
@@ -370,8 +383,10 @@ func (ec *Canvas) _PixelShader__Blend(
 	bmp *Bitmap,
 	bmpPtr *uint32,
 	alpha CanvasAlpha,
-) {
-	var factor float64 = float64(alpha) / 7.0
+) uint32 {
+
+	var factor = float64(cpx&CANV_STAT_BLEND>>uint32(CANV_STAT_BLEND_BITOFFSET)) / 7.0
+
 	opaque := ((*((*bmp).MemoryBuffer.Memory))[*bmpPtr] & uint32(BMP_OPAQUE)) >> 24
 
 	go_wasmcanvas.BlendPixel(
@@ -382,7 +397,11 @@ func (ec *Canvas) _PixelShader__Blend(
 
 	cpx |= uint32(layers) * opaque
 
-	(*((*ec).buffer.Memory))[*caPtr] = cpx&(^uint32(CANV_STAT_BLEND)) | (uint32(alpha) << CANV_STAT_BLEND_BITOFFSET)
+	(*((*ec).buffer.Memory))[*caPtr] = cpx&
+		(^(uint32(CANV_STAT_BLEND) * opaque)) |
+		((uint32(alpha) << CANV_STAT_BLEND_BITOFFSET) * opaque)
+
+	return opaque
 }
 
 func (ec *Canvas) _PixelShader__BlendStart(
@@ -393,9 +412,12 @@ func (ec *Canvas) _PixelShader__BlendStart(
 	bmp *Bitmap,
 	bmpPtr *uint32,
 	alpha CanvasAlpha,
-) {
-	ec._PixelShader__Full(cpx, outbyte, caPtr, layers, bmp, bmpPtr, alpha)
-	(*((*ec).buffer.Memory))[*caPtr] = ((*((*ec).buffer.Memory))[*caPtr] & (^uint32(CANV_STAT_RENDERED))) | uint32(alpha)<<uint32(CANV_STAT_BLEND_BITOFFSET)
+) uint32 {
+	ret := ec._PixelShader__Full(cpx, outbyte, caPtr, layers, bmp, bmpPtr, alpha)
+	(*((*ec).buffer.Memory))[*caPtr] = ((*((*ec).buffer.Memory))[*caPtr] & (^uint32(CANV_STAT_RENDERED))) |
+		uint32(alpha)<<uint32(CANV_STAT_BLEND_BITOFFSET)
+
+	return ret
 }
 
 func (ec *Canvas) _PixelShader__BlendToFull(
@@ -406,9 +428,11 @@ func (ec *Canvas) _PixelShader__BlendToFull(
 	bmp *Bitmap,
 	bmpPtr *uint32,
 	alpha CanvasAlpha,
-) {
-	ec._PixelShader__Blend(cpx, outbyte, caPtr, layers, bmp, bmpPtr, alpha)
-	(*((*ec).buffer.Memory))[*caPtr] |= CANV_STAT_RENDERED
+) uint32 {
+	ret := ec._PixelShader__Blend(cpx, outbyte, caPtr, layers, bmp, bmpPtr, alpha)
+	// IDEA: Comment this out, for a sort of Stencil/Mask effect
+	(*((*ec).buffer.Memory))[*caPtr] |= (CANV_STAT_RENDERED * ret)
+	return ret
 }
 
 var pixelShaders [16]_PixelShaderFunction
@@ -482,20 +506,26 @@ func (ec *Canvas) blitBitmapClipped(bmp *Bitmap, bmpw, bmph uint16, x, y int32, 
 
 	var shaderFNC int
 
-	fmt.Println("ShaderFNCIndex:", shaderFNCIndex, *alpha)
-
 	for line := int32(0); line < bitmapRenderLines; line++ {
 		for i := uint32(0); i < bitmapRenderLinePixels; i++ { //<- Render all Pixels to draw for the line
 			var cpx = (*(ec.buffer.Memory))[caPtr]
 
+			var pixelBlendEnable = cpx&CANV_STAT_BLEND_BIT_1>>uint32(CANV_STAT_BLEND_BITOFFSET) |
+				cpx&CANV_STAT_BLEND_BIT_2>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET) |
+				cpx&CANV_STAT_BLEND_BIT_3>>uint32(CANV_STAT_BLEND_BIT_3_OFFSET) |
+				cpx&CANV_STAT_BLEND_BIT_4>>uint32(CANV_STAT_BLEND_BIT_4_OFFSET)
+
 			shaderFNC = shaderFNCIndex + // Base function based on alpha
 				int(((cpx&CANV_STAT_RENDERED)>>31)*4) + // Fully rendered
-				int( // Pixel Blend
-					cpx&CANV_STAT_BLEND_BIT_1>>uint32(CANV_STAT_BLEND_BITOFFSET)|
-						cpx&CANV_STAT_BLEND_BIT_2>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET)|
-						cpx&CANV_STAT_BLEND_BIT_3>>uint32(CANV_STAT_BLEND_BIT_3_OFFSET)|
-						cpx&CANV_STAT_BLEND_BIT_4>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET),
-				)
+				int(pixelBlendEnable)*8
+
+				//			fmt.Println("shaderFNC",
+				//				shaderFNC,
+				//				cpx&CANV_STAT_BLEND_BIT_1>>uint32(CANV_STAT_BLEND_BITOFFSET),
+				//				cpx&CANV_STAT_BLEND_BIT_2>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET),
+				//				cpx&CANV_STAT_BLEND_BIT_3>>uint32(CANV_STAT_BLEND_BIT_3_OFFSET),
+				//				cpx&CANV_STAT_BLEND_BIT_4>>uint32(CANV_STAT_BLEND_BIT_2_OFFSET),
+				//			)
 
 			outbyte |= CanvasCollisionLayers(cpx & uint32(CANV_CL_ALL))
 
@@ -540,12 +570,13 @@ func (me *Canvas) enableLayer(l CanvasRenderLayers) {
 
 func (me *Canvas) reorderLayers() {
 	me.renderLayers = me.renderLayers[0:0]
+
 	for _, canvasLayer := range me.layerOrder {
-		fmt.Println("Layer Order:", canvasLayer)
 		if me.layerEnable[canvasLayer] {
-			me.renderLayers = append(me.renderLayers, me.layers[canvasLayer])
+			me.renderLayers = append(me.renderLayers, &me.layers[canvasLayer])
 		}
 	}
+	//fmt.Println("RenderLayers: ", me.renderLayers)
 }
 
 // ==============================================================================

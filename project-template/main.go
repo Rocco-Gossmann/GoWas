@@ -9,8 +9,8 @@ import (
 func main() {
 
 	e := GoWas.Init(GoWas.EngineSetup{
-		WindowWidth:  128, // 160
-		WindowHeight: 8,   // 144
+		WindowWidth:  160, // 160
+		WindowHeight: 144, // 144
 
 		AutoClearPixels: true,
 		//		AutoClearColor:  0x00333333,

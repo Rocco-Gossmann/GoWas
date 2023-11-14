@@ -32,11 +32,10 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 	s.initMaps(e)
 
 	e.SetLayerOrder(
-		core.CANV_RL_MAP2,  // Top most layer is drawn above all (Map2 has transparency to tint everything)
-		core.CANV_RL_TEXT,  // Then the text
-		core.CANV_RL_SCENE, // Scene.Draw below the text
-		core.CANV_RL_MAP1,  // Map 1 as the background
-
+		core.CANV_RL_MAP2,    // Top most layer is drawn above all (Map2 has transparency to tint everything)
+		core.CANV_RL_TEXT,    // Then the text
+		core.CANV_RL_MAP1,    // Map 1 as the background
+		core.CANV_RL_SCENE,   // Scene.Draw below the text
 		core.CANV_RL_SPRITES, // Sprites don't matter for now, so they are covered by Map 1
 	)
 
@@ -115,8 +114,6 @@ var Debug = debugScene{
 // Helpers
 // ------------------------------------------------------------------------------
 
-// /*Map Test
-// ------------------------------------------------------------------------------
 func (s *debugScene) initMaps(e *core.EngineState) {
 	// Setup Background Map
 	//-------------------------------------------------------------------------
@@ -124,8 +121,8 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 	tileSet := core.TileSet{}
 	tileSet.InitFromMapSheet(bmps.BMPdebugtiles, 8, 8)
 
-	// e.EnableMap1Layer(&tileSet)
-	e.Map1.SetAlpha(core.CANV_ALPHA_NONE).SetMap([]byte{
+	e.EnableMap1Layer(&tileSet)
+	e.Map1.AlphaSet(core.CANV_ALPHA_FULL).SetMap([]byte{ // Blue/Gray Checkers
 		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
 		7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12,
 		12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7, 12, 7,
@@ -151,8 +148,8 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 	})
 
 	e.EnableMap2Layer(&tileSet)
-	e.Map2.SetAlpha(core.CANV_ALPHA_NONE).SetMap([]byte{
-		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
+	e.Map2.AlphaSet(core.CANV_ALPHA_3).SetMap([]byte{ // Green / White Checkers
+		// At low transparency to tint everything
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
 		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
@@ -174,15 +171,14 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
 		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
+		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,
 	})
 }
 
-// /*Text Display Test
-// ------------------------------------------------------------------------------
 func (s *debugScene) initTextDisplay(e *core.EngineState) {
 	// Text-Layer
 	//-------------------------------------------------------------------------
-	//	e.EnableTextLayer()
+	e.EnableTextLayer()
 	e.Text.SetCursor(0, -2).Echo("FPS:\nTime:") //<-- Print some static text, that won't change
 	// Create A UI-Label that we can change without having to worry about the current TextDisplay-State
 	s.fpsLabel = ui.CreateLabel(e.Text, 6, -2, 4)
@@ -210,5 +206,3 @@ func (me *debugScene) updateTimes(e *core.EngineState) {
 func (me *debugScene) countFPS() {
 	me.fpsCnt++
 }
-
-//*/
