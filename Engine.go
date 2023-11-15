@@ -3,8 +3,6 @@
 package GoWas
 
 import (
-	"fmt"
-
 	"github.com/rocco-gossmann/GoWas/core"
 )
 
@@ -14,7 +12,7 @@ type EngineSetup core.EngineSetup
 
 func Init(setup EngineSetup) *core.Engine {
 
-	fmt.Println("[GoWas.Engine.Init] run")
+	//fmt.Println("[GoWas.Engine.Init] run")
 
 	if engineActive != nil {
 		panic("Engine.Init was called multiple times. Only one time allowed")

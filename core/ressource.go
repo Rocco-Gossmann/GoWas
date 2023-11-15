@@ -42,7 +42,7 @@ func (me *Ressource) _Process() {
 		me.state = RESSTATE_READY
 
 	default:
-		fmt.Println("unprocessable type ", me.ressourceType)
+		panic(fmt.Sprintf("unprocessable Ressource type: %v", me.ressourceType))
 	}
 }
 

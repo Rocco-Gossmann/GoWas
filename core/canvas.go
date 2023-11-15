@@ -124,17 +124,16 @@ func CreateCanvas(e *Engine, width, height uint16) *Canvas {
 
 	if inter, ok := interface{}(&ec).(_RenderLayer); ok {
 		ec.layers[CANV_RL_SCENE] = inter
-		ec.layerEnable[CANV_RL_SCENE] = true
 	} else {
 		panic("failed to assign canvas interface to itself")
 	}
 
-	// fmt.Println("Layer Text: ", &ec.layers[CANV_RL_TEXT])
-	// fmt.Println("Layer Map2: ", &ec.layers[CANV_RL_MAP2])
-	// fmt.Println("Layer Scene: ", &ec.layers[CANV_RL_SCENE])
-	// fmt.Println("Layer Sprites: ", &ec.layers[CANV_RL_SPRITES])
-	// fmt.Println("Layer Map1: ", &ec.layers[CANV_RL_MAP1])
-	// fmt.Println("Layer Clear: ", &ec.layers[0])
+	//fmt.Println("Layer Text: ", &ec.layers[CANV_RL_TEXT])
+	//fmt.Println("Layer Map2: ", &ec.layers[CANV_RL_MAP2])
+	//fmt.Println("Layer Scene: ", &ec.layers[CANV_RL_SCENE])
+	//fmt.Println("Layer Sprites: ", &ec.layers[CANV_RL_SPRITES])
+	//fmt.Println("Layer Map1: ", &ec.layers[CANV_RL_MAP1])
+	//fmt.Println("Layer Clear: ", &ec.layers[0])
 
 	ec.layerOrder[CANV_RL_MAP1] = CANV_RL_MAP1
 	ec.layerOrder[CANV_RL_MAP2] = CANV_RL_MAP2
@@ -576,7 +575,7 @@ func (me *Canvas) reorderLayers() {
 			me.renderLayers = append(me.renderLayers, &me.layers[canvasLayer])
 		}
 	}
-	//fmt.Println("RenderLayers: ", me.renderLayers)
+	// fmt.Println("RenderLayers: ", me.renderLayers)
 }
 
 // ==============================================================================

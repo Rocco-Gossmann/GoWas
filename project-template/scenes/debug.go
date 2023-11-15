@@ -32,9 +32,10 @@ func (s *debugScene) Load(e *core.EngineState, ca *core.Canvas) {
 	s.initMaps(e)
 
 	e.SetLayerOrder(
-		core.CANV_RL_MAP2,    // Top most layer is drawn above all (Map2 has transparency to tint everything)
-		core.CANV_RL_TEXT,    // Then the text
-		core.CANV_RL_MAP1,    // Map 1 as the background
+		core.CANV_RL_MAP2, // Top most layer is drawn above all (Map2 has transparency to tint everything)
+		core.CANV_RL_TEXT, // Then the text
+		core.CANV_RL_MAP1, // Map 1 as the background
+		// these wont be used, so their order does not matter
 		core.CANV_RL_SCENE,   // Scene.Draw below the text
 		core.CANV_RL_SPRITES, // Sprites don't matter for now, so they are covered by Map 1
 	)
@@ -71,36 +72,34 @@ func (me *debugScene) Tick(e *core.EngineState) bool {
 	return true
 }
 
-//func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
-//
-//	s.countFPS()
-//
-//	//s.bgMap.
-//	//	MoveTo(s.bgScroll, s.bgScroll).
-//	//	ToCanvas(ca)
-//
-//	//	s.text.
-//	//		SetCursor(5, 14).Clear(8).
-//	//		SetCursor(5, 11).Clear(9).
-//	//		Echo(fmt.Sprintf("%v, %v\n\n\n     %v", e.Mouse.X, e.Mouse.Y, e.Mouse.PressedOrHeld)).
-//	//		ToCanvas(ca) //<- Tell the engine to display the TextDisplay
-//	//
-//	//	// Draw the Mouse Button Display
-//	//	//-------------------------------------------------------------------------
-//	//	// This is not going to stay as it is. It will be replaced by propper sprites, that function similar to
-//	//	// How BitmapEntitys, Maps and TextDisplays do
-//	//	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&validMouseButtons), &core.TilesetBlitOptions{
-//	//		X: 0, Y: 88,
-//	//	})
-//
-//	// Draw the Mouse Cursor
-//	//-------------------------------------------------------------------------
-//	// s.CursorEntity.MoveTo(int32(e.Mouse.X), int32(e.Mouse.Y))
-//	// if e.Mouse.X > 0 || e.Mouse.Y > 0 {
-//	// 	s.CursorEntity.ToCanvas(ca)
-//	// }
-//
-//}
+func (s *debugScene) Draw(e *core.EngineState, ca *core.Canvas) {
+	s.countFPS()
+	//
+	// //s.bgMap.
+	// //	MoveTo(s.bgScroll, s.bgScroll).
+	// //	ToCanvas(ca)
+	//
+	// //	s.text.
+	// //		SetCursor(5, 14).Clear(8).
+	// //		SetCursor(5, 11).Clear(9).
+	// //		Echo(fmt.Sprintf("%v, %v\n\n\n     %v", e.Mouse.X, e.Mouse.Y, e.Mouse.PressedOrHeld)).
+	// //		ToCanvas(ca) //<- Tell the engine to display the TextDisplay
+	// //
+	// //	// Draw the Mouse Button Display
+	// //	//-------------------------------------------------------------------------
+	// //	// This is not going to stay as it is. It will be replaced by propper sprites, that function similar to
+	// //	// How BitmapEntitys, Maps and TextDisplays do
+	// //	s.mouseButtonDisplay.BlitTo(ca, int(e.Mouse.PressedOrHeld&validMouseButtons), &core.TilesetBlitOptions{
+	// //		X: 0, Y: 88,
+	// //	})
+	//
+	// // Draw the Mouse Cursor
+	// //-------------------------------------------------------------------------
+	// // s.CursorEntity.MoveTo(int32(e.Mouse.X), int32(e.Mouse.Y))
+	// // if e.Mouse.X > 0 || e.Mouse.Y > 0 {
+	// // 	s.CursorEntity.ToCanvas(ca)
+	// // }
+}
 
 func (s *debugScene) Unload(e *core.EngineState) *struct{} {
 	e.FreeRessource(s.exampleRessource)
@@ -148,7 +147,7 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 	})
 
 	e.EnableMap2Layer(&tileSet)
-	e.Map2.AlphaSet(core.CANV_ALPHA_3).SetMap([]byte{ // Green / White Checkers
+	e.Map2.AlphaSet(core.CANV_ALPHA_2).MoveBy(4, 4).SetMap([]byte{ // Green / White Checkers
 		// At low transparency to tint everything
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
 		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,

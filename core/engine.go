@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"syscall/js"
 
 	"github.com/rocco-gossmann/GoWas/io"
@@ -150,7 +149,7 @@ func (me *EngineState) SetLayerOrder(
 	me.canvas.layerOrder[2] = belowTop
 	me.canvas.layerOrder[1] = topMost
 
-	fmt.Println(me.canvas.layerOrder, me.canvas.layerEnable)
+	//fmt.Println(me.canvas.layerOrder, me.canvas.layerEnable)
 
 	me.canvas.reorderLayers()
 }
@@ -159,7 +158,7 @@ func (me *EngineState) SetLayerOrder(
 // Methods
 // ==============================================================================
 func (e *Engine) Init(s *EngineSetup) {
-	fmt.Println("[core.engine.Init] run")
+	//fmt.Println("[core.engine.Init] run")
 	if e == nil {
 		panic("'engine' can't be nil")
 	}
@@ -210,9 +209,11 @@ func (e *Engine) SwitchScene(scene any) {
 		if d, ok := interface{}(scene).(Drawable); ok {
 			e.Draw = &d
 			hasInterface = true
+			e.canvas.enableLayer(CANV_RL_SCENE)
 		} else {
 			i, _ := interface{}(defaultScene).(Drawable)
 			e.Draw = &i
+			e.canvas.disableLayer(CANV_RL_SCENE)
 		}
 
 		if u, ok := interface{}(scene).(Unloadable); ok {

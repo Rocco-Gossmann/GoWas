@@ -12,7 +12,7 @@ func main() {
 		WindowWidth:  160, // 160
 		WindowHeight: 144, // 144
 
-		AutoClearPixels: true,
+		AutoClearPixels: false,
 		//		AutoClearColor:  0x00333333,
 
 		TileMapWidth:  22,
