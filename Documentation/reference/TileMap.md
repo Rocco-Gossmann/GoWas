@@ -66,7 +66,7 @@ And Start filling it with Data
 ```go 
 func (tm *TileMap) Init(tileSet *core.TileSet, width, height uint32) *TileMap 
 ```
-> [!attention]
+> [!warning]
 > using this method on the [Build In Maps](#build-in-map-layers), will cause GO to panic.
 
 
@@ -113,7 +113,7 @@ So in a 6x3 Tilemap, the Bytes would be assigned as follows
 ------------------------------------------------------------------------------------
 ```
 
-> [!attention]
+> [!warning]
 > How many Bytes the given Slice must contain depends either on `width` * `height` given during the Maps [Init](#init) call
 > or, if you use the [Build In Maps](#build-in-map-layers) the `TileMapWith` * `TileMapHeight` given during the [Engine Setup](../reference/Engine.md#enginesetup)
 
@@ -129,7 +129,7 @@ func (me *TileMap) SetTileSet(ts *TileSet) *TileMap
 ```
 Allows for changing the Maps TileSet after the Map was [Initialized](#init).
 
-> [!info]   
+> [!note]   
 > If a Tiles Tile-Pixel-Size changes the overall displayed pixel-Size of the map will change with it
 
 ### Parameters
