@@ -8,8 +8,7 @@ Each Area can be drawn independently
 
 You first must define, where your Tileset Lives in your application.
 You do so, by defining a `var` of the `gfx.TileSet` struct type.
-
-After that you have 2 options to initialize it.
+After that, you have 2 options to initialize it.
 
 ```go
 import "github.com/rocco-gossmann/GoWas/gfx"
@@ -34,12 +33,7 @@ myTileSet.InitFromSpriteSheet(...) //<- yet to be implemented
 # Functions
 
 ## InitFromMapSheet(bmp, tilewidth, tileheight)
-
-```go
-func (ts *TileSet) InitFromMapSheet(bmp *core.Bitmap, tilewidth, tileheight uint16)
-```
-
-This function build a TileSet from a given [Bitmap](./Bitmap.md).
+This function builds a TileSet from a given [Bitmap](./Bitmap.md).
 
 ### Parameters:
 
@@ -56,20 +50,20 @@ This function build a TileSet from a given [Bitmap](./Bitmap.md).
 func (pTs *TileSet) BlitTo(canvas *core.Canvas, tileindex uint, opts *TilesetBlitOptions) core.CanvasCollisionLayers {
 ```
 
-Draw a given Tile to the Canvas
+Draw a given Tile on the Canvas
 
 ### Parameters:
 
-|           | type           | description                                     |
-|-----------|----------------|-------------------------------------------------|
-| canvas    | `*core.Canvas` | the target, the Map is drawn to                 |
-| tileindex | `int`          | see [Tile List Structure](#tile-list-structure) |
-| opts | [`*TilesetBlitOptions`](#blitoptions) |  Defines how and where the tile is drawn| 
+|           | type                                  | description                                     |
+|-----------|---------------------------------------|-------------------------------------------------|
+| canvas    | `*core.Canvas`                        | the target, the Map is drawn to                 |
+| tileindex | `int`                                 | see [Tile List Structure](#tile-list-structure) |
+| opts      | [`*TilesetBlitOptions`](#blitoptions) | Defines how and where the tile is drawn         |
 
 # Tile List Structure
 
-The Index of a Tile depends on the Type of map you created.
-(Right now their are only Map-TileSets so don't worry)
+The Index of a Tile depends on the type of map you created.
+(Right now there are only Map-TileSets so don't worry)
 
 ## Map Tilesets
 ### created via [InitFromMapSheet](#initfrommapsheetbmp-tilewidth-tileheight)
