@@ -190,12 +190,12 @@ func (me *TextDisplay) SetFont(ts *TileSet) *TextDisplay {
 }
 
 func (me *TextDisplay) MoveTo(x, y int32) *TextDisplay {
-	me.mp.MoveTo(x*-1, y*-1)
+	me.mp.ScrollTo(x*-1, y*-1)
 	return me
 }
 
 func (me *TextDisplay) MoveBy(x, y int32) *TextDisplay {
-	me.mp.MoveBy(x, y)
+	me.mp.ScrollBy(x, y)
 	return me
 }
 

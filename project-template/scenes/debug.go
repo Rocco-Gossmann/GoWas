@@ -147,7 +147,7 @@ func (s *debugScene) initMaps(e *core.EngineState) {
 	})
 
 	e.EnableMap2Layer(&tileSet)
-	e.Map2.AlphaSet(core.CANV_ALPHA_2).MoveBy(4, 4).SetMap([]byte{ // Green / White Checkers
+	e.Map2.AlphaSet(core.CANV_ALPHA_2).ScrollTo(4, 4).SetMap([]byte{ // Green / White Checkers
 		// At low transparency to tint everything
 		5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11,
 		11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5,

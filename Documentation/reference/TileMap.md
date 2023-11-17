@@ -18,6 +18,7 @@ Tilemaps are a 2-dimensional grid of bytes, where each entry points to an Entry 
     - [AlphaSet](#alphaset)
     - [AlphaReset](#alphareset)
     - [Alpha](#alpha)
+    - [ScrollTo](#scrollto)
 - [Creating your own TileMaps](#creating-your-own-tilemaps)
 
 <!-- /TOC -->
@@ -204,6 +205,31 @@ func (me *TileMap) Alpha() CanvasAlpha
 ### Returns
 [`CanvasAlpha`](./AlphaBlending.md#canvasalpha)
 the current Alpha-Level of the Map
+
+
+## ScrollTo
+```go
+func (me *TileMap) ScrollTo(x, y int32) *TileMap
+```
+
+Offsets the visible area of the map by `x` and `y` pixels.
+
+![ScrollTo-Graphics](../_img/tilemap.scrollto.png)
+
+### Parameters
+| Parameter | Type    | Description                                                  |
+|-----------|---------|--------------------------------------------------------------|
+| `x`       | `int32` | Absolute horizontal offset starting from the left of the Map |
+| `y`       | `int32` | Absolute vertical offset starting from the top of the map    |
+
+> [!info]  
+> Should the Viewport area reach the Map Borders, the Map will wrap around, to fill the Screen
+> ![ScrollTo-Wrap-Example](../_img/tilemap.scrollto-example.png)
+
+### Returns
+`*core.TileMap`
+The Tilemap, on which that Method was executed
+(That way, you can chain multiple Setter Functions together)
 
 
 # Creating your own TileMaps

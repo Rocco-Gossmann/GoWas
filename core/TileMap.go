@@ -160,14 +160,14 @@ func (me *TileMap) AlphaReset() *TileMap {
 	return me
 }
 
-func (me *TileMap) MoveTo(x, y int32) *TileMap {
+func (me *TileMap) ScrollTo(x, y int32) *TileMap {
 
 	me.opts.X = x
 	me.opts.Y = y
 
 	return me
 }
-func (me *TileMap) MoveBy(x, y int32) *TileMap {
+func (me *TileMap) ScrollBy(x, y int32) *TileMap {
 
 	me.opts.X += x
 	me.opts.Y += y
