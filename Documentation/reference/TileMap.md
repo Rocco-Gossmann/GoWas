@@ -19,6 +19,7 @@ Tilemaps are a 2-dimensional grid of bytes, where each entry points to an Entry 
     - [AlphaReset](#alphareset)
     - [Alpha](#alpha)
     - [ScrollTo](#scrollto)
+    - [ScrollBy](#scrollby)
 - [Creating your own TileMaps](#creating-your-own-tilemaps)
 
 <!-- /TOC -->
@@ -223,13 +224,34 @@ Offsets the visible area of the map by `x` and `y` pixels.
 | `y`       | `int32` | Absolute vertical offset starting from the top of the map    |
 
 > [!info]  
-> Should the Viewport area reach the Map Borders, the Map will wrap around, to fill the Screen
+> Should the Viewport area reach the Map Borders, the Map will wrap around, to fill the Screen.  
 > ![ScrollTo-Wrap-Example](../_img/tilemap.scrollto-example.png)
 
 ### Returns
 `*core.TileMap`
 The Tilemap, on which that Method was executed
 (That way, you can chain multiple Setter Functions together)
+
+
+
+## ScrollBy
+```go
+func (me *TileMap) ScrollBy(x, y int32) *TileMap
+```
+It works as [ScrollTo](#scrollto) does, but the `x` and `y` values are relative to the current scroll-offset of the Map
+
+
+### Parameters
+| Parameter | Type    | Description                                                     |
+|-----------|---------|-----------------------------------------------------------------|
+| `x`       | `int32` | relative horizontal offset from the current scroll-x coordinate |
+| `y`       | `int32` | relative vertical offset from the current scroll-y coordinate   |
+
+### Returns
+`*core.TileMap`
+The Tilemap, on which that Method was executed
+(That way, you can chain multiple Setter Functions together)
+
 
 
 # Creating your own TileMaps

@@ -164,14 +164,14 @@ func (me *TileMap) ScrollTo(x, y int32) *TileMap {
 
 	me.opts.X = x
 	me.opts.Y = y
-
+	me._NormalizeScroll()
 	return me
 }
 func (me *TileMap) ScrollBy(x, y int32) *TileMap {
 
 	me.opts.X += x
 	me.opts.Y += y
-
+	me._NormalizeScroll()
 	return me
 }
 
@@ -185,6 +185,26 @@ func (me *TileMap) X() int32           { return me.opts.X }
 func (me *TileMap) Y() int32           { return me.opts.Y }
 func (me *TileMap) XY() (int32, int32) { return me.opts.X, me.opts.Y }
 func (me *TileMap) Alpha() CanvasAlpha { return me.opts.Alpha }
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+func (me *TileMap) _NormalizeScroll() {
+	mpw := int(me.mw) * int(me.ts.GetTileWidth())
+	mph := int(me.mh) * int(me.ts.GetTileHeight())
+
+	me.opts.X = me.opts.X % int32(mpw)
+	me.opts.Y = me.opts.Y % int32(mph)
+
+	if me.opts.X < 0 {
+		me.opts.X = int32(mpw) + me.opts.X
+	}
+
+	if me.opts.Y < 0 {
+		me.opts.Y = int32(mph) + me.opts.Y
+	}
+}
 
 // -----------------------------------------------------------------------------
 // Actions
