@@ -130,6 +130,7 @@ Documentation:
 
 ## Example
     ☐ Mouse Cursor Demo
+    ☐ Map Demo
     ☐ Cli-interface / text Adventure type of demo
 
 ## Reference:
@@ -143,7 +144,7 @@ Documentation:
         ☐ Concept
         ☐ Map creation
         ☐ Map Editing
-        ☐ Scrolling
+        ✔ Scrolling @done (22.11.2023, 17:54:43)
     ✔ TileSet @done (27.10.2023, 05:02:45)
     ✔ Bitmap @done (27.10.2023, 05:02:49)
     ☐ Bitmap Entities

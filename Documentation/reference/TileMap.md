@@ -9,17 +9,24 @@ Tilemaps are a 2-dimensional grid of bytes, where each entry points to an Entry 
 
 - [Tile Maps](#tile-maps)
 - [Build in Map Layers](#build-in-map-layers)
-- [Available Methods](#available-methods)
+- [Constructor / Init Methods](#constructor--init-methods)
     - [Init](#init)
+- [Setters](#setters)
     - [SetMap](#setmap)
     - [SetTileSet](#settileset)
     - [Clear](#clear)
     - [SetTile](#settile)
     - [AlphaSet](#alphaset)
     - [AlphaReset](#alphareset)
-    - [Alpha](#alpha)
     - [ScrollTo](#scrollto)
     - [ScrollBy](#scrollby)
+- [Getters](#getters)
+    - [Alpha](#alpha)
+    - [HasTileSet](#hastileset)
+    - [X](#x)
+    - [Y](#y)
+    - [XY](#xy)
+    - [ToCanvas](#tocanvas)
 - [Creating your own TileMaps](#creating-your-own-tilemaps)
 
 <!-- /TOC -->
@@ -62,7 +69,7 @@ And Start filling it with Data
 ```
 
 
-# Available Methods
+# Constructor / Init Methods
 
 ## Init
 ```go 
@@ -89,7 +96,7 @@ The Tilemap, on which that Method was executed.
 (That way, you can chain multiple Setter Functions together)
 
 
-
+# Setters
 ## SetMap
 ```go 
 func (*TileMap) SetMap (tiles []byte) *TileMap
@@ -199,14 +206,6 @@ func (me *TileMap) AlphaReset() *TileMap {
 The Tilemap, on which that Method was executed
 (That way, you can chain multiple Setter Functions together)
 
-## Alpha
-```go
-func (me *TileMap) Alpha() CanvasAlpha
-```
-### Returns
-[`CanvasAlpha`](./AlphaBlending.md#canvasalpha)
-the current Alpha-Level of the Map
-
 
 ## ScrollTo
 ```go
@@ -252,7 +251,64 @@ It works as [ScrollTo](#scrollto) does, but the `x` and `y` values are relative 
 The Tilemap, on which that Method was executed
 (That way, you can chain multiple Setter Functions together)
 
+# Getters
 
+## Alpha
+```go
+func (me *TileMap) Alpha() CanvasAlpha
+```
+### Returns
+[`CanvasAlpha`](./AlphaBlending.md#canvasalpha)
+the current Alpha-Level of the Map
+
+
+
+## HasTileSet
+```go
+func (me *TileMap) HasTileSet() bool 
+```
+
+### Returns `bool`  
+`true` == the Maps has a Tileset, it can render from.
+(use [`SetTileSet(nil)`](#settileset) to deactivate the current aktive tileset)
+
+## X 
+```go
+func (me *TileMap) X() int32 
+```
+
+### Returns `int32`  
+The current horizontal Scroll of the Map
+
+## Y 
+```go
+func (me *TileMap) Y() int32           { return me.opts.Y }
+```
+### Returns `int32`  
+The current vertical Scroll of the Map
+
+
+## XY 
+```go
+func (me *TileMap) XY() (int32, int32) { return me.opts.X, me.opts.Y }
+```
+
+### Returns `scrollx int32, scrolly int32`  
+The current horizontal and vertical Scroll of the Map
+
+
+## ToCanvas
+```go
+func (me *TileMap) ToCanvas(ca *core.Canvas) 
+```
+
+Renders the Map onto the given [`core.Canvas`](./Canvas.md)
+
+### Parameters
+
+| Parameter | Type                         | Description                                     |
+|-----------|------------------------------|-------------------------------------------------|
+| `ca`      | [`core.Canvas`](./Canvas.md) | the target canvase onto which to render the Map |
 
 # Creating your own TileMaps
 
