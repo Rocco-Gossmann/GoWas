@@ -8,7 +8,7 @@ func onIOMessage(this js.Value, args []js.Value) interface{} {
 
 		data := ev.Get("2")
 		if data.Get("length").Int() != 11 {
-			js.Global().Get("console").Call("warn", "mousestate has not the required length expect 11 got", data.Get("length"))
+			js.Global().Get("console").Call("warn", "IO-Message has not the required length expect 11 got", data.Get("length"))
 		}
 
 		mouseState.X = uint16(data.Get("0").Int())
