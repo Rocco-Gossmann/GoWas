@@ -9,14 +9,14 @@ TextDisplay:
     ✔ Add Setters and Getters like in BitmapEntity @done (27.10.2023, 04:54:45)
         ✔ ScreenOffset <= done MoveTo and MoveBy added @done (27.10.2023, 04:54:57)
         ✔ Alpha @done (27.10.2023, 04:55:04)
-    ☐ Make bounderies resizeable (right now bounds are always the canvas size)
+    ☐ Make bounderies resizeable (right now bounds are always the canvas size) @low
 
 Rendering:
 ================================================================================
-    ☐ Rendering Rework
+    ✔ Rendering Rework @done (29.11.2023, 05:02:59)
         ✔ 1. Skip setting pixels, that have already been drawn to @done (13.11.2023, 07:18:33)
         ✔ 2. Reverse Render-Layer order @done (13.11.2023, 07:18:34)
-        ☐ Debugging, Debugging, Debugging
+        ✔ Debugging, Debugging, Debugging @done (29.11.2023, 05:02:56)
             ✔ TileMap.SetAlpha(CANV_ALPHA_NONE) is rendered as CANV_ALPHA_FULL @done (14.11.2023, 06:34:08)
             ✔ Text-Layer is glitching (as if not all pixels are set opaque, some are blended) @done (14.11.2023, 06:34:14)
             ✔ Transparent Pixels are still marked as "rendered" @done (14.11.2023, 07:04:58)
@@ -34,8 +34,8 @@ Maps:
 ================================================================================
     ✔ Rework Setters and Getters to Work like BitmapEntities Do @critical @done (27.10.2023, 04:56:23)
     ☐ Test how drawing Maps, that are smaller than the screen behaves @critical
-    ☐ Maps Collision layers @critical
-    ☐ MoveTo negative direction does not loop the map @critical 
+    ☐ Maps Collision layers 
+    ✔ MoveTo negative direction does not loop the map @critical @done (29.11.2023, 05:01:59)
     ✔ Maps Alpha blending @done (27.10.2023, 04:57:29)
     ☐ Allow to fill columns or rows of Tiles with data @high (Instead of just single tiles or the entire map)
     ☐ Maps Clipping-Rect @low
@@ -87,8 +87,8 @@ Tooling:
         ✘ stopserver.zsh @cancelled (27.10.2023, 04:59:01)
         ✔ entr.zsh @done (27.10.2023, 04:59:33)
 
-    ☐ Create Script to remove Demo-Project files from `project-template`
-    ☐ make it a `make` task
+    ✔ Create Script to remove Demo-Project files from `project-template` @done (29.11.2023, 05:00:48)
+    ✔ make it a `make` task @done (29.11.2023, 05:00:49)
 
 
 Loading Compressed Data:
@@ -112,7 +112,7 @@ Documentation:
 ## Usage:
     ✔ Project-Setup @done (27.10.2023, 05:00:32)
     ✔ Engine-Lifecycle @done (27.10.2023, 05:00:38)
-    ☐ Project - main.go
+    ✔ Project - main.go @done (29.11.2023, 05:03:54) => see Documentation/Engine.md
     ✔ Scenes @done (27.10.2023, 05:01:11)
     ☐ Scene-Transitions
     ☐ Drawing Stuff
@@ -131,6 +131,9 @@ Documentation:
 ## Example
     ☐ Mouse Cursor Demo
     ☐ Map Demo
+        ✔ Basic TileMap @done (29.11.2023, 05:05:17)
+        ☐ Custom TileMap
+
     ☐ Cli-interface / text Adventure type of demo
 
 ## Reference:

@@ -54,18 +54,24 @@ $(RESSOURCETARGETDIR)/%: $(RESSOURCE)/%
 setup: go.sum
 	@echo "setup done"
 
-go.sum: go.mod
-	GOPRIVATE="github.com/rocco-gossmann" go mod tidy
-	
 start: run
 
 run: $(BUILDDIR)/main.wasm
 	go run ./.tools/server/server.go
 
-.phony: dev open echo clean remake $(BUILDDIR)/ $(RESSOURCETARGETDIR)
+go.sum: go.mod
+	GOPRIVATE="github.com/rocco-gossmann" go mod tidy
+
+.phony: dev open echo clean reset remake $(BUILDDIR)/ $(RESSOURCETARGETDIR)
 
 open: 
 	open http://localhost:7353
+
+reset:
+	rm -rf ./scenes 2>/dev/null
+	rm -rf ./bmps 2>/dev/null
+	rm -rf ./main.go 2>/dev/null
+	cd ./.tools && go run ./unzipblank.go
 
 echo: 
 	@echo "Boilerplate files: "$(BOILERFILES)
@@ -90,6 +96,7 @@ remake:
 	rm -f $(BUILDDIR)/main.wasm
 	make $(BUILDDIR)/main.wasm
 
+	
 $(BUILDDIR)/:
 	mkdir $(BUILDDIR)
 	mkdir -p $(RESSOURCETARGETDIR)

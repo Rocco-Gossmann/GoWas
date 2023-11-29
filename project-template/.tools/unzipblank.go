@@ -9,9 +9,10 @@ import (
 	"path/filepath"
 )
 
-const targetOutput string = "./out"
+const targetOutput string = "./.."
 
 func main() {
+
 	var fZip *zip.ReadCloser
 	var err error
 
@@ -26,7 +27,7 @@ func main() {
 	for _, file := range fZip.Reader.File {
 
 		if file.FileInfo().IsDir() {
-			fmt.Println("Directory: ", file.Name)
+			fmt.Printf("Dir\t'%v' ", file.Name)
 			var dirPath = filepath.Join(targetOutput, file.Name)
 			err := os.MkdirAll(dirPath, file.FileInfo().Mode())
 			if err != nil {
@@ -36,7 +37,7 @@ func main() {
 			continue
 
 		} else {
-			fmt.Println("File: ", file.Name)
+			fmt.Printf("File\t'%v' ", file.Name)
 
 			// Open Input File (from Zip)
 			var fFile fs.File
@@ -46,8 +47,6 @@ func main() {
 				fmt.Println("=> Failed to open => ", err.Error())
 				continue
 			}
-
-			fmt.Println("=> Opened", fFile)
 
 			defer fFile.Close()
 
@@ -61,18 +60,14 @@ func main() {
 
 			defer fOut.Close()
 
-			// Copy Data Over
-			copied, err := io.Copy(fOut, fFile)
+			// Copy Data
+			_, err = io.Copy(fOut, fFile)
 			if err != nil {
 				fmt.Printf("=> failed to copy data => %v\n", err.Error())
 				//TODO: cleanup created files here
 				continue
 			}
-			fmt.Println("=> Copied", copied, "bytes")
+			fmt.Println("=> done ")
 		}
-
 	}
-
-	fmt.Printf("Files:\n%v", fZip.Reader.File)
-
 }

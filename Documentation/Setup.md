@@ -38,25 +38,27 @@ You can run that script either via.
 ```bash
 go run ./.tools/server/server.go
 ```
-or you can use
-
-```bash
-make run
-```
-
 and then opening any Browser and navigating to `http://localhost:7353` should be
 fine.
+Alternatively, you can use the 
+```bash
+make open
+```
+command to open the URL in your Default Browser
+
 
 ## Getting Started for Real
 
-- remove all the `*.go` files from the project 
-- rename the package inside `go.mod`
-- remove `go.work` and run `make setup` again.
+The default project template comes with some demo code, to check if the build was successful.
+To clear it and make room for your own code you can run the
+```bash
+make reset
+```
+command to clear everything and revert the Project-Template to a completely blank (yet still working) state.
+
 
 Now your blank slate is ready.
 
-> [!todo] 
-> Create a `make` task and tool-script to automate all of this.
 
 ## Using entr as an auto-building tool 
 

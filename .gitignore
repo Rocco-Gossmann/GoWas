@@ -3,3 +3,4 @@ project-template-*.tar.gz
 Documentation-*.tar.gz
 Makefile
 Documentation/+assets
+*.ignore
