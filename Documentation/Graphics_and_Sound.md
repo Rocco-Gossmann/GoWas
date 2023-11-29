@@ -48,12 +48,13 @@ The default formation looks like this. (The Top layer is drawn last.)
 
 
 > [!important]   
-> Right now only the `Text / UI` and `Scene.Draw` layers are implemented.
+> The `Sprites` layer is not implemented yet
 
 ### Layer Descriptions
 
 Each layer comes with: 
 - a Go `core.`Name, that is used for Rearranging Layers.
+
 With the exception of the `Scene.Draw` Layer, each Layer also has:
 
 - a Direct-Access property in the [`core.EngineState`](./reference/EngineState.md) (provided via [`core.Scene` Lifecycle-Hooks](./Scenes.md))   
@@ -74,7 +75,7 @@ With the exception of the `Scene.Draw` Layer, each Layer also has:
 
 ## Components
 
-//TODO: 
+> [!todo] List all available components here
 
 
 
@@ -83,16 +84,17 @@ With the exception of the `Scene.Draw` Layer, each Layer also has:
 
 ### Adding Assets at compile-time 
 
-Assets added at Compile-Time are available right from the Start of the Application, they don't need to be requested separatly by the browser and thus load quicker. 
+Assets added at Compile-Time are available right from the Start of the application, they don't need to be requested separately by the browser and thus load quicker. 
 
 Their binary data is baked into the Executable / WASM file.
 
-In return, they increase the size of of your executable, which can lead to a slower start, depending on the the size and complexety of the included Ressource.
+In return, they increase the size of your executable, which can lead to a slower start, depending on the size and complexity of the included Ressource.
+Baked-in Assets are therefore best suited for small graphics and data, that are required throughout the entire application's lifetime.
+(Graphics for a Mouse-Cursor or a Bitmap for a Font-TileSet for example) 
 
 
 #### Using PNG Files
-
-For now It is only possible to load PNG-Files.\
+For now, It is only possible to load PNG-Files.\
 At the moment, these are converted into `*.go` files and become part of the WASM
 binary.
 
