@@ -1,5 +1,17 @@
 # Getting Started
+<!-- TOC depthfrom:2 -->
 
+- [Requirements](#requirements)
+- [Starting a new Project.](#starting-a-new-project)
+- [Building the Project](#building-the-project)
+- [Running the Build](#running-the-build)
+- [Getting Started for Real](#getting-started-for-real)
+- [Using entr as an auto-building tool](#using-entr-as-an-auto-building-tool)
+        - [For Fedora Linux](#for-fedora-linux)
+        - [For Debian/Ubuntu based Linux](#for-debianubuntu-based-linux)
+        - [for MacOS use Homebrew](#for-macos-use-homebrew)
+
+<!-- /TOC -->
 ## Requirements
 
 to get Started your System must have access to the following commands at

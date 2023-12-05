@@ -1,6 +1,6 @@
 # The Engine-Lifecycle
 
-![Engine-Lifecycle-img](./Engine-Lifecycle.png)
+![Engine-Lifecycle-img](./_img/Engine-Lifecycle.png)
 
 The Engines Lifecycle may look complicated at first but you will only interact
 at a few points with it. (All the Blue-Methods in the graphic above)

@@ -1,5 +1,5 @@
 # Graphics and Sound
-<!-- TOC -->
+<!-- TOC depthfrom:2 -->
 
 - [Graphics and Sound](#graphics-and-sound)
     - [Structure](#structure)

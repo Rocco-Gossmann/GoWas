@@ -100,7 +100,7 @@ func (me *demoScene) Tick(e *core.EngineState) bool {
 
 ### Let's give an example.
 
-Many 3rd and 1st person, keyboard based games implement a "Sneak" key. A key
+Many 3rd and 1st person, keyboard-based games implement a "Sneak" key. A key
 that makes them move slower while it is held. This is how you can implement that
 in GoWas
 
@@ -155,7 +155,7 @@ The `limit` parameter in both of these means `the last X history entries` where
 
 ### Key-History
 
-The last 64 released keys are keept in an list, managed by the Engine.
+The last 64 released keys are kept in a list, managed by the Engine.
 
 ```go
 func (me *demoScene) Tick(e *core.EngineState) bool {
@@ -199,13 +199,13 @@ Some keys have a Human-readable representation. In Go, these are called `rune`s.
 If a key is released, that has a `Rune` assigned, it will be put into the
 Engines `Rune-History`
 
-The last 64 runes are keept in a list, managed by the Engine.
+The last 64 runes are kept in a list, managed by the Engine.
 
 (See the [Key - List](#key---list) below, to learn, what key has what rune
 attached.)
 
-it works exactly as the [Key-History](#key-history), but uses runes, which opens
-the possiblity of a command like like interface. (For text adventure games for
+it works exactly as the [Key-History](#key-history), but uses runes, which opens the 
+possibility of a commandline-like interface. (For text adventure games for
 example.)
 
 #### CLI-Like example

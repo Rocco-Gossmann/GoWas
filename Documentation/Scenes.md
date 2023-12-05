@@ -1,5 +1,18 @@
 # Scenes
 
+<!-- TOC depthfrom:1 -->
+
+- [Scenes](#scenes)
+    - [Lifecycle-Hooks](#lifecycle-hooks)
+        - [Tickable](#tickable)
+        - [Drawable](#drawable)
+        - [Loadable](#loadable)
+        - [Unloadable](#unloadable)
+    - [Barebones Example](#barebones-example)
+    - [Example for Using a Scene](#example-for-using-a-scene)
+
+<!-- /TOC -->
+
 A scene is a `struct{}` you define yourself. It hooks into the
 [Engines Lifecycle](./EngineLifecycle.md) to manipulate and change it in various
 ways.
